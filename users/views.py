@@ -11,7 +11,7 @@ from .forms import (
     ProjectOwnerProfileUpdateForm,
     InvestorProfileUpdateForm
 )
-from .models import User
+from .models import User, ProjectOwnerProfile, InvestorProfile
 
 
 def register_choice(request):
@@ -126,14 +126,18 @@ def profile(request):
         # Formulaire spécifique selon le type d'utilisateur
         profile_form = None
         if user.user_type == 'porteur':
+            # Créer le profil s'il n'existe pas
+            porteur_profile, created = ProjectOwnerProfile.objects.get_or_create(user=user)
             profile_form = ProjectOwnerProfileUpdateForm(
                 request.POST, 
-                instance=user.porteur_profile
+                instance=porteur_profile
             )
         elif user.user_type == 'investisseur':
+            # Créer le profil s'il n'existe pas
+            investisseur_profile, created = InvestorProfile.objects.get_or_create(user=user)
             profile_form = InvestorProfileUpdateForm(
                 request.POST, 
-                instance=user.investisseur_profile
+                instance=investisseur_profile
             )
         
         if user_form.is_valid() and (profile_form is None or profile_form.is_valid()):
@@ -147,9 +151,13 @@ def profile(request):
         profile_form = None
         
         if user.user_type == 'porteur':
-            profile_form = ProjectOwnerProfileUpdateForm(instance=user.porteur_profile)
+            # Créer le profil s'il n'existe pas
+            porteur_profile, created = ProjectOwnerProfile.objects.get_or_create(user=user)
+            profile_form = ProjectOwnerProfileUpdateForm(instance=porteur_profile)
         elif user.user_type == 'investisseur':
-            profile_form = InvestorProfileUpdateForm(instance=user.investisseur_profile)
+            # Créer le profil s'il n'existe pas
+            investisseur_profile, created = InvestorProfile.objects.get_or_create(user=user)
+            profile_form = InvestorProfileUpdateForm(instance=investisseur_profile)
     
     context = {
         'user_form': user_form,
