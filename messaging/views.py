@@ -92,7 +92,7 @@ def conversation_detail(request, pk):
     
     context = {
         'conversation': conversation,
-        'messages': messages_list,
+        'conversation_messages': messages_list,
         'other_participant': other_participant,
     }
     return render(request, 'messaging/conversation.html', context)
