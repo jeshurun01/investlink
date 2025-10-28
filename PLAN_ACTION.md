@@ -75,12 +75,14 @@
 - [x] Dashboard investisseur
 
 ### 2.4 Workflow de validation (Admin)
-- [ ] Liste des projets en attente de validation
-- [ ] Vue détaillée pour examen d'un projet
-- [ ] Téléchargement et vérification des documents
-- [ ] Actions : Valider / Refuser / Demander révision
-- [ ] Ajout de commentaires/motifs de refus
-- [ ] Statistiques globales (tableau de bord admin)
+- [x] Liste des projets en attente de validation
+- [x] Vue détaillée pour examen d'un projet
+- [x] Téléchargement et vérification des documents
+- [x] Actions : Valider / Refuser / Demander révision
+- [x] Ajout de commentaires/motifs de refus
+- [x] Notifications automatiques au porteur après validation
+- [x] Statistiques globales (projets soumis, en examen, validés, refusés)
+- [x] Liste de tous les projets avec filtres (statut, secteur)
 - [ ] Gestion des utilisateurs (activation/désactivation)
 - [ ] Outils de modération de contenu
 
@@ -368,7 +370,7 @@
 - Base de données SQLite opérationnelle
 - Interface admin configurée
 
-### 🔄 Phase 2 : EN COURS (65%)
+### 🔄 Phase 2 : EN COURS (75%)
 - ✅ Système d'authentification complet (inscription, login, logout)
 - ✅ Formulaires porteur et investisseur avec validation
 - ✅ Dashboards utilisateurs personnalisés
@@ -377,11 +379,13 @@
 - ✅ Système de soumission de projet complet
 - ✅ Gestion des projets porteur (mes projets, édition, suppression)
 - ✅ Upload multiple de documents avec validation
+- ✅ Workflow de validation admin (liste, examen, validation/rejet)
+- ✅ Notifications automatiques sur changement de statut
 - ⏳ Validation email (à faire)
 - ⏳ Reset mot de passe (à faire)
 - ⏳ 2FA (à faire)
 - ⏳ Favoris investisseur (à faire)
-- ⏳ Workflow de validation admin (à faire)
+- ⏳ Système de messagerie (à faire)
 
 ### 🔄 Phase 3 : EN COURS (55%)
 - ✅ Charte graphique et composants de base
@@ -404,13 +408,13 @@
 
 ### 🎯 Prochaines Étapes Prioritaires
 1. ✅ Formulaire de soumission de projet avec upload
-2. Favoris investisseur et contact porteur
-3. Workflow de validation admin
-4. Pages publiques manquantes (à propos, contact, FAQ)
-5. Système de messagerie
+2. ✅ Workflow de validation admin
+3. Favoris investisseur et contact porteur
+4. Système de messagerie
+5. Pages publiques manquantes (à propos, contact, FAQ)
 
 ---
 
-**Dernière mise à jour :** 27 octobre 2025  
-**Statut global :** � En développement actif - Phase 2/3
+**Dernière mise à jour :** 28 octobre 2025  
+**Statut global :** ✨ En développement actif - Phase 2/3
 
