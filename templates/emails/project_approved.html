@@ -1,0 +1,37 @@
+{% extends 'emails/base.html' %}
+
+{% block content %}
+<h2>🎉 Félicitations ! Votre projet a été approuvé</h2>
+
+<p>Bonjour {{ user.get_full_name }},</p>
+
+<p>
+    Excellente nouvelle ! Votre projet <strong>{{ project.title }}</strong> a été validé par notre équipe 
+    et est maintenant visible publiquement sur InvestLink.
+</p>
+
+<p>
+    Les investisseurs peuvent désormais découvrir votre projet, le consulter en détail, 
+    et vous contacter pour exprimer leur intérêt.
+</p>
+
+<p style="margin: 25px 0;">
+    <a href="{{ site_url }}{{ project.get_absolute_url }}" class="button">
+        Voir mon projet en ligne
+    </a>
+</p>
+
+<p><strong>Prochaines étapes :</strong></p>
+<ul>
+    <li>Surveillez vos messages pour les demandes d'investisseurs</li>
+    <li>Gardez votre projet à jour avec les dernières informations</li>
+    <li>Répondez rapidement aux questions des investisseurs</li>
+</ul>
+
+<p>Bonne chance avec votre levée de fonds !</p>
+
+<p>
+    Cordialement,<br>
+    <strong>L'équipe InvestLink</strong>
+</p>
+{% endblock %}

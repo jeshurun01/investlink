@@ -1,0 +1,30 @@
+{% extends 'emails/base.html' %}
+
+{% block content %}
+<h2>💬 Nouveau message reçu</h2>
+
+<p>Bonjour {{ user.get_full_name }},</p>
+
+<p>
+    Vous avez reçu un nouveau message de <strong>{{ sender.get_full_name }}</strong>.
+</p>
+
+<div style="background-color: #eff6ff; border-left: 4px solid #3b82f6; padding: 15px; margin: 20px 0;">
+    <p style="margin: 0;"><em>{{ message_preview }}</em></p>
+</div>
+
+<p style="margin: 25px 0;">
+    <a href="{{ site_url }}{{ conversation_url }}" class="button">
+        Lire le message
+    </a>
+</p>
+
+<p>
+    Connectez-vous à votre compte pour consulter l'intégralité du message et y répondre.
+</p>
+
+<p>
+    Cordialement,<br>
+    <strong>L'équipe InvestLink</strong>
+</p>
+{% endblock %}

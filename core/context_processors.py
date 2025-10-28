@@ -23,3 +23,24 @@ def unread_messages_count(request):
     return {
         'unread_messages_count': 0
     }
+
+
+def unread_notifications_count(request):
+    """Context processor pour le compteur de notifications non lues"""
+    if request.user.is_authenticated:
+        unread_count = 0
+        try:
+            from notifications.models import Notification
+            unread_count = Notification.objects.filter(
+                recipient=request.user,
+                is_read=False
+            ).count()
+        except:
+            pass
+        
+        return {
+            'unread_notifications_count': unread_count
+        }
+    return {
+        'unread_notifications_count': 0
+    }

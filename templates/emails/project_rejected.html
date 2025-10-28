@@ -1,0 +1,37 @@
+{% extends 'emails/base.html' %}
+
+{% block content %}
+<h2>❌ Projet non approuvé</h2>
+
+<p>Bonjour {{ user.get_full_name }},</p>
+
+<p>
+    Nous vous informons que votre projet <strong>{{ project.title }}</strong> 
+    n'a malheureusement pas été approuvé pour publication sur InvestLink.
+</p>
+
+<p><strong>Motif du refus :</strong></p>
+<div style="background-color: #fee; border-left: 4px solid #dc2626; padding: 15px; margin: 20px 0;">
+    {{ project.rejection_reason }}
+</div>
+
+<p>
+    Nous vous encourageons à prendre en compte ces remarques et à revoir votre dossier. 
+    Vous pouvez soumettre une nouvelle version de votre projet après avoir apporté les modifications nécessaires.
+</p>
+
+<p style="margin: 25px 0;">
+    <a href="{{ site_url }}/projects/submit/" class="button">
+        Soumettre un nouveau projet
+    </a>
+</p>
+
+<p>
+    Si vous avez des questions concernant ce refus, n'hésitez pas à nous contacter.
+</p>
+
+<p>
+    Cordialement,<br>
+    <strong>L'équipe InvestLink</strong>
+</p>
+{% endblock %}

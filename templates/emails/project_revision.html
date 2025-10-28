@@ -1,0 +1,37 @@
+{% extends 'emails/base.html' %}
+
+{% block content %}
+<h2>📝 Révisions demandées pour votre projet</h2>
+
+<p>Bonjour {{ user.get_full_name }},</p>
+
+<p>
+    Notre équipe a examiné votre projet <strong>{{ project.title }}</strong> 
+    et demande quelques révisions avant de pouvoir l'approuver.
+</p>
+
+<p><strong>Notes de l'équipe de validation :</strong></p>
+<div style="background-color: #fef3c7; border-left: 4px solid #f59e0b; padding: 15px; margin: 20px 0;">
+    {{ project.admin_notes }}
+</div>
+
+<p>
+    Veuillez apporter les modifications demandées et mettre à jour votre projet. 
+    Une fois les révisions effectuées, notre équipe procédera à un nouvel examen.
+</p>
+
+<p style="margin: 25px 0;">
+    <a href="{{ site_url }}{% url 'projects:edit' project.slug %}" class="button">
+        Modifier mon projet
+    </a>
+</p>
+
+<p>
+    Si vous avez des questions concernant ces demandes de révision, n'hésitez pas à nous contacter.
+</p>
+
+<p>
+    Cordialement,<br>
+    <strong>L'équipe InvestLink</strong>
+</p>
+{% endblock %}
