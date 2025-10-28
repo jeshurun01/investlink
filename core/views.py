@@ -1,4 +1,6 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from .forms import ContactForm
 
 
 def home(request):
@@ -17,8 +19,21 @@ def blog(request):
 
 
 def contact(request):
-    """Page Contact"""
-    return render(request, 'core/contact.html')
+    """Page Contact avec formulaire"""
+    if request.method == 'POST':
+        form = ContactForm(request.POST)
+        if form.is_valid():
+            # Ici on pourrait envoyer un email
+            # Pour l'instant on affiche juste un message de succès
+            messages.success(
+                request, 
+                'Votre message a été envoyé avec succès. Nous vous répondrons dans les plus brefs délais.'
+            )
+            return redirect('core:contact')
+    else:
+        form = ContactForm()
+    
+    return render(request, 'core/contact.html', {'form': form})
 
 
 def faq(request):

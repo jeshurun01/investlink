@@ -1,0 +1,340 @@
+{% extends 'base.html' %}
+
+{% block title %}FAQ - Questions Fréquentes - InvestLink{% endblock %}
+
+{% block content %}
+<div class="bg-gradient-to-br from-blue-900 via-blue-800 to-blue-900 text-white py-20">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h1 class="text-5xl font-bold mb-6">Questions Fréquentes</h1>
+        <p class="text-xl text-blue-100 max-w-3xl">
+            Trouvez rapidement des réponses aux questions les plus courantes sur InvestLink.
+        </p>
+    </div>
+</div>
+
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+    
+    <!-- Recherche rapide -->
+    <div class="mb-12">
+        <div class="relative">
+            <input 
+                type="text" 
+                id="faq-search"
+                placeholder="Rechercher dans la FAQ..."
+                class="w-full px-6 py-4 pl-12 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition text-lg"
+            >
+            <i class="fas fa-search absolute left-4 top-5 text-gray-400 text-xl"></i>
+        </div>
+    </div>
+
+    <!-- Catégories -->
+    <div class="mb-12">
+        <div class="flex flex-wrap gap-3">
+            <button onclick="filterFAQ('all')" class="faq-filter-btn active px-6 py-2 rounded-full bg-blue-600 text-white hover:bg-blue-700 transition">
+                Toutes
+            </button>
+            <button onclick="filterFAQ('porteur')" class="faq-filter-btn px-6 py-2 rounded-full bg-gray-200 text-gray-700 hover:bg-gray-300 transition">
+                Porteurs
+            </button>
+            <button onclick="filterFAQ('investisseur')" class="faq-filter-btn px-6 py-2 rounded-full bg-gray-200 text-gray-700 hover:bg-gray-300 transition">
+                Investisseurs
+            </button>
+            <button onclick="filterFAQ('compte')" class="faq-filter-btn px-6 py-2 rounded-full bg-gray-200 text-gray-700 hover:bg-gray-300 transition">
+                Compte
+            </button>
+            <button onclick="filterFAQ('securite')" class="faq-filter-btn px-6 py-2 rounded-full bg-gray-200 text-gray-700 hover:bg-gray-300 transition">
+                Sécurité
+            </button>
+        </div>
+    </div>
+
+    <!-- Questions générales -->
+    <section class="mb-12">
+        <h2 class="text-2xl font-bold text-gray-900 mb-6 flex items-center">
+            <i class="fas fa-info-circle text-blue-600 mr-3"></i>
+            Questions Générales
+        </h2>
+        
+        <div class="space-y-4" id="faq-container">
+            
+            <!-- Question 1 -->
+            <div class="faq-item bg-white rounded-lg shadow-md overflow-hidden" data-category="general">
+                <button class="faq-question w-full text-left px-6 py-4 flex justify-between items-center hover:bg-gray-50 transition" onclick="toggleFAQ(this)">
+                    <span class="font-semibold text-gray-900">Qu'est-ce qu'InvestLink ?</span>
+                    <i class="fas fa-chevron-down text-gray-400 transition-transform"></i>
+                </button>
+                <div class="faq-answer hidden px-6 pb-4 text-gray-600">
+                    <p>InvestLink est une plateforme de mise en relation entre porteurs de projets et investisseurs. Nous facilitons la recherche de financement pour les entrepreneurs et offrons aux investisseurs des opportunités d'investissement transparentes et vérifiées.</p>
+                </div>
+            </div>
+            
+            <!-- Question 2 -->
+            <div class="faq-item bg-white rounded-lg shadow-md overflow-hidden" data-category="general">
+                <button class="faq-question w-full text-left px-6 py-4 flex justify-between items-center hover:bg-gray-50 transition" onclick="toggleFAQ(this)">
+                    <span class="font-semibold text-gray-900">Est-ce gratuit d'utiliser InvestLink ?</span>
+                    <i class="fas fa-chevron-down text-gray-400 transition-transform"></i>
+                </button>
+                <div class="faq-answer hidden px-6 pb-4 text-gray-600">
+                    <p>Oui, l'inscription et la navigation sur la plateforme sont entièrement gratuites. Les porteurs de projets peuvent soumettre leurs projets gratuitement, et les investisseurs peuvent consulter tous les projets validés sans frais.</p>
+                </div>
+            </div>
+            
+            <!-- Question 3 -->
+            <div class="faq-item bg-white rounded-lg shadow-md overflow-hidden" data-category="securite">
+                <button class="faq-question w-full text-left px-6 py-4 flex justify-between items-center hover:bg-gray-50 transition" onclick="toggleFAQ(this)">
+                    <span class="font-semibold text-gray-900">Comment mes données sont-elles protégées ?</span>
+                    <i class="fas fa-chevron-down text-gray-400 transition-transform"></i>
+                </button>
+                <div class="faq-answer hidden px-6 pb-4 text-gray-600">
+                    <p>Nous utilisons un cryptage SSL/TLS pour toutes les communications. Vos données personnelles sont stockées de manière sécurisée et ne sont jamais partagées avec des tiers sans votre consentement. Nous sommes conformes au RGPD.</p>
+                </div>
+            </div>
+            
+        </div>
+    </section>
+
+    <!-- Questions Porteurs -->
+    <section class="mb-12">
+        <h2 class="text-2xl font-bold text-gray-900 mb-6 flex items-center">
+            <i class="fas fa-briefcase text-green-600 mr-3"></i>
+            Pour les Porteurs de Projet
+        </h2>
+        
+        <div class="space-y-4">
+            
+            <div class="faq-item bg-white rounded-lg shadow-md overflow-hidden" data-category="porteur">
+                <button class="faq-question w-full text-left px-6 py-4 flex justify-between items-center hover:bg-gray-50 transition" onclick="toggleFAQ(this)">
+                    <span class="font-semibold text-gray-900">Comment soumettre mon projet ?</span>
+                    <i class="fas fa-chevron-down text-gray-400 transition-transform"></i>
+                </button>
+                <div class="faq-answer hidden px-6 pb-4 text-gray-600">
+                    <p class="mb-3">Pour soumettre votre projet, suivez ces étapes :</p>
+                    <ol class="list-decimal pl-5 space-y-2">
+                        <li>Créez un compte porteur de projet</li>
+                        <li>Accédez à votre dashboard et cliquez sur "Nouveau projet"</li>
+                        <li>Remplissez tous les champs requis (description, budget, secteur, etc.)</li>
+                        <li>Téléchargez les documents nécessaires (business plan, documents financiers)</li>
+                        <li>Soumettez votre projet pour validation</li>
+                    </ol>
+                </div>
+            </div>
+            
+            <div class="faq-item bg-white rounded-lg shadow-md overflow-hidden" data-category="porteur">
+                <button class="faq-question w-full text-left px-6 py-4 flex justify-between items-center hover:bg-gray-50 transition" onclick="toggleFAQ(this)">
+                    <span class="font-semibold text-gray-900">Quels documents dois-je fournir ?</span>
+                    <i class="fas fa-chevron-down text-gray-400 transition-transform"></i>
+                </button>
+                <div class="faq-answer hidden px-6 pb-4 text-gray-600">
+                    <p class="mb-3">Les documents essentiels incluent :</p>
+                    <ul class="list-disc pl-5 space-y-2">
+                        <li>Business plan détaillé</li>
+                        <li>Prévisions financières (3-5 ans)</li>
+                        <li>Documents d'enregistrement de l'entreprise</li>
+                        <li>CV des fondateurs clés</li>
+                        <li>Tout autre document pertinent (brevets, contrats, etc.)</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="faq-item bg-white rounded-lg shadow-md overflow-hidden" data-category="porteur">
+                <button class="faq-question w-full text-left px-6 py-4 flex justify-between items-center hover:bg-gray-50 transition" onclick="toggleFAQ(this)">
+                    <span class="font-semibold text-gray-900">Combien de temps prend la validation ?</span>
+                    <i class="fas fa-chevron-down text-gray-400 transition-transform"></i>
+                </button>
+                <div class="faq-answer hidden px-6 pb-4 text-gray-600">
+                    <p>Le processus de validation prend généralement entre 3 à 7 jours ouvrables. Notre équipe examine attentivement chaque projet pour s'assurer qu'il répond à nos critères de qualité. Vous recevrez une notification dès que la validation sera terminée.</p>
+                </div>
+            </div>
+            
+            <div class="faq-item bg-white rounded-lg shadow-md overflow-hidden" data-category="porteur">
+                <button class="faq-question w-full text-left px-6 py-4 flex justify-between items-center hover:bg-gray-50 transition" onclick="toggleFAQ(this)">
+                    <span class="font-semibold text-gray-900">Que se passe-t-il si mon projet est refusé ?</span>
+                    <i class="fas fa-chevron-down text-gray-400 transition-transform"></i>
+                </button>
+                <div class="faq-answer hidden px-6 pb-4 text-gray-600">
+                    <p>Si votre projet n'est pas validé, vous recevrez un email détaillant les raisons du refus ou les modifications à apporter. Vous pourrez alors modifier votre projet et le soumettre à nouveau. Notre équipe est disponible pour vous accompagner dans ce processus.</p>
+                </div>
+            </div>
+            
+        </div>
+    </section>
+
+    <!-- Questions Investisseurs -->
+    <section class="mb-12">
+        <h2 class="text-2xl font-bold text-gray-900 mb-6 flex items-center">
+            <i class="fas fa-chart-line text-blue-600 mr-3"></i>
+            Pour les Investisseurs
+        </h2>
+        
+        <div class="space-y-4">
+            
+            <div class="faq-item bg-white rounded-lg shadow-md overflow-hidden" data-category="investisseur">
+                <button class="faq-question w-full text-left px-6 py-4 flex justify-between items-center hover:bg-gray-50 transition" onclick="toggleFAQ(this)">
+                    <span class="font-semibold text-gray-900">Comment trouver des projets qui m'intéressent ?</span>
+                    <i class="fas fa-chevron-down text-gray-400 transition-transform"></i>
+                </button>
+                <div class="faq-answer hidden px-6 pb-4 text-gray-600">
+                    <p>Utilisez nos filtres de recherche avancés pour trouver des projets selon vos critères : secteur d'activité, montant recherché, localisation, stade de développement, etc. Vous pouvez également mettre des projets en favoris pour les suivre.</p>
+                </div>
+            </div>
+            
+            <div class="faq-item bg-white rounded-lg shadow-md overflow-hidden" data-category="investisseur">
+                <button class="faq-question w-full text-left px-6 py-4 flex justify-between items-center hover:bg-gray-50 transition" onclick="toggleFAQ(this)">
+                    <span class="font-semibold text-gray-900">Comment contacter un porteur de projet ?</span>
+                    <i class="fas fa-chevron-down text-gray-400 transition-transform"></i>
+                </button>
+                <div class="faq-answer hidden px-6 pb-4 text-gray-600">
+                    <p>Sur chaque page de projet, vous trouverez un bouton "Contacter le porteur". Cela ouvrira une messagerie sécurisée interne à la plateforme vous permettant d'échanger directement avec le porteur du projet.</p>
+                </div>
+            </div>
+            
+            <div class="faq-item bg-white rounded-lg shadow-md overflow-hidden" data-category="investisseur">
+                <button class="faq-question w-full text-left px-6 py-4 flex justify-between items-center hover:bg-gray-50 transition" onclick="toggleFAQ(this)">
+                    <span class="font-semibold text-gray-900">Les projets sont-ils vérifiés ?</span>
+                    <i class="fas fa-chevron-down text-gray-400 transition-transform"></i>
+                </button>
+                <div class="faq-answer hidden px-6 pb-4 text-gray-600">
+                    <p>Oui, absolument. Tous les projets visibles sur la plateforme ont été validés par notre équipe. Nous vérifions la cohérence des informations, l'authenticité des documents et la viabilité globale du projet avant de le rendre public.</p>
+                </div>
+            </div>
+            
+            <div class="faq-item bg-white rounded-lg shadow-md overflow-hidden" data-category="investisseur">
+                <button class="faq-question w-full text-left px-6 py-4 flex justify-between items-center hover:bg-gray-50 transition" onclick="toggleFAQ(this)">
+                    <span class="font-semibold text-gray-900">InvestLink gère-t-elle les transactions financières ?</span>
+                    <i class="fas fa-chevron-down text-gray-400 transition-transform"></i>
+                </button>
+                <div class="faq-answer hidden px-6 pb-4 text-gray-600">
+                    <p>Non, InvestLink est une plateforme de mise en relation uniquement. Les négociations et transactions financières se font directement entre investisseurs et porteurs de projets. Nous recommandons de toujours établir des contrats formels avec l'aide de conseillers juridiques.</p>
+                </div>
+            </div>
+            
+        </div>
+    </section>
+
+    <!-- Questions Compte -->
+    <section class="mb-12">
+        <h2 class="text-2xl font-bold text-gray-900 mb-6 flex items-center">
+            <i class="fas fa-user-circle text-purple-600 mr-3"></i>
+            Gestion de Compte
+        </h2>
+        
+        <div class="space-y-4">
+            
+            <div class="faq-item bg-white rounded-lg shadow-md overflow-hidden" data-category="compte">
+                <button class="faq-question w-full text-left px-6 py-4 flex justify-between items-center hover:bg-gray-50 transition" onclick="toggleFAQ(this)">
+                    <span class="font-semibold text-gray-900">Comment modifier mon profil ?</span>
+                    <i class="fas fa-chevron-down text-gray-400 transition-transform"></i>
+                </button>
+                <div class="faq-answer hidden px-6 pb-4 text-gray-600">
+                    <p>Connectez-vous à votre compte, cliquez sur votre nom en haut à droite, puis sélectionnez "Mon profil". Vous pourrez y modifier toutes vos informations personnelles et professionnelles.</p>
+                </div>
+            </div>
+            
+            <div class="faq-item bg-white rounded-lg shadow-md overflow-hidden" data-category="compte">
+                <button class="faq-question w-full text-left px-6 py-4 flex justify-between items-center hover:bg-gray-50 transition" onclick="toggleFAQ(this)">
+                    <span class="font-semibold text-gray-900">J'ai oublié mon mot de passe, que faire ?</span>
+                    <i class="fas fa-chevron-down text-gray-400 transition-transform"></i>
+                </button>
+                <div class="faq-answer hidden px-6 pb-4 text-gray-600">
+                    <p>Sur la page de connexion, cliquez sur "Mot de passe oublié". Vous recevrez un email avec un lien pour réinitialiser votre mot de passe. Le lien est valable 24 heures.</p>
+                </div>
+            </div>
+            
+            <div class="faq-item bg-white rounded-lg shadow-md overflow-hidden" data-category="compte">
+                <button class="faq-question w-full text-left px-6 py-4 flex justify-between items-center hover:bg-gray-50 transition" onclick="toggleFAQ(this)">
+                    <span class="font-semibold text-gray-900">Puis-je supprimer mon compte ?</span>
+                    <i class="fas fa-chevron-down text-gray-400 transition-transform"></i>
+                </button>
+                <div class="faq-answer hidden px-6 pb-4 text-gray-600">
+                    <p>Oui, vous pouvez supprimer votre compte à tout moment depuis les paramètres de votre profil. Notez que cette action est irréversible et que toutes vos données seront définitivement supprimées conformément au RGPD.</p>
+                </div>
+            </div>
+            
+        </div>
+    </section>
+
+    <!-- Contact CTA -->
+    <section class="text-center mt-16 bg-gradient-to-r from-blue-50 to-green-50 rounded-2xl p-12">
+        <i class="fas fa-question-circle text-5xl text-blue-600 mb-4"></i>
+        <h2 class="text-3xl font-bold text-gray-900 mb-4">Vous n'avez pas trouvé de réponse ?</h2>
+        <p class="text-xl text-gray-600 mb-8">
+            Notre équipe support est là pour vous aider !
+        </p>
+        <a href="{% url 'core:contact' %}" class="btn-primary text-lg px-8 py-4">
+            <i class="fas fa-envelope mr-2"></i>
+            Contactez-nous
+        </a>
+    </section>
+
+</div>
+
+{% block extra_js %}
+<script>
+    // Toggle FAQ accordion
+    function toggleFAQ(button) {
+        const answer = button.nextElementSibling;
+        const icon = button.querySelector('i');
+        const allAnswers = document.querySelectorAll('.faq-answer');
+        const allIcons = document.querySelectorAll('.faq-question i');
+        
+        // Close all other answers
+        allAnswers.forEach(item => {
+            if (item !== answer) {
+                item.classList.add('hidden');
+            }
+        });
+        
+        // Reset all icons
+        allIcons.forEach(i => {
+            if (i !== icon) {
+                i.classList.remove('rotate-180');
+            }
+        });
+        
+        // Toggle current answer
+        answer.classList.toggle('hidden');
+        icon.classList.toggle('rotate-180');
+    }
+    
+    // Filter FAQ by category
+    function filterFAQ(category) {
+        const items = document.querySelectorAll('.faq-item');
+        const buttons = document.querySelectorAll('.faq-filter-btn');
+        
+        // Update button styles
+        buttons.forEach(btn => {
+            btn.classList.remove('bg-blue-600', 'text-white', 'active');
+            btn.classList.add('bg-gray-200', 'text-gray-700');
+        });
+        event.target.classList.remove('bg-gray-200', 'text-gray-700');
+        event.target.classList.add('bg-blue-600', 'text-white', 'active');
+        
+        // Filter items
+        items.forEach(item => {
+            if (category === 'all' || item.dataset.category === category || item.dataset.category === 'general') {
+                item.style.display = 'block';
+            } else {
+                item.style.display = 'none';
+            }
+        });
+    }
+    
+    // Search FAQ
+    document.getElementById('faq-search').addEventListener('input', function(e) {
+        const searchTerm = e.target.value.toLowerCase();
+        const items = document.querySelectorAll('.faq-item');
+        
+        items.forEach(item => {
+            const question = item.querySelector('.faq-question span').textContent.toLowerCase();
+            const answer = item.querySelector('.faq-answer').textContent.toLowerCase();
+            
+            if (question.includes(searchTerm) || answer.includes(searchTerm)) {
+                item.style.display = 'block';
+            } else {
+                item.style.display = 'none';
+            }
+        });
+    });
+</script>
+{% endblock %}
+{% endblock %}

@@ -1,0 +1,201 @@
+{% extends 'base.html' %}
+
+{% block title %}À propos - InvestLink{% endblock %}
+
+{% block content %}
+<div class="bg-gradient-to-br from-blue-900 via-blue-800 to-blue-900 text-white py-20">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h1 class="text-5xl font-bold mb-6">À propos d'InvestLink</h1>
+        <p class="text-xl text-blue-100 max-w-3xl">
+            Nous connectons les porteurs de projets ambitieux avec des investisseurs engagés pour créer de la valeur et transformer les idées en réalité.
+        </p>
+    </div>
+</div>
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+    
+    <!-- Notre Mission -->
+    <section class="mb-20">
+        <div class="grid md:grid-cols-2 gap-12 items-center">
+            <div>
+                <h2 class="text-3xl font-bold text-gray-900 mb-6">Notre Mission</h2>
+                <p class="text-lg text-gray-700 mb-4">
+                    InvestLink est née d'une vision simple : <strong>démocratiser l'accès au financement</strong> pour les entrepreneurs tout en offrant aux investisseurs des opportunités d'investissement transparentes et sécurisées.
+                </p>
+                <p class="text-lg text-gray-700 mb-4">
+                    Nous croyons que chaque projet mérite une chance d'être entendu, et que chaque investisseur devrait avoir accès à des projets soigneusement vérifiés et documentés.
+                </p>
+                <p class="text-lg text-gray-700">
+                    Notre plateforme met l'accent sur la <strong>transparence</strong>, la <strong>qualité</strong> et la <strong>sécurité</strong> pour créer un écosystème de confiance.
+                </p>
+            </div>
+            <div class="bg-gradient-to-br from-blue-50 to-green-50 rounded-2xl p-8">
+                <div class="space-y-6">
+                    <div class="flex items-start space-x-4">
+                        <div class="flex-shrink-0">
+                            <div class="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-shield-alt text-white text-xl"></i>
+                            </div>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-gray-900 mb-2">Sécurité et Confiance</h3>
+                            <p class="text-gray-600">Tous les projets sont vérifiés par notre équipe avant publication.</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start space-x-4">
+                        <div class="flex-shrink-0">
+                            <div class="w-12 h-12 bg-green-600 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-search text-white text-xl"></i>
+                            </div>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-gray-900 mb-2">Transparence Totale</h3>
+                            <p class="text-gray-600">Documents, financiers, objectifs : tout est accessible.</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start space-x-4">
+                        <div class="flex-shrink-0">
+                            <div class="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-handshake text-white text-xl"></i>
+                            </div>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-gray-900 mb-2">Accompagnement</h3>
+                            <p class="text-gray-600">Support dédié pour porteurs et investisseurs.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Nos Valeurs -->
+    <section class="mb-20">
+        <h2 class="text-3xl font-bold text-gray-900 mb-12 text-center">Nos Valeurs</h2>
+        <div class="grid md:grid-cols-3 gap-8">
+            <div class="bg-white p-8 rounded-xl shadow-lg border-t-4 border-blue-600 hover:shadow-xl transition">
+                <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-6 mx-auto">
+                    <i class="fas fa-lightbulb text-blue-600 text-2xl"></i>
+                </div>
+                <h3 class="text-xl font-bold text-gray-900 mb-4 text-center">Innovation</h3>
+                <p class="text-gray-600 text-center">
+                    Nous encourageons la créativité et soutenons les idées qui transforment les secteurs traditionnels.
+                </p>
+            </div>
+            <div class="bg-white p-8 rounded-xl shadow-lg border-t-4 border-green-600 hover:shadow-xl transition">
+                <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-6 mx-auto">
+                    <i class="fas fa-users text-green-600 text-2xl"></i>
+                </div>
+                <h3 class="text-xl font-bold text-gray-900 mb-4 text-center">Communauté</h3>
+                <p class="text-gray-600 text-center">
+                    Notre force réside dans notre réseau d'entrepreneurs et d'investisseurs passionnés.
+                </p>
+            </div>
+            <div class="bg-white p-8 rounded-xl shadow-lg border-t-4 border-blue-600 hover:shadow-xl transition">
+                <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-6 mx-auto">
+                    <i class="fas fa-chart-line text-blue-600 text-2xl"></i>
+                </div>
+                <h3 class="text-xl font-bold text-gray-900 mb-4 text-center">Croissance</h3>
+                <p class="text-gray-600 text-center">
+                    Nous visons la croissance durable et l'impact positif à long terme pour tous nos partenaires.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Statistiques -->
+    <section class="mb-20 bg-gradient-to-r from-blue-900 to-blue-800 rounded-2xl p-12 text-white">
+        <h2 class="text-3xl font-bold mb-12 text-center">InvestLink en Chiffres</h2>
+        <div class="grid md:grid-cols-4 gap-8">
+            <div class="text-center">
+                <div class="text-5xl font-bold mb-2 text-green-400">150+</div>
+                <div class="text-blue-100">Projets Validés</div>
+            </div>
+            <div class="text-center">
+                <div class="text-5xl font-bold mb-2 text-green-400">500+</div>
+                <div class="text-blue-100">Investisseurs Actifs</div>
+            </div>
+            <div class="text-center">
+                <div class="text-5xl font-bold mb-2 text-green-400">10M+</div>
+                <div class="text-blue-100">$ Investis</div>
+            </div>
+            <div class="text-center">
+                <div class="text-5xl font-bold mb-2 text-green-400">95%</div>
+                <div class="text-blue-100">Satisfaction</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Comment ça marche -->
+    <section class="mb-20">
+        <h2 class="text-3xl font-bold text-gray-900 mb-12 text-center">Comment ça marche ?</h2>
+        
+        <div class="mb-16">
+            <h3 class="text-2xl font-bold text-blue-900 mb-8 flex items-center">
+                <i class="fas fa-briefcase mr-3"></i>
+                Pour les Porteurs de Projet
+            </h3>
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="relative">
+                    <div class="bg-blue-100 text-blue-900 w-12 h-12 rounded-full flex items-center justify-center font-bold text-xl mb-4">1</div>
+                    <h4 class="font-bold text-gray-900 mb-2">Inscrivez-vous</h4>
+                    <p class="text-gray-600">Créez votre compte porteur en quelques minutes.</p>
+                </div>
+                <div class="relative">
+                    <div class="bg-blue-100 text-blue-900 w-12 h-12 rounded-full flex items-center justify-center font-bold text-xl mb-4">2</div>
+                    <h4 class="font-bold text-gray-900 mb-2">Soumettez votre projet</h4>
+                    <p class="text-gray-600">Décrivez votre projet et joignez tous les documents nécessaires.</p>
+                </div>
+                <div class="relative">
+                    <div class="bg-blue-100 text-blue-900 w-12 h-12 rounded-full flex items-center justify-center font-bold text-xl mb-4">3</div>
+                    <h4 class="font-bold text-gray-900 mb-2">Connectez avec des investisseurs</h4>
+                    <p class="text-gray-600">Une fois validé, votre projet est visible par nos investisseurs.</p>
+                </div>
+            </div>
+        </div>
+
+        <div>
+            <h3 class="text-2xl font-bold text-green-900 mb-8 flex items-center">
+                <i class="fas fa-chart-pie mr-3"></i>
+                Pour les Investisseurs
+            </h3>
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="relative">
+                    <div class="bg-green-100 text-green-900 w-12 h-12 rounded-full flex items-center justify-center font-bold text-xl mb-4">1</div>
+                    <h4 class="font-bold text-gray-900 mb-2">Créez votre profil</h4>
+                    <p class="text-gray-600">Inscrivez-vous en tant qu'investisseur et définissez vos critères.</p>
+                </div>
+                <div class="relative">
+                    <div class="bg-green-100 text-green-900 w-12 h-12 rounded-full flex items-center justify-center font-bold text-xl mb-4">2</div>
+                    <h4 class="font-bold text-gray-900 mb-2">Explorez les projets</h4>
+                    <p class="text-gray-600">Parcourez les projets validés avec tous les détails.</p>
+                </div>
+                <div class="relative">
+                    <div class="bg-green-100 text-green-900 w-12 h-12 rounded-full flex items-center justify-center font-bold text-xl mb-4">3</div>
+                    <h4 class="font-bold text-gray-900 mb-2">Contactez et investissez</h4>
+                    <p class="text-gray-600">Échangez directement avec les porteurs via messagerie sécurisée.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="text-center">
+        <div class="bg-gradient-to-r from-green-50 to-blue-50 rounded-2xl p-12">
+            <h2 class="text-3xl font-bold text-gray-900 mb-4">Prêt à commencer ?</h2>
+            <p class="text-xl text-gray-600 mb-8">
+                Rejoignez notre communauté d'entrepreneurs et d'investisseurs dès aujourd'hui.
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <a href="{% url 'users:register' %}" class="btn-primary text-lg px-8 py-4">
+                    <i class="fas fa-user-plus mr-2"></i> S'inscrire
+                </a>
+                <a href="{% url 'projects:list' %}" class="btn-secondary text-lg px-8 py-4">
+                    <i class="fas fa-search mr-2"></i> Découvrir les projets
+                </a>
+            </div>
+        </div>
+    </section>
+
+</div>
+{% endblock %}

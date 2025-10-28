@@ -1,0 +1,184 @@
+{% extends 'base.html' %}
+
+{% block title %}Contact - InvestLink{% endblock %}
+
+{% block content %}
+<div class="bg-gradient-to-br from-blue-900 via-blue-800 to-blue-900 text-white py-20">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h1 class="text-5xl font-bold mb-6">Contactez-nous</h1>
+        <p class="text-xl text-blue-100 max-w-3xl">
+            Une question, une suggestion ou besoin d'assistance ? Notre équipe est là pour vous aider.
+        </p>
+    </div>
+</div>
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+    
+    <div class="grid md:grid-cols-2 gap-12">
+        
+        <!-- Formulaire de contact -->
+        <div>
+            <h2 class="text-3xl font-bold text-gray-900 mb-6">Envoyez-nous un message</h2>
+            <p class="text-gray-600 mb-8">
+                Remplissez le formulaire ci-dessous et nous vous répondrons dans les plus brefs délais.
+            </p>
+            
+            <form method="post" class="space-y-6">
+                {% csrf_token %}
+                
+                {% if form.non_field_errors %}
+                    <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-6">
+                        <div class="flex">
+                            <div class="flex-shrink-0">
+                                <i class="fas fa-exclamation-circle text-red-500"></i>
+                            </div>
+                            <div class="ml-3">
+                                <p class="text-sm text-red-700">
+                                    {{ form.non_field_errors }}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+                
+                <!-- Nom -->
+                <div>
+                    <label for="{{ form.name.id_for_label }}" class="block text-sm font-semibold text-gray-700 mb-2">
+                        {{ form.name.label }}
+                        <span class="text-red-500">*</span>
+                    </label>
+                    {{ form.name }}
+                    {% if form.name.errors %}
+                        <p class="mt-2 text-sm text-red-600">{{ form.name.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                
+                <!-- Email -->
+                <div>
+                    <label for="{{ form.email.id_for_label }}" class="block text-sm font-semibold text-gray-700 mb-2">
+                        {{ form.email.label }}
+                        <span class="text-red-500">*</span>
+                    </label>
+                    {{ form.email }}
+                    {% if form.email.errors %}
+                        <p class="mt-2 text-sm text-red-600">{{ form.email.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                
+                <!-- Sujet -->
+                <div>
+                    <label for="{{ form.subject.id_for_label }}" class="block text-sm font-semibold text-gray-700 mb-2">
+                        {{ form.subject.label }}
+                        <span class="text-red-500">*</span>
+                    </label>
+                    {{ form.subject }}
+                    {% if form.subject.errors %}
+                        <p class="mt-2 text-sm text-red-600">{{ form.subject.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                
+                <!-- Message -->
+                <div>
+                    <label for="{{ form.message.id_for_label }}" class="block text-sm font-semibold text-gray-700 mb-2">
+                        {{ form.message.label }}
+                        <span class="text-red-500">*</span>
+                    </label>
+                    {{ form.message }}
+                    {% if form.message.errors %}
+                        <p class="mt-2 text-sm text-red-600">{{ form.message.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                
+                <!-- Bouton -->
+                <div>
+                    <button type="submit" class="btn-primary w-full py-4 text-lg">
+                        <i class="fas fa-paper-plane mr-2"></i>
+                        Envoyer le message
+                    </button>
+                </div>
+            </form>
+        </div>
+        
+        <!-- Informations de contact -->
+        <div>
+            <h2 class="text-3xl font-bold text-gray-900 mb-6">Nos coordonnées</h2>
+            
+            <div class="space-y-6 mb-12">
+                <div class="flex items-start space-x-4">
+                    <div class="flex-shrink-0">
+                        <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-envelope text-blue-600 text-xl"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-gray-900 mb-1">Email</h3>
+                        <p class="text-gray-600">contact@investlink.com</p>
+                        <p class="text-sm text-gray-500 mt-1">Réponse sous 24h ouvrées</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-start space-x-4">
+                    <div class="flex-shrink-0">
+                        <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-phone text-green-600 text-xl"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-gray-900 mb-1">Téléphone</h3>
+                        <p class="text-gray-600">+243 XXX XXX XXX</p>
+                        <p class="text-sm text-gray-500 mt-1">Lun-Ven, 9h-17h</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-start space-x-4">
+                    <div class="flex-shrink-0">
+                        <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-map-marker-alt text-blue-600 text-xl"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-gray-900 mb-1">Adresse</h3>
+                        <p class="text-gray-600">
+                            Avenue de la Démocratie<br>
+                            Kinshasa, RDC
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- FAQ Rapide -->
+            <div class="bg-gradient-to-br from-blue-50 to-green-50 rounded-2xl p-8">
+                <h3 class="text-xl font-bold text-gray-900 mb-4">Questions fréquentes</h3>
+                <p class="text-gray-600 mb-4">
+                    Avant de nous contacter, consultez notre page FAQ qui répond aux questions les plus courantes.
+                </p>
+                <a href="{% url 'core:faq' %}" class="btn-secondary">
+                    <i class="fas fa-question-circle mr-2"></i>
+                    Voir la FAQ
+                </a>
+            </div>
+            
+            <!-- Réseaux sociaux -->
+            <div class="mt-8">
+                <h3 class="text-xl font-bold text-gray-900 mb-4">Suivez-nous</h3>
+                <div class="flex space-x-4">
+                    <a href="#" class="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center text-white hover:bg-blue-700 transition">
+                        <i class="fab fa-facebook text-xl"></i>
+                    </a>
+                    <a href="#" class="w-12 h-12 bg-blue-400 rounded-lg flex items-center justify-center text-white hover:bg-blue-500 transition">
+                        <i class="fab fa-twitter text-xl"></i>
+                    </a>
+                    <a href="#" class="w-12 h-12 bg-blue-700 rounded-lg flex items-center justify-center text-white hover:bg-blue-800 transition">
+                        <i class="fab fa-linkedin text-xl"></i>
+                    </a>
+                    <a href="#" class="w-12 h-12 bg-pink-600 rounded-lg flex items-center justify-center text-white hover:bg-pink-700 transition">
+                        <i class="fab fa-instagram text-xl"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+    
+</div>
+{% endblock %}
