@@ -87,12 +87,14 @@
 - [ ] Outils de modération de contenu
 
 ### 2.5 Messagerie interne
-- [ ] Modèle et structure de la messagerie
-- [ ] Envoi de messages entre utilisateurs
-- [ ] Liste des conversations
-- [ ] Affichage d'une conversation
-- [ ] Notifications de nouveaux messages
-- [ ] Marquage des messages lus/non lus
+- [x] Modèle et structure de la messagerie
+- [x] Envoi de messages entre utilisateurs
+- [x] Liste des conversations avec compteur non lus
+- [x] Affichage d'une conversation avec historique
+- [x] Notifications de nouveaux messages
+- [x] Marquage des messages lus/non lus
+- [x] Démarrage de conversation depuis un projet
+- [x] Suppression de conversation
 - [ ] Recherche dans les messages
 
 ### 2.6 Système de notifications
@@ -370,7 +372,7 @@
 - Base de données SQLite opérationnelle
 - Interface admin configurée
 
-### 🔄 Phase 2 : EN COURS (75%)
+### 🔄 Phase 2 : EN COURS (85%)
 - ✅ Système d'authentification complet (inscription, login, logout)
 - ✅ Formulaires porteur et investisseur avec validation
 - ✅ Dashboards utilisateurs personnalisés
@@ -381,11 +383,12 @@
 - ✅ Upload multiple de documents avec validation
 - ✅ Workflow de validation admin (liste, examen, validation/rejet)
 - ✅ Notifications automatiques sur changement de statut
+- ✅ Messagerie interne complète avec notifications
+- ✅ Compteur de messages non lus
 - ⏳ Validation email (à faire)
 - ⏳ Reset mot de passe (à faire)
 - ⏳ 2FA (à faire)
 - ⏳ Favoris investisseur (à faire)
-- ⏳ Système de messagerie (à faire)
 
 ### 🔄 Phase 3 : EN COURS (55%)
 - ✅ Charte graphique et composants de base
@@ -409,8 +412,8 @@
 ### 🎯 Prochaines Étapes Prioritaires
 1. ✅ Formulaire de soumission de projet avec upload
 2. ✅ Workflow de validation admin
-3. Favoris investisseur et contact porteur
-4. Système de messagerie
+3. ✅ Système de messagerie interne
+4. Favoris investisseur et système de notation
 5. Pages publiques manquantes (à propos, contact, FAQ)
 
 ---
