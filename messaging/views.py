@@ -85,10 +85,7 @@ def conversation_detail(request, pk):
                     link=conversation.get_absolute_url()
                 )
             
-            django_messages.success(request, 'Message envoyé avec succès.')
             return redirect('messaging:conversation', pk=pk)
-        else:
-            django_messages.error(request, 'Le message ne peut pas être vide.')
     
     # Récupérer l'autre participant
     other_participant = conversation.get_other_participant(request.user)
@@ -125,7 +122,6 @@ def start_conversation(request, username):
     conversation = Conversation.objects.create()
     conversation.participants.add(request.user, other_user)
     
-    django_messages.success(request, f'Conversation démarrée avec {other_user.get_full_name()}.')
     return redirect('messaging:conversation', pk=conversation.pk)
 
 
@@ -157,10 +153,6 @@ def start_conversation_about_project(request, project_slug):
     conversation = Conversation.objects.create(project=project)
     conversation.participants.add(request.user, project_owner)
     
-    django_messages.success(
-        request,
-        f'Conversation démarrée avec {project_owner.get_full_name()} à propos du projet "{project.title}".'
-    )
     return redirect('messaging:conversation', pk=conversation.pk)
 
 
@@ -177,7 +169,6 @@ def delete_conversation(request, pk):
         if conversation.participants.count() == 0:
             conversation.delete()
         
-        django_messages.success(request, 'Conversation supprimée.')
         return redirect('messaging:inbox')
     
     return render(request, 'messaging/confirm_delete.html', {'conversation': conversation})
