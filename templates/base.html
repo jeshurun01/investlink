@@ -66,6 +66,15 @@
                                         <i class="fas fa-plus-circle mr-2"></i> Nouveau projet
                                     </a>
                                 {% endif %}
+                                {% if user.is_staff %}
+                                    <hr class="my-2">
+                                    <a href="{% url 'projects:admin_pending' %}" class="block px-4 py-2 hover:bg-gray-100 bg-yellow-50">
+                                        <i class="fas fa-check-circle mr-2 text-yellow-600"></i> Validation projets
+                                    </a>
+                                    <a href="{% url 'projects:admin_all' %}" class="block px-4 py-2 hover:bg-gray-100 bg-yellow-50">
+                                        <i class="fas fa-list mr-2 text-yellow-600"></i> Tous les projets
+                                    </a>
+                                {% endif %}
                                 <a href="{% url 'messaging:inbox' %}" class="block px-4 py-2 hover:bg-gray-100">
                                     <i class="fas fa-envelope mr-2"></i> Messages
                                 </a>

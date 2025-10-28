@@ -1,0 +1,168 @@
+{% extends 'base.html' %}
+
+{% block title %}Tous les projets - Administration - InvestLink{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- En-tête -->
+    <div class="mb-8 flex items-center justify-between">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-900 mb-2">
+                Tous les Projets
+            </h1>
+            <p class="text-gray-600">Vue d'ensemble de tous les projets de la plateforme</p>
+        </div>
+        <a href="{% url 'projects:admin_pending' %}" class="btn-secondary">
+            ← Projets en attente
+        </a>
+    </div>
+
+    <!-- Statistiques globales -->
+    <div class="grid grid-cols-2 md:grid-cols-6 gap-4 mb-8">
+        <div class="bg-white rounded-lg shadow p-4">
+            <p class="text-sm text-gray-500">Total</p>
+            <p class="text-2xl font-bold text-gray-900">{{ stats.total }}</p>
+        </div>
+        <div class="bg-white rounded-lg shadow p-4">
+            <p class="text-sm text-gray-500">Nouveaux</p>
+            <p class="text-2xl font-bold text-yellow-600">{{ stats.submitted }}</p>
+        </div>
+        <div class="bg-white rounded-lg shadow p-4">
+            <p class="text-sm text-gray-500">En examen</p>
+            <p class="text-2xl font-bold text-blue-600">{{ stats.under_review }}</p>
+        </div>
+        <div class="bg-white rounded-lg shadow p-4">
+            <p class="text-sm text-gray-500">Révision</p>
+            <p class="text-2xl font-bold text-orange-600">{{ stats.revision_requested }}</p>
+        </div>
+        <div class="bg-white rounded-lg shadow p-4">
+            <p class="text-sm text-gray-500">Validés</p>
+            <p class="text-2xl font-bold text-green-600">{{ stats.approved }}</p>
+        </div>
+        <div class="bg-white rounded-lg shadow p-4">
+            <p class="text-sm text-gray-500">Refusés</p>
+            <p class="text-2xl font-bold text-red-600">{{ stats.rejected }}</p>
+        </div>
+    </div>
+
+    <!-- Filtres -->
+    <div class="bg-white rounded-lg shadow p-4 mb-6">
+        <form method="get" class="flex flex-wrap gap-4">
+            <div class="flex-1 min-w-[200px]">
+                <label for="status" class="block text-sm font-medium text-gray-700 mb-1">Statut</label>
+                <select name="status" id="status" class="input-field">
+                    <option value="">Tous les statuts</option>
+                    {% for value, label in status_choices %}
+                        <option value="{{ value }}" {% if request.GET.status == value %}selected{% endif %}>
+                            {{ label }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="flex-1 min-w-[200px]">
+                <label for="sector" class="block text-sm font-medium text-gray-700 mb-1">Secteur</label>
+                <select name="sector" id="sector" class="input-field">
+                    <option value="">Tous les secteurs</option>
+                    {% for value, label in sectors %}
+                        <option value="{{ value }}" {% if request.GET.sector == value %}selected{% endif %}>
+                            {{ label }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="flex items-end">
+                <button type="submit" class="btn-primary">
+                    Filtrer
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Liste des projets -->
+    <div class="bg-white rounded-lg shadow overflow-hidden">
+        {% if projects %}
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Projet</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Porteur</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Secteur</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Montant</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Statut</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        {% for project in projects %}
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-6 py-4">
+                                <div class="text-sm font-medium text-gray-900">{{ project.title }}</div>
+                                <div class="text-sm text-gray-500">{{ project.summary|truncatewords:10 }}</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-900">{{ project.owner.get_full_name }}</div>
+                                <div class="text-sm text-gray-500">{{ project.owner.email }}</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+                                    {{ project.get_sector_display }}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                {{ project.funding_goal|floatformat:0 }} $
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                {% if project.status == 'submitted' %}
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                                        Nouveau
+                                    </span>
+                                {% elif project.status == 'under_review' %}
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+                                        En examen
+                                    </span>
+                                {% elif project.status == 'revision_requested' %}
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-orange-100 text-orange-800">
+                                        Révision
+                                    </span>
+                                {% elif project.status == 'approved' %}
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                        Validé
+                                    </span>
+                                {% elif project.status == 'rejected' %}
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
+                                        Refusé
+                                    </span>
+                                {% endif %}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                {{ project.created_at|date:"d/m/Y" }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
+                                <a href="{% url 'projects:detail' project.slug %}" class="text-blue-600 hover:text-blue-900">
+                                    Voir
+                                </a>
+                                {% if project.status != 'approved' %}
+                                    <a href="{% url 'projects:admin_validate' project.slug %}" class="text-green-600 hover:text-green-900">
+                                        Valider
+                                    </a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="text-center py-12">
+                <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+                <h3 class="mt-2 text-sm font-medium text-gray-900">Aucun projet trouvé</h3>
+                <p class="mt-1 text-sm text-gray-500">Aucun projet ne correspond à vos critères de recherche.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

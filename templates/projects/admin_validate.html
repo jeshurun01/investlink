@@ -1,0 +1,215 @@
+{% extends 'base.html' %}
+
+{% block title %}Valider {{ project.title }} - InvestLink{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Fil d'Ariane -->
+    <nav class="mb-6">
+        <ol class="flex items-center space-x-2 text-sm text-gray-500">
+            <li><a href="{% url 'projects:admin_pending' %}" class="hover:text-gray-700">Validation</a></li>
+            <li><span class="mx-2">/</span></li>
+            <li class="text-gray-900">{{ project.title }}</li>
+        </ol>
+    </nav>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Contenu principal -->
+        <div class="lg:col-span-2">
+            <!-- En-tête du projet -->
+            <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+                <div class="flex items-start justify-between mb-4">
+                    <div>
+                        <h1 class="text-3xl font-bold text-gray-900 mb-2">{{ project.title }}</h1>
+                        <p class="text-gray-600">{{ project.summary }}</p>
+                    </div>
+                    {% if project.status == 'submitted' %}
+                        <span class="px-3 py-1 text-sm font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                            Nouveau
+                        </span>
+                    {% elif project.status == 'under_review' %}
+                        <span class="px-3 py-1 text-sm font-semibold rounded-full bg-blue-100 text-blue-800">
+                            En examen
+                        </span>
+                    {% elif project.status == 'revision_requested' %}
+                        <span class="px-3 py-1 text-sm font-semibold rounded-full bg-orange-100 text-orange-800">
+                            Révision
+                        </span>
+                    {% endif %}
+                </div>
+
+                <!-- Informations clés -->
+                <div class="grid grid-cols-2 gap-4 pt-4 border-t border-gray-200">
+                    <div>
+                        <p class="text-sm text-gray-500">Secteur</p>
+                        <p class="font-medium text-gray-900">{{ project.get_sector_display }}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500">Stade</p>
+                        <p class="font-medium text-gray-900">{{ project.get_funding_stage_display }}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500">Localisation</p>
+                        <p class="font-medium text-gray-900">{{ project.location }}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500">Soumis le</p>
+                        <p class="font-medium text-gray-900">{{ project.created_at|date:"d/m/Y à H:i" }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Image principale -->
+            {% if project.featured_image %}
+            <div class="bg-white rounded-lg shadow-md overflow-hidden mb-6">
+                <img src="{{ project.featured_image.url }}" alt="{{ project.title }}" class="w-full h-64 object-cover">
+            </div>
+            {% endif %}
+
+            <!-- Description détaillée -->
+            <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+                <h2 class="text-xl font-semibold text-gray-900 mb-4">Description du projet</h2>
+                <div class="prose max-w-none text-gray-700">
+                    {{ project.description|linebreaks }}
+                </div>
+            </div>
+
+            <!-- Détails financiers -->
+            <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+                <h2 class="text-xl font-semibold text-gray-900 mb-4">Détails financiers</h2>
+                <div class="grid grid-cols-2 gap-6">
+                    <div>
+                        <p class="text-sm text-gray-500 mb-1">Montant recherché</p>
+                        <p class="text-2xl font-bold text-blue-600">{{ project.funding_goal|floatformat:0 }} $</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500 mb-1">Investissement minimum</p>
+                        <p class="text-2xl font-bold text-gray-900">{{ project.min_investment|floatformat:0 }} $</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Documents -->
+            {% if documents %}
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <h2 class="text-xl font-semibold text-gray-900 mb-4">Documents fournis</h2>
+                <div class="space-y-3">
+                    {% for doc in documents %}
+                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                        <div class="flex items-center space-x-3">
+                            <svg class="h-8 w-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                            </svg>
+                            <div>
+                                <p class="font-medium text-gray-900">{{ doc.title }}</p>
+                                <p class="text-sm text-gray-500">{{ doc.get_document_type_display }}</p>
+                            </div>
+                        </div>
+                        <a href="{{ doc.file.url }}" target="_blank" class="text-blue-600 hover:text-blue-800">
+                            Télécharger
+                        </a>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Sidebar - Formulaire de validation -->
+        <div class="lg:col-span-1">
+            <!-- Informations du porteur -->
+            <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Porteur du projet</h3>
+                <div class="space-y-3">
+                    <div>
+                        <p class="text-sm text-gray-500">Nom</p>
+                        <p class="font-medium text-gray-900">{{ project.owner.get_full_name }}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500">Email</p>
+                        <p class="font-medium text-gray-900">{{ project.owner.email }}</p>
+                    </div>
+                    {% if project.owner.phone %}
+                    <div>
+                        <p class="text-sm text-gray-500">Téléphone</p>
+                        <p class="font-medium text-gray-900">{{ project.owner.phone }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Formulaire de validation -->
+            <div class="bg-white rounded-lg shadow-md p-6 sticky top-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Validation du projet</h3>
+                
+                <form method="post" class="space-y-4">
+                    {% csrf_token %}
+                    
+                    <!-- Affichage des erreurs globales -->
+                    {% if form.non_field_errors %}
+                        <div class="bg-red-50 border-l-4 border-red-400 p-4 mb-4">
+                            <div class="flex">
+                                <div class="flex-shrink-0">
+                                    <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                                    </svg>
+                                </div>
+                                <div class="ml-3">
+                                    {% for error in form.non_field_errors %}
+                                        <p class="text-sm text-red-700">{{ error }}</p>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+
+                    <!-- Statut -->
+                    <div>
+                        <label for="{{ form.status.id_for_label }}" class="form-label">
+                            {{ form.status.label }}
+                        </label>
+                        {{ form.status }}
+                        {% if form.status.errors %}
+                            <p class="error-message">{{ form.status.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Notes administratives -->
+                    <div>
+                        <label for="{{ form.admin_notes.id_for_label }}" class="form-label">
+                            {{ form.admin_notes.label }}
+                        </label>
+                        {{ form.admin_notes }}
+                        {% if form.admin_notes.errors %}
+                            <p class="error-message">{{ form.admin_notes.errors.0 }}</p>
+                        {% endif %}
+                        <p class="text-xs text-gray-500 mt-1">Ces notes ne seront pas visibles par le porteur</p>
+                    </div>
+
+                    <!-- Motif de refus -->
+                    <div>
+                        <label for="{{ form.rejection_reason.id_for_label }}" class="form-label">
+                            {{ form.rejection_reason.label }}
+                        </label>
+                        {{ form.rejection_reason }}
+                        {% if form.rejection_reason.errors %}
+                            <p class="error-message">{{ form.rejection_reason.errors.0 }}</p>
+                        {% endif %}
+                        <p class="text-xs text-gray-500 mt-1">Ce message sera envoyé au porteur en cas de refus</p>
+                    </div>
+
+                    <!-- Boutons -->
+                    <div class="flex space-x-3 pt-4">
+                        <button type="submit" class="flex-1 btn-primary">
+                            Enregistrer
+                        </button>
+                        <a href="{% url 'projects:admin_pending' %}" class="flex-1 btn-secondary text-center">
+                            Annuler
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

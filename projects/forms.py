@@ -3,6 +3,61 @@ from django.core.exceptions import ValidationError
 from .models import Project, ProjectDocument
 
 
+class ProjectValidationForm(forms.ModelForm):
+    """Formulaire pour la validation des projets par les admins"""
+    
+    class Meta:
+        model = Project
+        fields = ['status', 'admin_notes', 'rejection_reason']
+        widgets = {
+            'status': forms.Select(attrs={
+                'class': 'input-field',
+            }),
+            'admin_notes': forms.Textarea(attrs={
+                'class': 'input-field',
+                'rows': 4,
+                'placeholder': 'Notes internes pour l\'équipe administrative...'
+            }),
+            'rejection_reason': forms.Textarea(attrs={
+                'class': 'input-field',
+                'rows': 4,
+                'placeholder': 'Raison du refus (sera envoyée au porteur)...'
+            }),
+        }
+        labels = {
+            'status': 'Statut du projet',
+            'admin_notes': 'Notes administratives (internes)',
+            'rejection_reason': 'Motif de refus (visible par le porteur)',
+        }
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Limiter les choix de statut disponibles pour la validation
+        self.fields['status'].choices = [
+            ('under_review', 'En cours d\'examen'),
+            ('revision_requested', 'Révision demandée'),
+            ('approved', 'Validé'),
+            ('rejected', 'Refusé'),
+        ]
+    
+    def clean(self):
+        cleaned_data = super().clean()
+        status = cleaned_data.get('status')
+        rejection_reason = cleaned_data.get('rejection_reason')
+        
+        # Si le projet est rejeté, une raison est obligatoire
+        if status == 'rejected' and not rejection_reason:
+            raise ValidationError({
+                'rejection_reason': 'Vous devez fournir une raison pour le refus du projet.'
+            })
+        
+        # Si le projet n'est pas rejeté, vider le motif de refus
+        if status != 'rejected':
+            cleaned_data['rejection_reason'] = ''
+        
+        return cleaned_data
+
+
 class MultipleFileInput(forms.ClearableFileInput):
     """Widget personnalisé pour l'upload multiple de fichiers"""
     allow_multiple_selected = True
