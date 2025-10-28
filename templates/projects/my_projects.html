@@ -33,7 +33,7 @@
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-sm text-gray-600 mb-1">En attente</p>
-                            <p class="text-2xl font-bold text-yellow-900">{{ projects|filter_by_status:'submitted'|length }}</p>
+                            <p class="text-2xl font-bold text-yellow-900">{{ submitted_count }}</p>
                         </div>
                         <i class="fas fa-clock text-3xl text-yellow-600 opacity-20"></i>
                     </div>
@@ -43,7 +43,7 @@
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-sm text-gray-600 mb-1">Validés</p>
-                            <p class="text-2xl font-bold text-green-900">{{ projects|filter_by_status:'approved'|length }}</p>
+                            <p class="text-2xl font-bold text-green-900">{{ approved_count }}</p>
                         </div>
                         <i class="fas fa-check-circle text-3xl text-green-600 opacity-20"></i>
                     </div>
@@ -53,7 +53,7 @@
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-sm text-gray-600 mb-1">Refusés</p>
-                            <p class="text-2xl font-bold text-red-900">{{ projects|filter_by_status:'rejected'|length }}</p>
+                            <p class="text-2xl font-bold text-red-900">{{ rejected_count }}</p>
                         </div>
                         <i class="fas fa-times-circle text-3xl text-red-600 opacity-20"></i>
                     </div>

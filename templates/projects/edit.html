@@ -1,0 +1,235 @@
+{% extends 'base.html' %}
+
+{% block title %}Modifier le projet - {{ project.title }} - InvestLink{% endblock %}
+
+{% block content %}
+<div class="bg-gradient-to-r from-green-900 to-blue-900 text-white py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h1 class="text-3xl font-bold mb-2">
+            <i class="fas fa-edit mr-2"></i>
+            Modifier le projet
+        </h1>
+        <p class="text-blue-100">{{ project.title }}</p>
+    </div>
+</div>
+
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    
+    <!-- Messages d'alerte -->
+    {% if project.status == 'revision_requested' and project.admin_notes %}
+    <div class="bg-orange-50 border-l-4 border-orange-500 p-6 mb-8">
+        <div class="flex">
+            <div class="flex-shrink-0">
+                <i class="fas fa-exclamation-triangle text-orange-500 text-2xl"></i>
+            </div>
+            <div class="ml-4">
+                <h3 class="text-lg font-bold text-orange-900 mb-2">Révision demandée</h3>
+                <p class="text-orange-800 mb-2">L'administrateur a demandé des modifications sur votre projet :</p>
+                <div class="bg-white rounded p-4 text-gray-700">
+                    {{ project.admin_notes|linebreaks }}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if project.status == 'rejected' and project.rejection_reason %}
+    <div class="bg-red-50 border-l-4 border-red-500 p-6 mb-8">
+        <div class="flex">
+            <div class="flex-shrink-0">
+                <i class="fas fa-times-circle text-red-500 text-2xl"></i>
+            </div>
+            <div class="ml-4">
+                <h3 class="text-lg font-bold text-red-900 mb-2">Projet refusé</h3>
+                <p class="text-red-800 mb-2">Raison du refus :</p>
+                <div class="bg-white rounded p-4 text-gray-700">
+                    {{ project.rejection_reason|linebreaks }}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    
+    <div class="bg-white rounded-lg shadow p-8">
+        
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            
+            {% if form.non_field_errors %}
+                <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-6">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-exclamation-circle text-red-500"></i>
+                        </div>
+                        <div class="ml-3">
+                            <p class="text-sm text-red-700">
+                                {{ form.non_field_errors }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+            
+            <div class="space-y-6">
+                
+                <!-- Titre -->
+                <div>
+                    <label for="{{ form.title.id_for_label }}" class="block text-sm font-semibold text-gray-700 mb-2">
+                        {{ form.title.label }}
+                        <span class="text-red-500">*</span>
+                    </label>
+                    {{ form.title }}
+                    {% if form.title.errors %}
+                        <p class="mt-2 text-sm text-red-600">{{ form.title.errors.0 }}</p>
+                    {% endif %}
+                    <p class="mt-1 text-sm text-gray-500">{{ form.title.help_text }}</p>
+                </div>
+                
+                <!-- Description -->
+                <div>
+                    <label for="{{ form.description.id_for_label }}" class="block text-sm font-semibold text-gray-700 mb-2">
+                        {{ form.description.label }}
+                        <span class="text-red-500">*</span>
+                    </label>
+                    {{ form.description }}
+                    {% if form.description.errors %}
+                        <p class="mt-2 text-sm text-red-600">{{ form.description.errors.0 }}</p>
+                    {% endif %}
+                    <p class="mt-1 text-sm text-gray-500">{{ form.description.help_text }}</p>
+                </div>
+                
+                <!-- Secteur et Montant -->
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="{{ form.sector.id_for_label }}" class="block text-sm font-semibold text-gray-700 mb-2">
+                            {{ form.sector.label }}
+                            <span class="text-red-500">*</span>
+                        </label>
+                        {{ form.sector }}
+                        {% if form.sector.errors %}
+                            <p class="mt-2 text-sm text-red-600">{{ form.sector.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                    
+                    <div>
+                        <label for="{{ form.funding_goal.id_for_label }}" class="block text-sm font-semibold text-gray-700 mb-2">
+                            {{ form.funding_goal.label }}
+                            <span class="text-red-500">*</span>
+                        </label>
+                        {{ form.funding_goal }}
+                        {% if form.funding_goal.errors %}
+                            <p class="mt-2 text-sm text-red-600">{{ form.funding_goal.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- Localisation et Durée -->
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="{{ form.location.id_for_label }}" class="block text-sm font-semibold text-gray-700 mb-2">
+                            {{ form.location.label }}
+                            <span class="text-red-500">*</span>
+                        </label>
+                        {{ form.location }}
+                        {% if form.location.errors %}
+                            <p class="mt-2 text-sm text-red-600">{{ form.location.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                    
+                    <div>
+                        <label for="{{ form.duration.id_for_label }}" class="block text-sm font-semibold text-gray-700 mb-2">
+                            {{ form.duration.label }}
+                            <span class="text-red-500">*</span>
+                        </label>
+                        {{ form.duration }}
+                        {% if form.duration.errors %}
+                            <p class="mt-2 text-sm text-red-600">{{ form.duration.errors.0 }}</p>
+                        {% endif %}
+                        <p class="mt-1 text-sm text-gray-500">{{ form.duration.help_text }}</p>
+                    </div>
+                </div>
+                
+                <!-- Image principale -->
+                <div>
+                    <label for="{{ form.image.id_for_label }}" class="block text-sm font-semibold text-gray-700 mb-2">
+                        {{ form.image.label }}
+                    </label>
+                    {% if project.image %}
+                    <div class="mb-3">
+                        <p class="text-sm text-gray-600 mb-2">Image actuelle :</p>
+                        <img src="{{ project.image.url }}" alt="{{ project.title }}" class="w-48 h-32 object-cover rounded-lg">
+                    </div>
+                    {% endif %}
+                    {{ form.image }}
+                    {% if form.image.errors %}
+                        <p class="mt-2 text-sm text-red-600">{{ form.image.errors.0 }}</p>
+                    {% endif %}
+                    <p class="mt-1 text-sm text-gray-500">{{ form.image.help_text }}</p>
+                </div>
+                
+                <!-- Vidéo -->
+                <div>
+                    <label for="{{ form.video.id_for_label }}" class="block text-sm font-semibold text-gray-700 mb-2">
+                        {{ form.video.label }}
+                    </label>
+                    {% if project.video %}
+                    <div class="mb-3">
+                        <p class="text-sm text-gray-600 mb-2">Vidéo actuelle :</p>
+                        <video controls class="w-full max-w-md rounded-lg">
+                            <source src="{{ project.video.url }}" type="video/mp4">
+                        </video>
+                    </div>
+                    {% endif %}
+                    {{ form.video }}
+                    {% if form.video.errors %}
+                        <p class="mt-2 text-sm text-red-600">{{ form.video.errors.0 }}</p>
+                    {% endif %}
+                    <p class="mt-1 text-sm text-gray-500">{{ form.video.help_text }}</p>
+                </div>
+                
+            </div>
+            
+            <!-- Documents existants -->
+            {% if project.documents.all %}
+            <div class="mt-8 pt-8 border-t border-gray-200">
+                <h3 class="text-lg font-bold text-gray-900 mb-4">Documents actuels</h3>
+                <div class="grid md:grid-cols-2 gap-4">
+                    {% for doc in project.documents.all %}
+                    <div class="border border-gray-200 rounded-lg p-4 flex items-center justify-between">
+                        <div class="flex items-center">
+                            <i class="fas fa-file-pdf text-red-500 text-2xl mr-3"></i>
+                            <div>
+                                <p class="font-semibold text-gray-900">{{ doc.title }}</p>
+                                <a href="{{ doc.file.url }}" target="_blank" class="text-sm text-blue-600 hover:underline">
+                                    Télécharger
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                <p class="text-sm text-gray-500 mt-4">
+                    <i class="fas fa-info-circle mr-1"></i>
+                    Pour modifier les documents, contactez l'administrateur ou soumettez un nouveau projet.
+                </p>
+            </div>
+            {% endif %}
+            
+            <!-- Boutons -->
+            <div class="mt-8 flex gap-4">
+                <button type="submit" class="btn-primary flex-1">
+                    <i class="fas fa-save mr-2"></i>
+                    Enregistrer les modifications
+                </button>
+                <a href="{% url 'projects:my_projects' %}" class="btn-secondary flex-1 text-center">
+                    <i class="fas fa-times mr-2"></i>
+                    Annuler
+                </a>
+            </div>
+            
+        </form>
+        
+    </div>
+    
+</div>
+{% endblock %}

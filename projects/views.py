@@ -146,8 +146,16 @@ def my_projects(request):
     
     projects = Project.objects.filter(owner=request.user).order_by('-created_at')
     
+    # Calculer les statistiques
+    submitted_count = projects.filter(status='submitted').count()
+    approved_count = projects.filter(status='approved').count()
+    rejected_count = projects.filter(status='rejected').count()
+    
     context = {
         'projects': projects,
+        'submitted_count': submitted_count,
+        'approved_count': approved_count,
+        'rejected_count': rejected_count,
     }
     return render(request, 'projects/my_projects.html', context)
 
