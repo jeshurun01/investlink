@@ -23,7 +23,6 @@
         {% if conversations %}
             <div class="divide-y divide-gray-200">
                 {% for conversation in conversations %}
-                    {% with other_user=conversation.get_other_participant|args:request.user %}
                     <a href="{% url 'messaging:conversation' conversation.pk %}" class="block hover:bg-gray-50 transition">
                         <div class="px-6 py-4">
                             <div class="flex items-center justify-between">
@@ -31,19 +30,19 @@
                                 <div class="flex items-center space-x-4 flex-1">
                                     <div class="flex-shrink-0">
                                         <div class="h-12 w-12 rounded-full bg-blue-600 flex items-center justify-center text-white text-lg font-bold">
-                                            {{ other_user.get_full_name|first|upper }}
+                                            {{ conversation.other_user.get_full_name|first|upper }}
                                         </div>
                                     </div>
                                     <div class="flex-1 min-w-0">
                                         <div class="flex items-center space-x-2">
                                             <p class="text-lg font-semibold text-gray-900 truncate">
-                                                {{ other_user.get_full_name }}
+                                                {{ conversation.other_user.get_full_name }}
                                             </p>
-                                            {% if other_user.user_type == 'porteur' %}
+                                            {% if conversation.other_user.user_type == 'porteur' %}
                                                 <span class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
                                                     Porteur
                                                 </span>
-                                            {% elif other_user.user_type == 'investisseur' %}
+                                            {% elif conversation.other_user.user_type == 'investisseur' %}
                                                 <span class="px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
                                                     Investisseur
                                                 </span>
@@ -56,7 +55,7 @@
                                                 {% if conversation.latest_message.0.sender == request.user %}
                                                     <span class="font-medium">Vous :</span>
                                                 {% else %}
-                                                    <span class="font-medium">{{ other_user.first_name }} :</span>
+                                                    <span class="font-medium">{{ conversation.other_user.first_name }} :</span>
                                                 {% endif %}
                                                 {{ conversation.latest_message.0.content|truncatewords:10 }}
                                             </p>
@@ -89,7 +88,6 @@
                             </div>
                         </div>
                     </a>
-                    {% endwith %}
                 {% endfor %}
             </div>
         {% else %}

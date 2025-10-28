@@ -29,6 +29,10 @@ def inbox(request):
         )
     ).order_by('-last_message_time')
     
+    # Ajouter l'autre participant à chaque conversation
+    for conversation in conversations:
+        conversation.other_user = conversation.get_other_participant(request.user)
+    
     # Statistiques
     total_unread = sum(conv.unread_count for conv in conversations)
     
