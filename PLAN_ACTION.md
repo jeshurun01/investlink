@@ -98,12 +98,14 @@
 - [ ] Recherche dans les messages
 
 ### 2.6 Système de notifications
-- [ ] Création de notifications dans le système
-- [ ] Affichage des notifications (badge)
-- [ ] Page de liste des notifications
-- [ ] Marquage comme lu
-- [ ] Notifications email automatiques
-- [ ] Templates d'emails (soumission, validation, refus, etc.)
+- [x] Création de notifications dans le système
+- [x] Affichage des notifications (badge avec compteur)
+- [x] Page de liste des notifications avec filtres
+- [x] Marquage comme lu (individuel et global)
+- [x] Suppression de notifications
+- [x] API pour dropdown de notifications
+- [x] Templates d'emails (validation, refus, révision, message)
+- [ ] Notifications email automatiques (envoi SMTP)
 - [ ] Configuration SMTP
 
 ---
@@ -372,7 +374,7 @@
 - Base de données SQLite opérationnelle
 - Interface admin configurée
 
-### 🔄 Phase 2 : EN COURS (85%)
+### 🔄 Phase 2 : EN COURS (90%)
 - ✅ Système d'authentification complet (inscription, login, logout)
 - ✅ Formulaires porteur et investisseur avec validation
 - ✅ Dashboards utilisateurs personnalisés
@@ -385,10 +387,13 @@
 - ✅ Notifications automatiques sur changement de statut
 - ✅ Messagerie interne complète avec notifications
 - ✅ Compteur de messages non lus
+- ✅ Système de notifications avec filtres et badges
+- ✅ Templates d'emails pour notifications importantes
 - ⏳ Validation email (à faire)
 - ⏳ Reset mot de passe (à faire)
 - ⏳ 2FA (à faire)
 - ⏳ Favoris investisseur (à faire)
+- ⏳ Envoi emails SMTP (à faire)
 
 ### 🔄 Phase 3 : EN COURS (55%)
 - ✅ Charte graphique et composants de base
@@ -413,8 +418,9 @@
 1. ✅ Formulaire de soumission de projet avec upload
 2. ✅ Workflow de validation admin
 3. ✅ Système de messagerie interne
-4. Favoris investisseur et système de notation
-5. Pages publiques manquantes (à propos, contact, FAQ)
+4. ✅ Système de notifications
+5. Favoris investisseur et système de rating
+6. Pages publiques (à propos, contact, FAQ)
 
 ---
 
