@@ -295,9 +295,9 @@
                     {% endif %}
 
                     {% if request.user.is_authenticated and request.user != project.owner %}
-                        <button class="btn-outline w-full mt-4">
+                        <a href="{% url 'messaging:start_project_conversation' project.slug %}" class="btn-outline w-full mt-4">
                             <i class="fas fa-envelope mr-2"></i>Contacter
-                        </button>
+                        </a>
                     {% endif %}
                 </div>
             </div>

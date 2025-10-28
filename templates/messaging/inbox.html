@@ -1,0 +1,114 @@
+{% extends 'base.html' %}
+
+{% block title %}Messages - InvestLink{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- En-tête -->
+    <div class="mb-8 flex items-center justify-between">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-900 mb-2">
+                Messagerie
+            </h1>
+            <p class="text-gray-600">Vos conversations avec les autres utilisateurs</p>
+        </div>
+        {% if total_unread > 0 %}
+        <div class="bg-blue-100 text-blue-800 px-4 py-2 rounded-full font-semibold">
+            {{ total_unread }} message{{ total_unread|pluralize }} non lu{{ total_unread|pluralize }}
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="bg-white rounded-lg shadow overflow-hidden">
+        {% if conversations %}
+            <div class="divide-y divide-gray-200">
+                {% for conversation in conversations %}
+                    {% with other_user=conversation.get_other_participant|args:request.user %}
+                    <a href="{% url 'messaging:conversation' conversation.pk %}" class="block hover:bg-gray-50 transition">
+                        <div class="px-6 py-4">
+                            <div class="flex items-center justify-between">
+                                <!-- Avatar et info utilisateur -->
+                                <div class="flex items-center space-x-4 flex-1">
+                                    <div class="flex-shrink-0">
+                                        <div class="h-12 w-12 rounded-full bg-blue-600 flex items-center justify-center text-white text-lg font-bold">
+                                            {{ other_user.get_full_name|first|upper }}
+                                        </div>
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <div class="flex items-center space-x-2">
+                                            <p class="text-lg font-semibold text-gray-900 truncate">
+                                                {{ other_user.get_full_name }}
+                                            </p>
+                                            {% if other_user.user_type == 'porteur' %}
+                                                <span class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
+                                                    Porteur
+                                                </span>
+                                            {% elif other_user.user_type == 'investisseur' %}
+                                                <span class="px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
+                                                    Investisseur
+                                                </span>
+                                            {% endif %}
+                                        </div>
+                                        
+                                        <!-- Dernier message -->
+                                        {% if conversation.latest_message %}
+                                            <p class="text-sm text-gray-600 truncate mt-1">
+                                                {% if conversation.latest_message.0.sender == request.user %}
+                                                    <span class="font-medium">Vous :</span>
+                                                {% else %}
+                                                    <span class="font-medium">{{ other_user.first_name }} :</span>
+                                                {% endif %}
+                                                {{ conversation.latest_message.0.content|truncatewords:10 }}
+                                            </p>
+                                        {% endif %}
+                                        
+                                        <!-- Projet lié -->
+                                        {% if conversation.project %}
+                                            <p class="text-xs text-blue-600 mt-1">
+                                                <i class="fas fa-folder mr-1"></i>
+                                                Projet : {{ conversation.project.title }}
+                                            </p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                
+                                <!-- Métadonnées -->
+                                <div class="text-right ml-4">
+                                    {% if conversation.latest_message %}
+                                        <p class="text-sm text-gray-500">
+                                            {{ conversation.last_message_time|timesince }} ago
+                                        </p>
+                                    {% endif %}
+                                    
+                                    {% if conversation.unread_count > 0 %}
+                                        <span class="inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white bg-red-600 rounded-full mt-2">
+                                            {{ conversation.unread_count }}
+                                        </span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                    {% endwith %}
+                {% endfor %}
+            </div>
+        {% else %}
+            <!-- État vide -->
+            <div class="text-center py-12">
+                <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                </svg>
+                <h3 class="mt-2 text-sm font-medium text-gray-900">Aucune conversation</h3>
+                <p class="mt-1 text-sm text-gray-500">
+                    Vous n'avez pas encore de conversations. Commencez par découvrir des projets !
+                </p>
+                <div class="mt-6">
+                    <a href="{% url 'projects:list' %}" class="btn-primary">
+                        Découvrir les projets
+                    </a>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

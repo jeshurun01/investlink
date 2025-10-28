@@ -1,0 +1,155 @@
+{% extends 'base.html' %}
+
+{% block title %}Conversation avec {{ other_participant.get_full_name }} - InvestLink{% endblock %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- En-tête de la conversation -->
+    <div class="bg-white rounded-lg shadow mb-6 p-6">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-4">
+                <a href="{% url 'messaging:inbox' %}" class="text-gray-600 hover:text-gray-900">
+                    <i class="fas fa-arrow-left text-xl"></i>
+                </a>
+                <div class="h-12 w-12 rounded-full bg-blue-600 flex items-center justify-center text-white text-lg font-bold">
+                    {{ other_participant.get_full_name|first|upper }}
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold text-gray-900">
+                        {{ other_participant.get_full_name }}
+                    </h1>
+                    <p class="text-sm text-gray-500">
+                        {% if other_participant.user_type == 'porteur' %}
+                            <span class="text-green-600">Porteur de projet</span>
+                        {% elif other_participant.user_type == 'investisseur' %}
+                            <span class="text-blue-600">Investisseur</span>
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+            
+            <!-- Actions -->
+            <div class="flex items-center space-x-2">
+                {% if conversation.project %}
+                    <a href="{% url 'projects:detail' conversation.project.slug %}" class="text-sm text-blue-600 hover:text-blue-800">
+                        <i class="fas fa-folder mr-1"></i>
+                        Voir le projet
+                    </a>
+                {% endif %}
+                <form method="post" action="{% url 'messaging:delete_conversation' conversation.pk %}" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette conversation ?');">
+                    {% csrf_token %}
+                    <button type="submit" class="text-red-600 hover:text-red-800">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Info projet si applicable -->
+        {% if conversation.project %}
+        <div class="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
+            <p class="text-sm text-blue-800">
+                <i class="fas fa-info-circle mr-1"></i>
+                Cette conversation concerne le projet : <strong>{{ conversation.project.title }}</strong>
+            </p>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Zone des messages -->
+    <div class="bg-white rounded-lg shadow mb-6">
+        <div class="p-6 h-96 overflow-y-auto" id="messages-container">
+            {% if messages %}
+                <div class="space-y-4">
+                    {% for message in messages %}
+                        <div class="flex {% if message.sender == request.user %}justify-end{% else %}justify-start{% endif %}">
+                            <div class="{% if message.sender == request.user %}bg-blue-600 text-white{% else %}bg-gray-200 text-gray-900{% endif %} rounded-lg px-4 py-3 max-w-md">
+                                <div class="flex items-start space-x-2">
+                                    {% if message.sender != request.user %}
+                                        <div class="flex-shrink-0">
+                                            <div class="h-8 w-8 rounded-full bg-blue-600 flex items-center justify-center text-white text-sm font-bold">
+                                                {{ message.sender.get_full_name|first|upper }}
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                    <div class="flex-1">
+                                        <p class="text-sm whitespace-pre-wrap break-words">{{ message.content }}</p>
+                                        <p class="text-xs {% if message.sender == request.user %}text-blue-200{% else %}text-gray-500{% endif %} mt-1">
+                                            {{ message.created_at|date:"d/m/Y à H:i" }}
+                                            {% if message.sender == request.user %}
+                                                {% if message.is_read %}
+                                                    <i class="fas fa-check-double ml-1"></i>
+                                                {% else %}
+                                                    <i class="fas fa-check ml-1"></i>
+                                                {% endif %}
+                                            {% endif %}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="text-center py-12">
+                    <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                    </svg>
+                    <p class="mt-2 text-sm text-gray-500">Aucun message dans cette conversation</p>
+                    <p class="text-sm text-gray-500">Soyez le premier à envoyer un message !</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Formulaire d'envoi de message -->
+    <div class="bg-white rounded-lg shadow p-6">
+        <form method="post" class="space-y-4">
+            {% csrf_token %}
+            
+            <!-- Affichage des messages d'erreur/succès -->
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="{% if message.tags == 'error' %}bg-red-50 border-l-4 border-red-400{% else %}bg-green-50 border-l-4 border-green-400{% endif %} p-4">
+                        <p class="{% if message.tags == 'error' %}text-red-700{% else %}text-green-700{% endif %}">{{ message }}</p>
+                    </div>
+                {% endfor %}
+            {% endif %}
+            
+            <div>
+                <label for="content" class="block text-sm font-medium text-gray-700 mb-2">
+                    Votre message
+                </label>
+                <textarea 
+                    name="content" 
+                    id="content" 
+                    rows="3" 
+                    class="input-field resize-none"
+                    placeholder="Écrivez votre message ici..."
+                    required
+                ></textarea>
+            </div>
+            
+            <div class="flex justify-end space-x-3">
+                <a href="{% url 'messaging:inbox' %}" class="btn-secondary">
+                    Retour
+                </a>
+                <button type="submit" class="btn-primary">
+                    <i class="fas fa-paper-plane mr-2"></i>
+                    Envoyer
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    // Scroller automatiquement vers le bas de la zone de messages
+    document.addEventListener('DOMContentLoaded', function() {
+        const messagesContainer = document.getElementById('messages-container');
+        if (messagesContainer) {
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+    });
+</script>
+{% endblock %}
