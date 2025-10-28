@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+
+{% block title %}Choisir votre type de compte - InvestLink{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-blue-50 to-green-50 py-12">
+    <div class="container mx-auto px-4">
+        <div class="max-w-4xl mx-auto">
+            <!-- Header -->
+            <div class="text-center mb-12">
+                <h1 class="text-4xl font-bold text-gray-800 mb-4">Créer un compte</h1>
+                <p class="text-xl text-gray-600">Choisissez le type de compte qui vous correspond</p>
+            </div>
+            
+            <!-- Cards -->
+            <div class="grid md:grid-cols-2 gap-8">
+                <!-- Porteur de projet -->
+                <div class="card hover:shadow-2xl transition-shadow duration-300 border-2 border-transparent hover:border-blue-500">
+                    <div class="text-center mb-6">
+                        <div class="w-24 h-24 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-rocket text-5xl text-blue-900"></i>
+                        </div>
+                        <h2 class="text-2xl font-bold text-gray-800 mb-2">Porteur de projet</h2>
+                        <p class="text-gray-600">Vous avez un projet innovant à financer</p>
+                    </div>
+                    
+                    <ul class="space-y-3 mb-8">
+                        <li class="flex items-start">
+                            <i class="fas fa-check text-green-600 mt-1 mr-3"></i>
+                            <span class="text-gray-700">Présentez votre projet en détail</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check text-green-600 mt-1 mr-3"></i>
+                            <span class="text-gray-700">Accédez à des investisseurs qualifiés</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check text-green-600 mt-1 mr-3"></i>
+                            <span class="text-gray-700">Validation gratuite de votre projet</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check text-green-600 mt-1 mr-3"></i>
+                            <span class="text-gray-700">Messagerie directe avec les investisseurs</span>
+                        </li>
+                    </ul>
+                    
+                    <a href="{% url 'users:register_porteur' %}" class="btn-primary w-full text-center block">
+                        <i class="fas fa-user-plus mr-2"></i>
+                        Je suis porteur de projet
+                    </a>
+                </div>
+                
+                <!-- Investisseur -->
+                <div class="card hover:shadow-2xl transition-shadow duration-300 border-2 border-transparent hover:border-green-500">
+                    <div class="text-center mb-6">
+                        <div class="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-hand-holding-usd text-5xl text-green-600"></i>
+                        </div>
+                        <h2 class="text-2xl font-bold text-gray-800 mb-2">Investisseur</h2>
+                        <p class="text-gray-600">Vous recherchez des opportunités d'investissement</p>
+                    </div>
+                    
+                    <ul class="space-y-3 mb-8">
+                        <li class="flex items-start">
+                            <i class="fas fa-check text-green-600 mt-1 mr-3"></i>
+                            <span class="text-gray-700">Projets vérifiés et validés</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check text-green-600 mt-1 mr-3"></i>
+                            <span class="text-gray-700">Recherche avancée par secteur et budget</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check text-green-600 mt-1 mr-3"></i>
+                            <span class="text-gray-700">Accès aux documents complets</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check text-green-600 mt-1 mr-3"></i>
+                            <span class="text-gray-700">Contact direct avec les porteurs</span>
+                        </li>
+                    </ul>
+                    
+                    <a href="{% url 'users:register_investisseur' %}" class="btn-secondary w-full text-center block">
+                        <i class="fas fa-user-plus mr-2"></i>
+                        Je suis investisseur
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Login link -->
+            <div class="text-center mt-8">
+                <p class="text-gray-600">
+                    Vous avez déjà un compte ?
+                    <a href="{% url 'users:login' %}" class="text-blue-600 hover:text-blue-800 font-semibold">
+                        Connectez-vous ici
+                    </a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,166 @@
+{% extends 'base.html' %}
+
+{% block title %}InvestLink - Plateforme de mise en relation{% endblock %}
+
+{% block content %}
+<div class="relative bg-gradient-to-br from-blue-900 via-blue-800 to-green-700 text-white">
+    <div class="container mx-auto px-4 py-24">
+        <div class="max-w-4xl mx-auto text-center">
+            <h1 class="text-5xl md:text-6xl font-bold mb-6 animate-fade-in">
+                Connectez vos projets aux investisseurs
+            </h1>
+            <p class="text-xl md:text-2xl mb-8 text-gray-200">
+                InvestLink facilite la rencontre entre porteurs de projets innovants et investisseurs à la recherche d'opportunités vérifiées.
+            </p>
+            <div class="flex flex-col md:flex-row gap-4 justify-center">
+                <a href="{% url 'projects:submit' %}" class="btn-secondary text-lg px-8 py-4">
+                    <i class="fas fa-rocket mr-2"></i>
+                    Soumettre un projet
+                </a>
+                <a href="{% url 'projects:list' %}" class="btn-outline bg-white bg-opacity-10 hover:bg-opacity-20 text-lg px-8 py-4">
+                    <i class="fas fa-search mr-2"></i>
+                    Découvrir les projets
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Features Section -->
+<section class="py-20 bg-white">
+    <div class="container mx-auto px-4">
+        <h2 class="text-4xl font-bold text-center mb-12 text-gray-800">Pourquoi choisir InvestLink ?</h2>
+        <div class="grid md:grid-cols-3 gap-8">
+            <!-- Feature 1 -->
+            <div class="card text-center">
+                <div class="text-5xl mb-4 text-blue-900">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <h3 class="text-2xl font-semibold mb-3 text-gray-800">Sécurité garantie</h3>
+                <p class="text-gray-600">
+                    Tous les projets sont validés manuellement par notre équipe avant publication pour garantir leur qualité et leur crédibilité.
+                </p>
+            </div>
+            
+            <!-- Feature 2 -->
+            <div class="card text-center">
+                <div class="text-5xl mb-4 text-green-600">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <h3 class="text-2xl font-semibold mb-3 text-gray-800">Projets vérifiés</h3>
+                <p class="text-gray-600">
+                    Chaque porteur de projet fournit des documents officiels vérifiés : business plan, documents juridiques, etc.
+                </p>
+            </div>
+            
+            <!-- Feature 3 -->
+            <div class="card text-center">
+                <div class="text-5xl mb-4 text-blue-900">
+                    <i class="fas fa-comments"></i>
+                </div>
+                <h3 class="text-2xl font-semibold mb-3 text-gray-800">Échanges directs</h3>
+                <p class="text-gray-600">
+                    Messagerie interne sécurisée pour faciliter la communication entre investisseurs et porteurs de projets.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- How it works -->
+<section class="py-20 bg-gray-100">
+    <div class="container mx-auto px-4">
+        <h2 class="text-4xl font-bold text-center mb-12 text-gray-800">Comment ça marche ?</h2>
+        
+        <div class="grid md:grid-cols-2 gap-12">
+            <!-- Pour les porteurs -->
+            <div>
+                <h3 class="text-2xl font-bold mb-6 text-blue-900 flex items-center">
+                    <i class="fas fa-user-tie mr-3"></i>
+                    Pour les porteurs de projets
+                </h3>
+                <div class="space-y-4">
+                    <div class="flex items-start">
+                        <div class="bg-blue-900 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold mr-4 flex-shrink-0">1</div>
+                        <div>
+                            <h4 class="font-semibold text-gray-800">Créez votre compte</h4>
+                            <p class="text-gray-600">Inscrivez-vous en tant que porteur de projet</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start">
+                        <div class="bg-blue-900 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold mr-4 flex-shrink-0">2</div>
+                        <div>
+                            <h4 class="font-semibold text-gray-800">Soumettez votre projet</h4>
+                            <p class="text-gray-600">Présentez votre projet avec tous les documents nécessaires</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start">
+                        <div class="bg-blue-900 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold mr-4 flex-shrink-0">3</div>
+                        <div>
+                            <h4 class="font-semibold text-gray-800">Validation</h4>
+                            <p class="text-gray-600">Notre équipe examine et valide votre projet</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start">
+                        <div class="bg-green-600 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold mr-4 flex-shrink-0">4</div>
+                        <div>
+                            <h4 class="font-semibold text-gray-800">Rencontrez des investisseurs</h4>
+                            <p class="text-gray-600">Votre projet est publié et visible par les investisseurs</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Pour les investisseurs -->
+            <div>
+                <h3 class="text-2xl font-bold mb-6 text-green-600 flex items-center">
+                    <i class="fas fa-hand-holding-usd mr-3"></i>
+                    Pour les investisseurs
+                </h3>
+                <div class="space-y-4">
+                    <div class="flex items-start">
+                        <div class="bg-green-600 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold mr-4 flex-shrink-0">1</div>
+                        <div>
+                            <h4 class="font-semibold text-gray-800">Créez votre profil</h4>
+                            <p class="text-gray-600">Inscrivez-vous en tant qu'investisseur</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start">
+                        <div class="bg-green-600 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold mr-4 flex-shrink-0">2</div>
+                        <div>
+                            <h4 class="font-semibold text-gray-800">Parcourez les projets</h4>
+                            <p class="text-gray-600">Consultez les projets validés selon vos critères</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start">
+                        <div class="bg-green-600 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold mr-4 flex-shrink-0">3</div>
+                        <div>
+                            <h4 class="font-semibold text-gray-800">Analysez en détail</h4>
+                            <p class="text-gray-600">Accédez aux documents et informations complètes</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start">
+                        <div class="bg-blue-900 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold mr-4 flex-shrink-0">4</div>
+                        <div>
+                            <h4 class="font-semibold text-gray-800">Contactez les porteurs</h4>
+                            <p class="text-gray-600">Échangez directement via notre messagerie sécurisée</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="py-20 bg-blue-900 text-white">
+    <div class="container mx-auto px-4 text-center">
+        <h2 class="text-4xl font-bold mb-6">Prêt à démarrer ?</h2>
+        <p class="text-xl mb-8 text-gray-200">Rejoignez notre communauté d'entrepreneurs et d'investisseurs</p>
+        <a href="{% url 'users:register' %}" class="btn-secondary text-lg px-10 py-4 inline-block">
+            <i class="fas fa-user-plus mr-2"></i>
+            Créer un compte gratuitement
+        </a>
+    </div>
+</section>
+{% endblock %}

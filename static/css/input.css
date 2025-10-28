@@ -1,0 +1,166 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* InvestLink Custom Styles */
+
+/* Charte graphique: Bleu foncé, Vert, Blanc */
+:root {
+  --color-primary: #1e3a8a; /* Bleu foncé */
+  --color-secondary: #059669; /* Vert */
+  --color-accent: #10b981; /* Vert clair */
+  --color-dark: #0f172a; /* Presque noir */
+  --color-light: #f8fafc; /* Blanc cassé */
+}
+
+/* Custom components */
+@layer components {
+  /* Buttons */
+  .btn-primary {
+    @apply bg-blue-900 hover:bg-blue-800 text-white font-semibold py-3 px-6 rounded-lg transition duration-300 ease-in-out transform hover:scale-105 shadow-md hover:shadow-lg;
+  }
+  
+  .btn-secondary {
+    @apply bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-lg transition duration-300 ease-in-out shadow-md hover:shadow-lg;
+  }
+  
+  .btn-outline {
+    @apply border-2 border-blue-900 text-blue-900 hover:bg-blue-900 hover:text-white font-semibold py-2 px-6 rounded-lg transition duration-300 ease-in-out;
+  }
+  
+  /* Cards */
+  .card {
+    @apply bg-white rounded-lg shadow-md p-6 hover:shadow-xl transition-shadow duration-300;
+  }
+  
+  /* Badges */
+  .badge-status {
+    @apply inline-block px-3 py-1 text-xs font-semibold rounded-full;
+  }
+  
+  .badge-pending {
+    @apply badge-status bg-yellow-100 text-yellow-800;
+  }
+  
+  .badge-approved {
+    @apply badge-status bg-green-100 text-green-800;
+  }
+  
+  .badge-rejected {
+    @apply badge-status bg-red-100 text-red-800;
+  }
+  
+  .badge-revision {
+    @apply badge-status bg-blue-100 text-blue-800;
+  }
+  
+  /* Form Elements - IMPROVED */
+  .input-field {
+    @apply w-full px-4 py-3 text-gray-900 bg-white border border-gray-300 rounded-lg 
+           focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent 
+           placeholder-gray-400 transition duration-200 ease-in-out;
+  }
+  
+  .input-field:hover {
+    @apply border-gray-400;
+  }
+  
+  .input-field:disabled {
+    @apply bg-gray-100 cursor-not-allowed;
+  }
+  
+  /* Textarea */
+  textarea.input-field {
+    @apply resize-y min-h-[100px];
+  }
+  
+  /* Select */
+  select.input-field {
+    @apply appearance-none bg-no-repeat bg-right pr-10;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%236B7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
+    background-position: right 0.5rem center;
+    background-size: 1.5em 1.5em;
+  }
+  
+  /* File input */
+  input[type="file"].input-field {
+    @apply file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 
+           file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 
+           hover:file:bg-blue-100 file:cursor-pointer cursor-pointer;
+  }
+  
+  /* Checkbox & Radio */
+  .checkbox-field,
+  .radio-field {
+    @apply w-4 h-4 text-blue-900 bg-white border-gray-300 rounded 
+           focus:ring-2 focus:ring-blue-500 cursor-pointer;
+  }
+  
+  /* Label */
+  .label-field {
+    @apply block text-gray-700 text-sm font-semibold mb-2;
+  }
+  
+  /* Error messages */
+  .error-message {
+    @apply text-red-600 text-sm mt-1 flex items-center;
+  }
+  
+  /* Success messages */
+  .success-message {
+    @apply text-green-600 text-sm mt-1 flex items-center;
+  }
+  
+  /* Form group */
+  .form-group {
+    @apply mb-4;
+  }
+  
+  /* Password toggle button */
+  .password-toggle {
+    @apply absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 
+           focus:outline-none focus:text-blue-600 transition-colors duration-200 cursor-pointer;
+  }
+}
+
+/* Custom animations */
+@layer utilities {
+  .animate-fade-in {
+    animation: fadeIn 0.5s ease-in;
+  }
+  
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  /* Smooth transitions */
+  .transition-smooth {
+    @apply transition-all duration-300 ease-in-out;
+  }
+}
+
+/* Override Django form widget classes */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="url"],
+input[type="tel"],
+input[type="number"],
+input[type="date"],
+textarea,
+select {
+  @apply input-field;
+}
+
+input[type="checkbox"],
+input[type="radio"] {
+  @apply cursor-pointer;
+}
+

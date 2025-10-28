@@ -1,0 +1,189 @@
+{% extends 'base.html' %}
+
+{% block title %}Mes Projets - InvestLink{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 py-12">
+    <div class="container mx-auto px-4">
+        <!-- Header -->
+        <div class="flex justify-between items-center mb-8">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-800 mb-2">Mes Projets</h1>
+                <p class="text-gray-600">Gérez tous vos projets soumis</p>
+            </div>
+            <a href="{% url 'projects:submit' %}" class="btn-primary">
+                <i class="fas fa-plus mr-2"></i>Nouveau projet
+            </a>
+        </div>
+        
+        {% if projects %}
+            <!-- Stats rapides -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+                <div class="card bg-blue-50 border-l-4 border-blue-600">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-gray-600 mb-1">Total</p>
+                            <p class="text-2xl font-bold text-blue-900">{{ projects.count }}</p>
+                        </div>
+                        <i class="fas fa-project-diagram text-3xl text-blue-600 opacity-20"></i>
+                    </div>
+                </div>
+                
+                <div class="card bg-yellow-50 border-l-4 border-yellow-600">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-gray-600 mb-1">En attente</p>
+                            <p class="text-2xl font-bold text-yellow-900">{{ projects|filter_by_status:'submitted'|length }}</p>
+                        </div>
+                        <i class="fas fa-clock text-3xl text-yellow-600 opacity-20"></i>
+                    </div>
+                </div>
+                
+                <div class="card bg-green-50 border-l-4 border-green-600">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-gray-600 mb-1">Validés</p>
+                            <p class="text-2xl font-bold text-green-900">{{ projects|filter_by_status:'approved'|length }}</p>
+                        </div>
+                        <i class="fas fa-check-circle text-3xl text-green-600 opacity-20"></i>
+                    </div>
+                </div>
+                
+                <div class="card bg-red-50 border-l-4 border-red-600">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-gray-600 mb-1">Refusés</p>
+                            <p class="text-2xl font-bold text-red-900">{{ projects|filter_by_status:'rejected'|length }}</p>
+                        </div>
+                        <i class="fas fa-times-circle text-3xl text-red-600 opacity-20"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Liste des projets -->
+            <div class="space-y-4">
+                {% for project in projects %}
+                <div class="card hover:shadow-xl transition-shadow">
+                    <div class="flex flex-col md:flex-row gap-6">
+                        <!-- Image -->
+                        <div class="md:w-1/4">
+                            {% if project.featured_image %}
+                                <img src="{{ project.featured_image.url }}" 
+                                     alt="{{ project.title }}"
+                                     class="w-full h-48 object-cover rounded-lg">
+                            {% else %}
+                                <div class="w-full h-48 bg-gradient-to-br from-blue-100 to-blue-200 rounded-lg flex items-center justify-center">
+                                    <i class="fas fa-image text-4xl text-blue-400"></i>
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Contenu -->
+                        <div class="md:w-3/4">
+                            <div class="flex justify-between items-start mb-4">
+                                <div>
+                                    <h3 class="text-xl font-bold text-gray-800 mb-2">{{ project.title }}</h3>
+                                    <p class="text-gray-600 mb-2">{{ project.summary|truncatewords:30 }}</p>
+                                    <div class="flex flex-wrap gap-2 text-sm">
+                                        <span class="px-2 py-1 bg-gray-100 text-gray-700 rounded">
+                                            <i class="fas fa-tag mr-1"></i>{{ project.get_sector_display }}
+                                        </span>
+                                        <span class="px-2 py-1 bg-gray-100 text-gray-700 rounded">
+                                            <i class="fas fa-map-marker-alt mr-1"></i>{{ project.location }}
+                                        </span>
+                                        <span class="px-2 py-1 bg-gray-100 text-gray-700 rounded">
+                                            <i class="fas fa-dollar-sign mr-1"></i>${{ project.funding_goal|floatformat:0 }}
+                                        </span>
+                                    </div>
+                                </div>
+                                
+                                <!-- Statut -->
+                                <div>
+                                    {% if project.status == 'submitted' %}
+                                        <span class="badge-pending">
+                                            <i class="fas fa-clock mr-1"></i>En attente
+                                        </span>
+                                    {% elif project.status == 'under_review' %}
+                                        <span class="badge-status bg-blue-100 text-blue-800">
+                                            <i class="fas fa-search mr-1"></i>En examen
+                                        </span>
+                                    {% elif project.status == 'revision_requested' %}
+                                        <span class="badge-revision">
+                                            <i class="fas fa-edit mr-1"></i>Révision demandée
+                                        </span>
+                                    {% elif project.status == 'approved' %}
+                                        <span class="badge-approved">
+                                            <i class="fas fa-check-circle mr-1"></i>Validé
+                                        </span>
+                                    {% elif project.status == 'rejected' %}
+                                        <span class="badge-rejected">
+                                            <i class="fas fa-times-circle mr-1"></i>Refusé
+                                        </span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <!-- Métriques -->
+                            <div class="flex gap-4 text-sm text-gray-600 mb-4">
+                                <span><i class="fas fa-eye mr-1"></i>{{ project.views_count }} vues</span>
+                                <span><i class="fas fa-heart mr-1"></i>{{ project.favorites_count }} favoris</span>
+                                <span><i class="fas fa-calendar mr-1"></i>{{ project.created_at|date:"d M Y" }}</span>
+                            </div>
+                            
+                            <!-- Notes admin (si refusé ou révision) -->
+                            {% if project.status == 'rejected' and project.rejection_reason %}
+                                <div class="bg-red-50 border-l-4 border-red-500 p-3 rounded mb-4">
+                                    <p class="text-sm font-semibold text-red-800 mb-1">Motif de refus :</p>
+                                    <p class="text-sm text-red-700">{{ project.rejection_reason }}</p>
+                                </div>
+                            {% elif project.status == 'revision_requested' and project.admin_notes %}
+                                <div class="bg-blue-50 border-l-4 border-blue-500 p-3 rounded mb-4">
+                                    <p class="text-sm font-semibold text-blue-800 mb-1">Révisions demandées :</p>
+                                    <p class="text-sm text-blue-700">{{ project.admin_notes }}</p>
+                                </div>
+                            {% endif %}
+                            
+                            <!-- Actions -->
+                            <div class="flex gap-2">
+                                <a href="{% url 'projects:detail' project.slug %}" 
+                                   class="btn-outline text-sm">
+                                    <i class="fas fa-eye mr-1"></i>Voir
+                                </a>
+                                
+                                {% if project.status != 'approved' %}
+                                    <a href="{% url 'projects:edit' project.slug %}" 
+                                       class="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition">
+                                        <i class="fas fa-edit mr-1"></i>Modifier
+                                    </a>
+                                    
+                                    <form action="{% url 'projects:delete' project.slug %}" 
+                                          method="post" 
+                                          onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce projet ?');"
+                                          class="inline">
+                                        {% csrf_token %}
+                                        <button type="submit" 
+                                                class="px-4 py-2 bg-red-600 text-white text-sm rounded-lg hover:bg-red-700 transition">
+                                            <i class="fas fa-trash mr-1"></i>Supprimer
+                                        </button>
+                                    </form>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <!-- État vide -->
+            <div class="card text-center py-16">
+                <i class="fas fa-folder-open text-6xl text-gray-300 mb-4"></i>
+                <h3 class="text-xl font-semibold text-gray-700 mb-2">Aucun projet pour le moment</h3>
+                <p class="text-gray-500 mb-6">Commencez par soumettre votre premier projet</p>
+                <a href="{% url 'projects:submit' %}" class="btn-primary inline-flex items-center">
+                    <i class="fas fa-plus mr-2"></i>Créer mon premier projet
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

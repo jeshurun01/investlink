@@ -1,0 +1,307 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ project.title }} - InvestLink{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 py-12">
+    <div class="container mx-auto px-4">
+        <!-- Breadcrumb -->
+        <nav class="mb-8 text-sm">
+            <ol class="flex items-center space-x-2 text-gray-600">
+                <li><a href="{% url 'core:home' %}" class="hover:text-blue-600">Accueil</a></li>
+                <li><i class="fas fa-chevron-right text-xs"></i></li>
+                <li><a href="{% url 'projects:list' %}" class="hover:text-blue-600">Projets</a></li>
+                <li><i class="fas fa-chevron-right text-xs"></i></li>
+                <li class="text-gray-800">{{ project.title|truncatewords:5 }}</li>
+            </ol>
+        </nav>
+
+        <div class="grid lg:grid-cols-3 gap-8">
+            <!-- Contenu principal -->
+            <div class="lg:col-span-2 space-y-6">
+                <!-- En-tête -->
+                <div class="card">
+                    <!-- Statut badge (si propriétaire) -->
+                    {% if request.user == project.owner %}
+                        <div class="mb-4">
+                            {% if project.status == 'submitted' %}
+                                <span class="badge-pending">
+                                    <i class="fas fa-clock mr-1"></i>En attente de validation
+                                </span>
+                            {% elif project.status == 'under_review' %}
+                                <span class="badge-status bg-blue-100 text-blue-800">
+                                    <i class="fas fa-search mr-1"></i>En cours d'examen
+                                </span>
+                            {% elif project.status == 'revision_requested' %}
+                                <span class="badge-revision">
+                                    <i class="fas fa-edit mr-1"></i>Révision demandée
+                                </span>
+                            {% elif project.status == 'approved' %}
+                                <span class="badge-approved">
+                                    <i class="fas fa-check-circle mr-1"></i>Validé
+                                </span>
+                            {% elif project.status == 'rejected' %}
+                                <span class="badge-rejected">
+                                    <i class="fas fa-times-circle mr-1"></i>Refusé
+                                </span>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+
+                    <h1 class="text-3xl font-bold text-gray-800 mb-4">{{ project.title }}</h1>
+                    
+                    <!-- Métadonnées -->
+                    <div class="flex flex-wrap gap-4 text-sm text-gray-600 mb-4">
+                        <span class="flex items-center">
+                            <i class="fas fa-user mr-2 text-blue-600"></i>
+                            {{ project.owner.get_full_name|default:project.owner.username }}
+                        </span>
+                        <span class="flex items-center">
+                            <i class="fas fa-calendar mr-2 text-blue-600"></i>
+                            {{ project.created_at|date:"d M Y" }}
+                        </span>
+                        <span class="flex items-center">
+                            <i class="fas fa-eye mr-2 text-blue-600"></i>
+                            {{ project.views_count }} vues
+                        </span>
+                        <span class="flex items-center">
+                            <i class="fas fa-heart mr-2 text-blue-600"></i>
+                            {{ project.favorites_count }} favoris
+                        </span>
+                    </div>
+
+                    <!-- Tags -->
+                    <div class="flex flex-wrap gap-2 mb-6">
+                        <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
+                            <i class="fas fa-tag mr-1"></i>{{ project.get_sector_display }}
+                        </span>
+                        <span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium">
+                            <i class="fas fa-chart-line mr-1"></i>{{ project.get_funding_stage_display }}
+                        </span>
+                        <span class="px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-sm font-medium">
+                            <i class="fas fa-map-marker-alt mr-1"></i>{{ project.location }}
+                        </span>
+                    </div>
+
+                    <!-- Image principale -->
+                    {% if project.featured_image %}
+                        <img src="{{ project.featured_image.url }}" 
+                             alt="{{ project.title }}"
+                             class="w-full h-96 object-cover rounded-lg mb-6">
+                    {% else %}
+                        <div class="w-full h-96 bg-gradient-to-br from-blue-100 to-blue-200 rounded-lg flex items-center justify-center mb-6">
+                            <i class="fas fa-image text-6xl text-blue-300"></i>
+                        </div>
+                    {% endif %}
+
+                    <!-- Résumé -->
+                    <div class="prose max-w-none mb-6">
+                        <p class="text-lg text-gray-700 leading-relaxed">{{ project.summary }}</p>
+                    </div>
+                </div>
+
+                <!-- Description détaillée -->
+                <div class="card">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-4 flex items-center">
+                        <i class="fas fa-file-alt text-blue-600 mr-3"></i>
+                        Description du Projet
+                    </h2>
+                    <div class="prose max-w-none">
+                        <p class="text-gray-700 leading-relaxed whitespace-pre-line">{{ project.description }}</p>
+                    </div>
+                </div>
+
+                <!-- Vidéo -->
+                {% if project.video_url %}
+                <div class="card">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-4 flex items-center">
+                        <i class="fas fa-video text-red-600 mr-3"></i>
+                        Vidéo de Présentation
+                    </h2>
+                    <div class="aspect-video">
+                        {% if 'youtube.com' in project.video_url or 'youtu.be' in project.video_url %}
+                            {% if 'youtu.be' in project.video_url %}
+                                <iframe class="w-full h-full rounded-lg" 
+                                        src="https://www.youtube.com/embed/{{ project.video_url|slice:'17:' }}" 
+                                        frameborder="0" 
+                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                                        allowfullscreen>
+                                </iframe>
+                            {% else %}
+                                <iframe class="w-full h-full rounded-lg" 
+                                        src="https://www.youtube.com/embed/{{ project.video_url|slice:'-11:' }}" 
+                                        frameborder="0" 
+                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                                        allowfullscreen>
+                                </iframe>
+                            {% endif %}
+                        {% elif 'vimeo.com' in project.video_url %}
+                            <iframe class="w-full h-full rounded-lg" 
+                                    src="https://player.vimeo.com/video/{{ project.video_url|slice:'-9:' }}" 
+                                    frameborder="0" 
+                                    allow="autoplay; fullscreen; picture-in-picture" 
+                                    allowfullscreen>
+                            </iframe>
+                        {% else %}
+                            <a href="{{ project.video_url }}" target="_blank" class="text-blue-600 hover:underline">
+                                <i class="fas fa-external-link-alt mr-2"></i>Voir la vidéo
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Documents -->
+                {% if documents %}
+                <div class="card">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-4 flex items-center">
+                        <i class="fas fa-folder-open text-orange-600 mr-3"></i>
+                        Documents
+                    </h2>
+                    <div class="space-y-3">
+                        {% for doc in documents %}
+                        <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition">
+                            <div class="flex items-center">
+                                <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mr-4">
+                                    <i class="fas fa-file-pdf text-blue-600 text-xl"></i>
+                                </div>
+                                <div>
+                                    <p class="font-medium text-gray-800">{{ doc.title }}</p>
+                                    <p class="text-sm text-gray-600">
+                                        {{ doc.get_document_type_display }}
+                                        {% if doc.uploaded_at %}
+                                        • {{ doc.uploaded_at|date:"d M Y" }}
+                                        {% endif %}
+                                    </p>
+                                </div>
+                            </div>
+                            <a href="{{ doc.file.url }}" 
+                               target="_blank"
+                               download
+                               class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+                                <i class="fas fa-download mr-2"></i>Télécharger
+                            </a>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Notes admin (si propriétaire et refusé/révision) -->
+                {% if request.user == project.owner %}
+                    {% if project.status == 'rejected' and project.rejection_reason %}
+                        <div class="card bg-red-50 border-l-4 border-red-500">
+                            <h3 class="text-lg font-bold text-red-800 mb-3 flex items-center">
+                                <i class="fas fa-exclamation-triangle mr-2"></i>
+                                Motif de refus
+                            </h3>
+                            <p class="text-red-700">{{ project.rejection_reason }}</p>
+                        </div>
+                    {% elif project.status == 'revision_requested' and project.admin_notes %}
+                        <div class="card bg-blue-50 border-l-4 border-blue-500">
+                            <h3 class="text-lg font-bold text-blue-800 mb-3 flex items-center">
+                                <i class="fas fa-info-circle mr-2"></i>
+                                Révisions demandées
+                            </h3>
+                            <p class="text-blue-700">{{ project.admin_notes }}</p>
+                            <a href="{% url 'projects:edit' project.slug %}" 
+                               class="btn-primary mt-4 inline-flex items-center">
+                                <i class="fas fa-edit mr-2"></i>Modifier le projet
+                            </a>
+                        </div>
+                    {% endif %}
+                {% endif %}
+            </div>
+
+            <!-- Sidebar -->
+            <div class="space-y-6">
+                <!-- Financement -->
+                <div class="card sticky top-4">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4">Financement</h3>
+                    
+                    <div class="mb-4">
+                        <div class="flex justify-between mb-2">
+                            <span class="text-sm text-gray-600">Objectif</span>
+                            <span class="text-sm font-semibold text-gray-800">${{ project.funding_goal|floatformat:0 }}</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="bg-green-600 h-2 rounded-full" style="width: {{ project.funding_percentage }}%"></div>
+                        </div>
+                        <p class="text-xs text-gray-600 mt-1">{{ project.funding_percentage|floatformat:1 }}% financé</p>
+                    </div>
+
+                    <div class="space-y-3 mb-6">
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Montant levé</span>
+                            <span class="font-semibold text-green-600">${{ project.current_funding|floatformat:0 }}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Investissement min.</span>
+                            <span class="font-semibold text-gray-800">${{ project.min_investment|floatformat:0 }}</span>
+                        </div>
+                    </div>
+
+                    {% if project.status == 'approved' and request.user.is_authenticated %}
+                        {% if request.user.user_type == 'investisseur' %}
+                            <button class="btn-primary w-full mb-3">
+                                <i class="fas fa-hand-holding-usd mr-2"></i>
+                                Investir maintenant
+                            </button>
+                            <button class="btn-outline w-full">
+                                <i class="fas fa-heart mr-2"></i>
+                                Ajouter aux favoris
+                            </button>
+                        {% endif %}
+                    {% endif %}
+
+                    {% if request.user == project.owner and project.status != 'approved' %}
+                        <div class="pt-4 border-t space-y-2">
+                            <a href="{% url 'projects:edit' project.slug %}" 
+                               class="btn-primary w-full text-center">
+                                <i class="fas fa-edit mr-2"></i>Modifier
+                            </a>
+                            <form action="{% url 'projects:delete' project.slug %}" 
+                                  method="post" 
+                                  onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce projet ?');">
+                                {% csrf_token %}
+                                <button type="submit" class="w-full px-4 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition">
+                                    <i class="fas fa-trash mr-2"></i>Supprimer
+                                </button>
+                            </form>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Porteur du projet -->
+                <div class="card">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4">Porteur du Projet</h3>
+                    <div class="flex items-center mb-4">
+                        <div class="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center text-white text-2xl font-bold mr-4">
+                            {{ project.owner.first_name.0|default:project.owner.username.0|upper }}
+                        </div>
+                        <div>
+                            <p class="font-semibold text-gray-800">
+                                {{ project.owner.get_full_name|default:project.owner.username }}
+                            </p>
+                            <p class="text-sm text-gray-600">Porteur de projet</p>
+                        </div>
+                    </div>
+                    
+                    {% if project.owner.projectownerprofile and project.owner.projectownerprofile.company_name %}
+                        <div class="pt-4 border-t">
+                            <p class="text-sm text-gray-600 mb-1">Entreprise</p>
+                            <p class="font-medium text-gray-800">{{ project.owner.projectownerprofile.company_name }}</p>
+                        </div>
+                    {% endif %}
+
+                    {% if request.user.is_authenticated and request.user != project.owner %}
+                        <button class="btn-outline w-full mt-4">
+                            <i class="fas fa-envelope mr-2"></i>Contacter
+                        </button>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

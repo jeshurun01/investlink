@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="{% block meta_description %}InvestLink - Plateforme de mise en relation entre porteurs de projets et investisseurs{% endblock %}">
+    <meta name="keywords" content="{% block meta_keywords %}investissement, projets, financement, startup{% endblock %}">
+    
+    <title>{% block title %}InvestLink - Plateforme d'investissement{% endblock %}</title>
+    
+    {% load static %}
+    
+    <!-- Tailwind CSS -->
+    <link rel="stylesheet" href="{% static 'css/output.css' %}">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700;900&family=Open+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="bg-gray-50 font-sans">
+    
+    <!-- Navigation -->
+    <nav class="bg-blue-900 text-white shadow-lg">
+        <div class="container mx-auto px-4 py-3">
+            <div class="flex justify-between items-center">
+                <!-- Logo -->
+                <a href="{% url 'core:home' %}" class="text-2xl font-bold flex items-center space-x-2">
+                    <i class="fas fa-link text-green-500"></i>
+                    <span>InvestLink</span>
+                </a>
+                
+                <!-- Desktop Menu -->
+                <div class="hidden md:flex space-x-6 items-center">
+                    <a href="{% url 'core:home' %}" class="hover:text-green-400 transition">Accueil</a>
+                    <a href="{% url 'projects:list' %}" class="hover:text-green-400 transition">Découvrir les projets</a>
+                    <a href="{% url 'core:about' %}" class="hover:text-green-400 transition">À propos</a>
+                    <a href="{% url 'core:blog' %}" class="hover:text-green-400 transition">Blog</a>
+                    <a href="{% url 'core:contact' %}" class="hover:text-green-400 transition">Contact</a>
+                    
+                    {% if user.is_authenticated %}
+                        <div class="relative group">
+                            <button class="flex items-center space-x-2 hover:text-green-400 transition">
+                                <i class="fas fa-user-circle"></i>
+                                <span>{{ user.get_full_name|default:user.username }}</span>
+                                <i class="fas fa-chevron-down text-xs"></i>
+                            </button>
+                            <!-- Dropdown -->
+                            <div class="absolute right-0 mt-2 w-48 bg-white text-gray-800 rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
+                                <a href="{% url 'users:dashboard' %}" class="block px-4 py-2 hover:bg-gray-100 rounded-t-lg">
+                                    <i class="fas fa-dashboard mr-2"></i> Dashboard
+                                </a>
+                                <a href="{% url 'users:profile' %}" class="block px-4 py-2 hover:bg-gray-100">
+                                    <i class="fas fa-user mr-2"></i> Mon profil
+                                </a>
+                                {% if user.user_type == 'porteur' %}
+                                    <a href="{% url 'projects:my_projects' %}" class="block px-4 py-2 hover:bg-gray-100">
+                                        <i class="fas fa-folder mr-2"></i> Mes projets
+                                    </a>
+                                    <a href="{% url 'projects:submit' %}" class="block px-4 py-2 hover:bg-gray-100">
+                                        <i class="fas fa-plus-circle mr-2"></i> Nouveau projet
+                                    </a>
+                                {% endif %}
+                                <a href="{% url 'messaging:inbox' %}" class="block px-4 py-2 hover:bg-gray-100">
+                                    <i class="fas fa-envelope mr-2"></i> Messages
+                                </a>
+                                <a href="{% url 'notifications:list' %}" class="block px-4 py-2 hover:bg-gray-100">
+                                    <i class="fas fa-bell mr-2"></i> Notifications
+                                </a>
+                                <hr class="my-2">
+                                <a href="{% url 'users:logout' %}" class="block px-4 py-2 hover:bg-gray-100 rounded-b-lg text-red-600">
+                                    <i class="fas fa-sign-out-alt mr-2"></i> Déconnexion
+                                </a>
+                            </div>
+                        </div>
+                    {% else %}
+                        <a href="{% url 'users:login' %}" class="hover:text-green-400 transition">Connexion</a>
+                        <a href="{% url 'users:register' %}" class="btn-secondary">S'inscrire</a>
+                    {% endif %}
+                </div>
+                
+                <!-- Mobile Menu Button -->
+                <button class="md:hidden" id="mobile-menu-button">
+                    <i class="fas fa-bars text-2xl"></i>
+                </button>
+            </div>
+            
+            <!-- Mobile Menu -->
+            <div class="md:hidden hidden mt-4" id="mobile-menu">
+                <a href="{% url 'core:home' %}" class="block py-2 hover:text-green-400 transition">Accueil</a>
+                <a href="{% url 'projects:list' %}" class="block py-2 hover:text-green-400 transition">Découvrir les projets</a>
+                <a href="{% url 'core:about' %}" class="block py-2 hover:text-green-400 transition">À propos</a>
+                <a href="{% url 'core:blog' %}" class="block py-2 hover:text-green-400 transition">Blog</a>
+                <a href="{% url 'core:contact' %}" class="block py-2 hover:text-green-400 transition">Contact</a>
+                
+                {% if user.is_authenticated %}
+                    <hr class="my-2 border-blue-700">
+                    <a href="{% url 'users:dashboard' %}" class="block py-2 hover:text-green-400 transition">Dashboard</a>
+                    <a href="{% url 'users:profile' %}" class="block py-2 hover:text-green-400 transition">Mon profil</a>
+                    <a href="{% url 'messaging:inbox' %}" class="block py-2 hover:text-green-400 transition">Messages</a>
+                    <a href="{% url 'users:logout' %}" class="block py-2 hover:text-green-400 transition">Déconnexion</a>
+                {% else %}
+                    <a href="{% url 'users:login' %}" class="block py-2 hover:text-green-400 transition">Connexion</a>
+                    <a href="{% url 'users:register' %}" class="block py-2 hover:text-green-400 transition">S'inscrire</a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Messages Flash -->
+    {% if messages %}
+    <div class="container mx-auto px-4 mt-4">
+        {% for message in messages %}
+        <div class="animate-fade-in p-4 rounded-lg mb-2 {% if message.tags == 'error' %}bg-red-100 text-red-800{% elif message.tags == 'success' %}bg-green-100 text-green-800{% elif message.tags == 'warning' %}bg-yellow-100 text-yellow-800{% else %}bg-blue-100 text-blue-800{% endif %}">
+            <div class="flex items-center justify-between">
+                <span>{{ message }}</span>
+                <button onclick="this.parentElement.parentElement.remove()" class="ml-4">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    
+    <!-- Main Content -->
+    <main class="min-h-screen">
+        {% block content %}{% endblock %}
+    </main>
+    
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white mt-16">
+        <div class="container mx-auto px-4 py-12">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <!-- About -->
+                <div>
+                    <h3 class="text-xl font-bold mb-4 flex items-center">
+                        <i class="fas fa-link text-green-500 mr-2"></i>
+                        InvestLink
+                    </h3>
+                    <p class="text-gray-400 text-sm">
+                        Plateforme de mise en relation entre porteurs de projets et investisseurs. 
+                        Transparence, sécurité et qualité garanties.
+                    </p>
+                </div>
+                
+                <!-- Quick Links -->
+                <div>
+                    <h4 class="font-semibold mb-4">Liens rapides</h4>
+                    <ul class="space-y-2 text-sm text-gray-400">
+                        <li><a href="{% url 'core:about' %}" class="hover:text-green-400 transition">À propos</a></li>
+                        <li><a href="{% url 'projects:list' %}" class="hover:text-green-400 transition">Projets</a></li>
+                        <li><a href="{% url 'core:blog' %}" class="hover:text-green-400 transition">Blog</a></li>
+                        <li><a href="{% url 'core:faq' %}" class="hover:text-green-400 transition">FAQ</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Legal -->
+                <div>
+                    <h4 class="font-semibold mb-4">Informations légales</h4>
+                    <ul class="space-y-2 text-sm text-gray-400">
+                        <li><a href="{% url 'core:terms' %}" class="hover:text-green-400 transition">CGU</a></li>
+                        <li><a href="{% url 'core:privacy' %}" class="hover:text-green-400 transition">Politique de confidentialité</a></li>
+                        <li><a href="{% url 'core:legal' %}" class="hover:text-green-400 transition">Mentions légales</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Contact -->
+                <div>
+                    <h4 class="font-semibold mb-4">Contact</h4>
+                    <ul class="space-y-2 text-sm text-gray-400">
+                        <li><i class="fas fa-envelope mr-2"></i> contact@investlink.com</li>
+                        <li><i class="fas fa-phone mr-2"></i> +243 XXX XXX XXX</li>
+                    </ul>
+                    <div class="flex space-x-4 mt-4">
+                        <a href="#" class="text-gray-400 hover:text-green-400 transition"><i class="fab fa-facebook text-xl"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-green-400 transition"><i class="fab fa-twitter text-xl"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-green-400 transition"><i class="fab fa-linkedin text-xl"></i></a>
+                    </div>
+                </div>
+            </div>
+            
+            <hr class="border-gray-800 my-8">
+            
+            <div class="text-center text-gray-400 text-sm">
+                <p>&copy; {% now "Y" %} InvestLink. Tous droits réservés.</p>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- JavaScript -->
+    <script>
+        // Mobile menu toggle
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+        
+        if (mobileMenuButton) {
+            mobileMenuButton.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+        }
+    </script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
