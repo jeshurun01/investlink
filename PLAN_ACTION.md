@@ -127,10 +127,10 @@
 - [x] Page d'accueil (hero, appel à l'action)
 - [x] Page "Découvrir les projets"
 - [x] Page détail d'un projet (vue publique)
-- [ ] Page "À propos"
+- [x] Page "À propos"
 - [ ] Page "Blog/Actualités"
-- [ ] Page "Contact"
-- [ ] Page "FAQ"
+- [x] Page "Contact"
+- [x] Page "FAQ"
 - [ ] Pages mentions légales et CGU
 - [ ] Page politique de confidentialité (RGPD)
 
@@ -395,7 +395,7 @@
 - ⏳ Favoris investisseur (à faire)
 - ⏳ Envoi emails SMTP (à faire)
 
-### 🔄 Phase 3 : EN COURS (55%)
+### 🔄 Phase 3 : EN COURS (65%)
 - ✅ Charte graphique et composants de base
 - ✅ Pages d'authentification complètes
 - ✅ Navigation responsive
@@ -405,7 +405,11 @@
 - ✅ Page "Mes projets" pour porteurs
 - ✅ Page détails de projet avec sidebar
 - ✅ Page liste publique des projets avec filtres
-- ⏳ Pages publiques manquantes (à propos, contact, FAQ)
+- ✅ Page "À propos" complète avec mission et valeurs
+- ✅ Page "Contact" avec formulaire fonctionnel
+- ✅ Page "FAQ" avec accordéon et recherche
+- ⏳ Pages légales manquantes (CGU, confidentialité, mentions légales)
+- ⏳ Page "Blog/Actualités" (à faire)
 
 ### 🎨 Améliorations UX Récentes
 - ✅ Refonte CSS des formulaires (padding, focus, transitions)
@@ -419,8 +423,10 @@
 2. ✅ Workflow de validation admin
 3. ✅ Système de messagerie interne
 4. ✅ Système de notifications
-5. Favoris investisseur et système de rating
-6. Pages publiques (à propos, contact, FAQ)
+5. ✅ Pages publiques (à propos, contact, FAQ)
+6. Favoris investisseur et système de rating
+7. Pages légales (CGU, confidentialité, mentions légales)
+8. Configuration SMTP pour envoi d'emails
 
 ---
 
