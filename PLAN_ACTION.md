@@ -161,10 +161,10 @@
 - [ ] Page de notifications
 
 ### 3.6 Interface administrateur
-- [ ] Dashboard admin (statistiques)
-- [ ] Page de modération des projets
-- [ ] Page de validation détaillée d'un projet
-- [ ] Page de gestion des utilisateurs
+- [x] Dashboard admin (statistiques)
+- [x] Page de modération des projets
+- [x] Page de validation détaillée d'un projet
+- [x] Page de gestion des utilisateurs
 - [ ] Page de gestion du contenu
 - [ ] Page de logs/activités
 
@@ -395,7 +395,7 @@
 - ⏳ Favoris investisseur (à faire)
 - ⏳ Envoi emails SMTP (à faire)
 
-### 🔄 Phase 3 : EN COURS (65%)
+### 🔄 Phase 3 : EN COURS (75%)
 - ✅ Charte graphique et composants de base
 - ✅ Pages d'authentification complètes
 - ✅ Navigation responsive
@@ -408,8 +408,12 @@
 - ✅ Page "À propos" complète avec mission et valeurs
 - ✅ Page "Contact" avec formulaire fonctionnel
 - ✅ Page "FAQ" avec accordéon et recherche
+- ✅ Dashboard admin avec statistiques globales
+- ✅ Page de gestion des utilisateurs avec filtres
+- ✅ Page détail utilisateur avec activation/désactivation
 - ⏳ Pages légales manquantes (CGU, confidentialité, mentions légales)
 - ⏳ Page "Blog/Actualités" (à faire)
+- ⏳ Page de logs/activités admin (à faire)
 
 ### 🎨 Améliorations UX Récentes
 - ✅ Refonte CSS des formulaires (padding, focus, transitions)
@@ -424,9 +428,11 @@
 3. ✅ Système de messagerie interne
 4. ✅ Système de notifications
 5. ✅ Pages publiques (à propos, contact, FAQ)
-6. Favoris investisseur et système de rating
-7. Pages légales (CGU, confidentialité, mentions légales)
-8. Configuration SMTP pour envoi d'emails
+6. ✅ Interface administrateur (dashboard, gestion utilisateurs)
+7. Favoris investisseur et système de rating
+8. Pages légales (CGU, confidentialité, mentions légales)
+9. Configuration SMTP pour envoi d'emails
+10. Responsive design (mobile/tablette)
 
 ---
 
