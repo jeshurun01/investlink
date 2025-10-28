@@ -1,8 +1,12 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
+from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib import messages
 from django.urls import reverse
+from django.db.models import Count, Q
+from django.utils import timezone
+from datetime import timedelta
 from .forms import (
     ProjectOwnerRegistrationForm, 
     InvestorRegistrationForm,
@@ -167,3 +171,186 @@ def profile(request):
     return render(request, 'users/profile.html', context)
 
 
+# ============================================
+# INTERFACE ADMINISTRATEUR
+# ============================================
+
+@staff_member_required
+def admin_dashboard(request):
+    """Dashboard administrateur avec statistiques globales"""
+    from projects.models import Project
+    from messaging.models import Message, Conversation
+    from notifications.models import Notification
+    
+    # Statistiques utilisateurs
+    total_users = User.objects.count()
+    porteurs_count = User.objects.filter(user_type='porteur').count()
+    investisseurs_count = User.objects.filter(user_type='investisseur').count()
+    new_users_week = User.objects.filter(
+        date_joined__gte=timezone.now() - timedelta(days=7)
+    ).count()
+    active_users_month = User.objects.filter(
+        last_login__gte=timezone.now() - timedelta(days=30)
+    ).count()
+    
+    # Statistiques projets
+    total_projects = Project.objects.count()
+    pending_projects = Project.objects.filter(
+        status__in=['submitted', 'under_review', 'revision_requested']
+    ).count()
+    approved_projects = Project.objects.filter(status='approved').count()
+    rejected_projects = Project.objects.filter(status='rejected').count()
+    
+    # Statistiques par secteur
+    projects_by_sector = Project.objects.values('sector').annotate(
+        count=Count('id')
+    ).order_by('-count')[:5]
+    
+    # Statistiques messagerie
+    total_messages = Message.objects.count()
+    total_conversations = Conversation.objects.count()
+    messages_week = Message.objects.filter(
+        created_at__gte=timezone.now() - timedelta(days=7)
+    ).count()
+    
+    # Statistiques notifications
+    total_notifications = Notification.objects.count()
+    unread_notifications = Notification.objects.filter(is_read=False).count()
+    
+    # Activité récente (derniers utilisateurs)
+    recent_users = User.objects.order_by('-date_joined')[:10]
+    
+    # Projets récents
+    recent_projects = Project.objects.order_by('-created_at')[:10].select_related('owner')
+    
+    # Messages récents
+    recent_messages = Message.objects.order_by('-created_at')[:10].select_related(
+        'sender', 'conversation'
+    )
+    
+    context = {
+        # Utilisateurs
+        'total_users': total_users,
+        'porteurs_count': porteurs_count,
+        'investisseurs_count': investisseurs_count,
+        'new_users_week': new_users_week,
+        'active_users_month': active_users_month,
+        
+        # Projets
+        'total_projects': total_projects,
+        'pending_projects': pending_projects,
+        'approved_projects': approved_projects,
+        'rejected_projects': rejected_projects,
+        'projects_by_sector': projects_by_sector,
+        
+        # Messagerie
+        'total_messages': total_messages,
+        'total_conversations': total_conversations,
+        'messages_week': messages_week,
+        
+        # Notifications
+        'total_notifications': total_notifications,
+        'unread_notifications': unread_notifications,
+        
+        # Activité récente
+        'recent_users': recent_users,
+        'recent_projects': recent_projects,
+        'recent_messages': recent_messages,
+    }
+    
+    return render(request, 'users/admin_dashboard.html', context)
+
+
+@staff_member_required
+def admin_users(request):
+    """Gestion des utilisateurs"""
+    users = User.objects.all().order_by('-date_joined')
+    
+    # Filtres
+    user_type = request.GET.get('type')
+    if user_type:
+        users = users.filter(user_type=user_type)
+    
+    is_active = request.GET.get('active')
+    if is_active == 'true':
+        users = users.filter(is_active=True)
+    elif is_active == 'false':
+        users = users.filter(is_active=False)
+    
+    search = request.GET.get('search')
+    if search:
+        users = users.filter(
+            Q(username__icontains=search) |
+            Q(email__icontains=search) |
+            Q(first_name__icontains=search) |
+            Q(last_name__icontains=search)
+        )
+    
+    # Statistiques
+    total_count = User.objects.count()
+    active_count = User.objects.filter(is_active=True).count()
+    inactive_count = User.objects.filter(is_active=False).count()
+    
+    context = {
+        'users': users,
+        'total_count': total_count,
+        'active_count': active_count,
+        'inactive_count': inactive_count,
+    }
+    
+    return render(request, 'users/admin_users.html', context)
+
+
+@staff_member_required
+def admin_user_detail(request, user_id):
+    """Détail d'un utilisateur avec possibilité d'activation/désactivation"""
+    user_obj = get_object_or_404(User, id=user_id)
+    
+    from projects.models import Project
+    from messaging.models import Message
+    
+    # Statistiques de l'utilisateur
+    if user_obj.user_type == 'porteur':
+        projects_count = Project.objects.filter(owner=user_obj).count()
+        approved_projects = Project.objects.filter(owner=user_obj, status='approved').count()
+    else:
+        projects_count = 0
+        approved_projects = 0
+    
+    messages_sent = Message.objects.filter(sender=user_obj).count()
+    
+    # Projets de l'utilisateur
+    user_projects = Project.objects.filter(owner=user_obj).order_by('-created_at')[:10] if user_obj.user_type == 'porteur' else []
+    
+    context = {
+        'user_obj': user_obj,
+        'projects_count': projects_count,
+        'approved_projects': approved_projects,
+        'messages_sent': messages_sent,
+        'user_projects': user_projects,
+    }
+    
+    return render(request, 'users/admin_user_detail.html', context)
+
+
+@staff_member_required
+def admin_toggle_user_status(request, user_id):
+    """Activer/Désactiver un utilisateur"""
+    if request.method == 'POST':
+        user_obj = get_object_or_404(User, id=user_id)
+        
+        # Ne pas permettre de se désactiver soi-même
+        if user_obj == request.user:
+            messages.error(request, 'Vous ne pouvez pas modifier votre propre statut.')
+            return redirect('users:admin_user_detail', user_id=user_id)
+        
+        # Toggle le statut
+        user_obj.is_active = not user_obj.is_active
+        user_obj.save()
+        
+        status = 'activé' if user_obj.is_active else 'désactivé'
+        messages.success(request, f'Le compte de {user_obj.get_full_name()} a été {status}.')
+        
+        return redirect('users:admin_user_detail', user_id=user_id)
+    
+    return redirect('users:admin_users')

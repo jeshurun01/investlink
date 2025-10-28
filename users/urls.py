@@ -17,4 +17,10 @@ urlpatterns = [
     # Profil et dashboard
     path('dashboard/', views.dashboard, name='dashboard'),
     path('profile/', views.profile, name='profile'),
+    
+    # Interface administrateur
+    path('admin/dashboard/', views.admin_dashboard, name='admin_dashboard'),
+    path('admin/users/', views.admin_users, name='admin_users'),
+    path('admin/users/<int:user_id>/', views.admin_user_detail, name='admin_user_detail'),
+    path('admin/users/<int:user_id>/toggle-status/', views.admin_toggle_user_status, name='admin_toggle_user_status'),
 ]
