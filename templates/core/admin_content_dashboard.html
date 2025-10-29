@@ -1,0 +1,206 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Gestion du Contenu - Admin{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <!-- En-tête -->
+        <div class="mb-8">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-900">Gestion du Contenu</h1>
+                    <p class="mt-2 text-gray-600">Articles de blog et catégories</p>
+                </div>
+                <a href="{% url 'users:admin_dashboard' %}" 
+                   class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition">
+                    ← Retour au Dashboard
+                </a>
+            </div>
+        </div>
+
+        <!-- Statistiques -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div class="bg-white rounded-lg shadow-sm p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600">Total Articles</p>
+                        <p class="text-3xl font-bold text-gray-900 mt-2">{{ total_posts }}</p>
+                    </div>
+                    <div class="p-3 bg-blue-100 rounded-full">
+                        <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-sm p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600">Publiés</p>
+                        <p class="text-3xl font-bold text-green-600 mt-2">{{ published_posts }}</p>
+                    </div>
+                    <div class="p-3 bg-green-100 rounded-full">
+                        <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-sm p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600">Brouillons</p>
+                        <p class="text-3xl font-bold text-orange-600 mt-2">{{ draft_posts }}</p>
+                    </div>
+                    <div class="p-3 bg-orange-100 rounded-full">
+                        <svg class="w-8 h-8 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-sm p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600">Catégories</p>
+                        <p class="text-3xl font-bold text-purple-600 mt-2">{{ total_categories }}</p>
+                    </div>
+                    <div class="p-3 bg-purple-100 rounded-full">
+                        <svg class="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Actions rapides -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <a href="{% url 'core:admin_blog_post_create' %}" 
+               class="bg-blue-600 text-white rounded-lg shadow-sm p-6 hover:bg-blue-700 transition group">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h3 class="text-lg font-semibold mb-2">Nouvel Article</h3>
+                        <p class="text-blue-100">Créer un nouvel article de blog</p>
+                    </div>
+                    <svg class="w-10 h-10 text-blue-200 group-hover:text-white transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                    </svg>
+                </div>
+            </a>
+
+            <a href="{% url 'core:admin_category_create' %}" 
+               class="bg-purple-600 text-white rounded-lg shadow-sm p-6 hover:bg-purple-700 transition group">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h3 class="text-lg font-semibold mb-2">Nouvelle Catégorie</h3>
+                        <p class="text-purple-100">Ajouter une nouvelle catégorie</p>
+                    </div>
+                    <svg class="w-10 h-10 text-purple-200 group-hover:text-white transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                    </svg>
+                </div>
+            </a>
+        </div>
+
+        <!-- Articles récents -->
+        <div class="bg-white rounded-lg shadow-sm">
+            <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+                <h2 class="text-xl font-semibold text-gray-900">Articles Récents</h2>
+                <a href="{% url 'core:admin_blog_posts' %}" 
+                   class="text-blue-600 hover:text-blue-800 font-medium">
+                    Voir tous →
+                </a>
+            </div>
+            
+            <div class="divide-y divide-gray-200">
+                {% for post in recent_posts %}
+                <div class="px-6 py-4 hover:bg-gray-50 transition">
+                    <div class="flex items-center justify-between">
+                        <div class="flex-1">
+                            <div class="flex items-center space-x-3">
+                                <h3 class="font-semibold text-gray-900">{{ post.title }}</h3>
+                                {% if post.status == 'published' %}
+                                <span class="px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full">
+                                    Publié
+                                </span>
+                                {% else %}
+                                <span class="px-2 py-1 text-xs font-medium bg-orange-100 text-orange-800 rounded-full">
+                                    Brouillon
+                                </span>
+                                {% endif %}
+                            </div>
+                            <div class="mt-1 flex items-center space-x-4 text-sm text-gray-500">
+                                <span>Par {{ post.author.get_full_name|default:post.author.email }}</span>
+                                <span>•</span>
+                                <span>{{ post.created_at|date:"d M Y" }}</span>
+                                {% if post.category %}
+                                <span>•</span>
+                                <span class="text-purple-600">{{ post.category.name }}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <a href="{% url 'core:admin_blog_post_edit' post.id %}" 
+                               class="px-3 py-1 text-sm text-blue-600 hover:bg-blue-50 rounded transition">
+                                Modifier
+                            </a>
+                            <a href="{% url 'core:blog_detail' post.slug %}" target="_blank"
+                               class="px-3 py-1 text-sm text-gray-600 hover:bg-gray-100 rounded transition">
+                                Voir
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="px-6 py-12 text-center text-gray-500">
+                    <p>Aucun article pour le moment.</p>
+                    <a href="{% url 'core:admin_blog_post_create' %}" 
+                       class="inline-block mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                        Créer le premier article
+                    </a>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Liens rapides -->
+        <div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
+            <a href="{% url 'core:admin_blog_posts' %}" 
+               class="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition text-center">
+                <svg class="w-12 h-12 text-blue-600 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                </svg>
+                <h3 class="font-semibold text-gray-900 mb-1">Gérer les Articles</h3>
+                <p class="text-sm text-gray-600">Liste complète des articles</p>
+            </a>
+
+            <a href="{% url 'core:admin_categories' %}" 
+               class="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition text-center">
+                <svg class="w-12 h-12 text-purple-600 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
+                </svg>
+                <h3 class="font-semibold text-gray-900 mb-1">Gérer les Catégories</h3>
+                <p class="text-sm text-gray-600">Organiser les catégories</p>
+            </a>
+
+            <a href="{% url 'core:blog' %}" target="_blank"
+               class="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition text-center">
+                <svg class="w-12 h-12 text-gray-600 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                </svg>
+                <h3 class="font-semibold text-gray-900 mb-1">Voir le Blog</h3>
+                <p class="text-sm text-gray-600">Vue publique du blog</p>
+            </a>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

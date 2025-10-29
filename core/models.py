@@ -86,3 +86,88 @@ class BlogPost(models.Model):
         """Incrémente le compteur de vues"""
         self.views_count += 1
         self.save(update_fields=['views_count'])
+
+
+class ActivityLog(models.Model):
+    """Journal des activités pour traçabilité"""
+    ACTION_CHOICES = [
+        ('login', 'Connexion'),
+        ('logout', 'Déconnexion'),
+        ('create', 'Création'),
+        ('update', 'Modification'),
+        ('delete', 'Suppression'),
+        ('validate', 'Validation'),
+        ('reject', 'Rejet'),
+        ('publish', 'Publication'),
+        ('view', 'Consultation'),
+    ]
+    
+    ENTITY_CHOICES = [
+        ('user', 'Utilisateur'),
+        ('project', 'Projet'),
+        ('investment', 'Investissement'),
+        ('blog_post', 'Article de blog'),
+        ('blog_category', 'Catégorie'),
+        ('message', 'Message'),
+        ('notification', 'Notification'),
+        ('document', 'Document'),
+    ]
+    
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, 
+                            verbose_name="Utilisateur", related_name='activity_logs')
+    action = models.CharField("Action", max_length=20, choices=ACTION_CHOICES)
+    entity_type = models.CharField("Type d'entité", max_length=20, choices=ENTITY_CHOICES)
+    entity_id = models.PositiveIntegerField("ID de l'entité", null=True, blank=True)
+    entity_name = models.CharField("Nom de l'entité", max_length=200, blank=True)
+    
+    description = models.TextField("Description", blank=True)
+    ip_address = models.GenericIPAddressField("Adresse IP", null=True, blank=True)
+    user_agent = models.CharField("User Agent", max_length=255, blank=True)
+    
+    created_at = models.DateTimeField("Date et heure", auto_now_add=True)
+    
+    class Meta:
+        verbose_name = "Journal d'activité"
+        verbose_name_plural = "Journal des activités"
+        ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['-created_at']),
+            models.Index(fields=['user', '-created_at']),
+            models.Index(fields=['entity_type', '-created_at']),
+            models.Index(fields=['action', '-created_at']),
+        ]
+    
+    def __str__(self):
+        return f"{self.get_action_display()} - {self.get_entity_type_display()} - {self.created_at.strftime('%d/%m/%Y %H:%M')}"
+    
+    @classmethod
+    def log(cls, user, action, entity_type, entity_id=None, entity_name='', 
+            description='', request=None):
+        """
+        Méthode helper pour créer un log facilement
+        
+        Usage:
+        ActivityLog.log(request.user, 'create', 'project', project.id, project.title, 
+                       'Création d\'un nouveau projet', request)
+        """
+        log_data = {
+            'user': user if user and user.is_authenticated else None,
+            'action': action,
+            'entity_type': entity_type,
+            'entity_id': entity_id,
+            'entity_name': entity_name,
+            'description': description,
+        }
+        
+        if request:
+            # Récupération de l'IP
+            x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+            if x_forwarded_for:
+                log_data['ip_address'] = x_forwarded_for.split(',')[0].strip()
+            else:
+                log_data['ip_address'] = request.META.get('REMOTE_ADDR')
+            
+            # User Agent
+            log_data['user_agent'] = request.META.get('HTTP_USER_AGENT', '')[:255]
+        
+        return cls.objects.create(**log_data)

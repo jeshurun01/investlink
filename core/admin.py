@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import BlogPost, BlogCategory
+from .models import BlogPost, BlogCategory, ActivityLog
 
 
 @admin.register(BlogCategory)
@@ -48,3 +48,23 @@ class BlogPostAdmin(admin.ModelAdmin):
         if not change:  # Si c'est une nouvelle création
             obj.author = request.user
         super().save_model(request, obj, form, change)
+
+
+@admin.register(ActivityLog)
+class ActivityLogAdmin(admin.ModelAdmin):
+    """Administration des logs d'activité"""
+    list_display = ['created_at', 'user', 'action', 'entity_type', 'entity_name', 'ip_address']
+    list_filter = ['action', 'entity_type', 'created_at']
+    search_fields = ['user__email', 'entity_name', 'description', 'ip_address']
+    date_hierarchy = 'created_at'
+    ordering = ['-created_at']
+    readonly_fields = ['user', 'action', 'entity_type', 'entity_id', 'entity_name', 
+                      'description', 'ip_address', 'user_agent', 'created_at']
+    
+    def has_add_permission(self, request):
+        """Empêcher la création manuelle de logs"""
+        return False
+    
+    def has_change_permission(self, request, obj=None):
+        """Empêcher la modification de logs"""
+        return False

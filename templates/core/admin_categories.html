@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+
+{% block title %}Catégories - Admin{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 py-8">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <div class="mb-8">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-900">Catégories</h1>
+                    <p class="mt-2 text-gray-600">{{ categories.count }} catégorie{{ categories.count|pluralize }}</p>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <a href="{% url 'core:admin_content_dashboard' %}" 
+                       class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition">
+                        ← Retour
+                    </a>
+                    <a href="{% url 'core:admin_category_create' %}" 
+                       class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition">
+                        + Nouvelle Catégorie
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {% for category in categories %}
+            <div class="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition">
+                <div class="flex items-start justify-between">
+                    <div class="flex-1">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-2">{{ category.name }}</h3>
+                        <p class="text-sm text-gray-600 mb-3">{{ category.description|default:"Aucune description" }}</p>
+                        <div class="flex items-center text-sm text-gray-500">
+                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                            </svg>
+                            {{ category.posts_count }} article{{ category.posts_count|pluralize }}
+                        </div>
+                    </div>
+                    <div class="ml-4 flex flex-col space-y-2">
+                        <a href="{% url 'core:admin_category_edit' category.id %}" 
+                           class="px-3 py-1 text-sm text-blue-600 hover:bg-blue-50 rounded transition">
+                            Modifier
+                        </a>
+                        <a href="{% url 'core:admin_category_delete' category.id %}" 
+                           class="px-3 py-1 text-sm text-red-600 hover:bg-red-50 rounded transition">
+                            Supprimer
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-span-2 bg-white rounded-lg shadow-sm p-12 text-center">
+                <p class="text-gray-500 mb-4">Aucune catégorie pour le moment.</p>
+                <a href="{% url 'core:admin_category_create' %}" 
+                   class="inline-block px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700">
+                    Créer la première catégorie
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+
+    </div>
+</div>
+{% endblock %}
