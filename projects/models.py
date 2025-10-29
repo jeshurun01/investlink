@@ -207,3 +207,157 @@ class ProjectFavorite(models.Model):
     def __str__(self):
         return f"{self.user.username} - {self.project.title}"
 
+
+class Investment(models.Model):
+    """Investissements réalisés dans les projets"""
+    
+    STATUS_CHOICES = (
+        ('pending', 'En attente de validation'),
+        ('confirmed', 'Confirmé'),
+        ('rejected', 'Rejeté'),
+    )
+    
+    investor = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='investments',
+        verbose_name='Investisseur'
+    )
+    project = models.ForeignKey(
+        Project,
+        on_delete=models.CASCADE,
+        related_name='investments',
+        verbose_name='Projet'
+    )
+    amount = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
+        verbose_name='Montant investi ($)'
+    )
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default='pending',
+        verbose_name='Statut'
+    )
+    investment_date = models.DateField(verbose_name='Date d\'investissement')
+    
+    # Informations additionnelles
+    notes = models.TextField(blank=True, verbose_name='Notes')
+    admin_notes = models.TextField(blank=True, verbose_name='Notes administrateur')
+    
+    # Dates de suivi
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name='Date de déclaration')
+    validated_at = models.DateTimeField(null=True, blank=True, verbose_name='Date de validation')
+    
+    class Meta:
+        verbose_name = 'Investissement'
+        verbose_name_plural = 'Investissements'
+        ordering = ['-investment_date']
+        indexes = [
+            models.Index(fields=['-investment_date']),
+            models.Index(fields=['status']),
+        ]
+    
+    def __str__(self):
+        return f"{self.investor.username} - {self.project.title} - ${self.amount}"
+    
+    @property
+    def current_value(self):
+        """Valeur actuelle de l'investissement basée sur les dernières performances"""
+        latest_performance = self.project.performances.order_by('-report_date').first()
+        if latest_performance and latest_performance.roi_percentage is not None:
+            return float(self.amount) * (1 + latest_performance.roi_percentage / 100)
+        return float(self.amount)
+    
+    @property
+    def roi_amount(self):
+        """Montant du retour sur investissement"""
+        return self.current_value - float(self.amount)
+    
+    @property
+    def roi_percentage(self):
+        """Pourcentage du retour sur investissement"""
+        if self.amount > 0:
+            return (self.roi_amount / float(self.amount)) * 100
+        return 0
+
+
+class ProjectPerformance(models.Model):
+    """Performances mensuelles des projets"""
+    
+    project = models.ForeignKey(
+        Project,
+        on_delete=models.CASCADE,
+        related_name='performances',
+        verbose_name='Projet'
+    )
+    report_date = models.DateField(verbose_name='Date du rapport')
+    
+    # Métriques financières
+    revenue = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        verbose_name='Chiffre d\'affaires ($)'
+    )
+    profit = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        verbose_name='Bénéfice ($)'
+    )
+    roi_percentage = models.DecimalField(
+        max_digits=5,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        verbose_name='ROI (%)',
+        help_text='Retour sur investissement en pourcentage'
+    )
+    
+    # Métriques d'activité
+    active_users = models.PositiveIntegerField(
+        null=True,
+        blank=True,
+        verbose_name='Utilisateurs actifs'
+    )
+    growth_rate = models.DecimalField(
+        max_digits=5,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        verbose_name='Taux de croissance (%)'
+    )
+    
+    # Informations qualitatives
+    summary = models.TextField(blank=True, verbose_name='Résumé des performances')
+    challenges = models.TextField(blank=True, verbose_name='Défis rencontrés')
+    next_objectives = models.TextField(blank=True, verbose_name='Prochains objectifs')
+    
+    # Metadata
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name='Date de création')
+    updated_at = models.DateTimeField(auto_now=True, verbose_name='Dernière mise à jour')
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='performance_reports',
+        verbose_name='Créé par'
+    )
+    
+    class Meta:
+        verbose_name = 'Performance de projet'
+        verbose_name_plural = 'Performances de projets'
+        ordering = ['-report_date']
+        unique_together = ['project', 'report_date']
+        indexes = [
+            models.Index(fields=['-report_date']),
+            models.Index(fields=['project', '-report_date']),
+        ]
+    
+    def __str__(self):
+        return f"{self.project.title} - {self.report_date.strftime('%B %Y')}"

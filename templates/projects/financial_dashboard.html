@@ -1,0 +1,317 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}États Financiers Mensuels - InvestLink{% endblock %}
+
+{% block extra_css %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- En-tête -->
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-900 mb-2">
+            <i class="fas fa-chart-pie text-blue-600 mr-2"></i>
+            États Financiers Mensuels
+        </h1>
+        <p class="text-gray-600">
+            Vue d'ensemble de vos performances d'investissement
+        </p>
+    </div>
+
+    <!-- Statistiques globales -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div class="bg-gradient-to-br from-green-500 to-green-600 rounded-lg shadow p-6 text-white">
+            <div class="flex items-center justify-between mb-2">
+                <p class="text-green-100 text-sm font-medium">Total Investi</p>
+                <i class="fas fa-coins text-2xl text-green-200"></i>
+            </div>
+            <p class="text-3xl font-bold">${{ total_invested|floatformat:0 }}</p>
+        </div>
+
+        <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg shadow p-6 text-white">
+            <div class="flex items-center justify-between mb-2">
+                <p class="text-blue-100 text-sm font-medium">Valeur Actuelle</p>
+                <i class="fas fa-chart-line text-2xl text-blue-200"></i>
+            </div>
+            <p class="text-3xl font-bold">${{ total_current_value|floatformat:0 }}</p>
+        </div>
+
+        <div class="bg-gradient-to-br from-{% if total_roi >= 0 %}green{% else %}red{% endif %}-500 to-{% if total_roi >= 0 %}green{% else %}red{% endif %}-600 rounded-lg shadow p-6 text-white">
+            <div class="flex items-center justify-between mb-2">
+                <p class="text-{% if total_roi >= 0 %}green{% else %}red{% endif %}-100 text-sm font-medium">ROI Total</p>
+                <i class="fas fa-{% if total_roi >= 0 %}arrow-up{% else %}arrow-down{% endif %} text-2xl text-{% if total_roi >= 0 %}green{% else %}red{% endif %}-200"></i>
+            </div>
+            <p class="text-3xl font-bold">{% if total_roi >= 0 %}+{% endif %}${{ total_roi|floatformat:0 }}</p>
+            <p class="text-sm text-{% if total_roi >= 0 %}green{% else %}red{% endif %}-200 mt-1">{{ roi_percentage|floatformat:1 }}%</p>
+        </div>
+
+        <div class="bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg shadow p-6 text-white">
+            <div class="flex items-center justify-between mb-2">
+                <p class="text-purple-100 text-sm font-medium">Projets</p>
+                <i class="fas fa-folder text-2xl text-purple-200"></i>
+            </div>
+            <p class="text-3xl font-bold">{{ projects_count }}</p>
+            <p class="text-sm text-purple-200 mt-1">{{ investments.count }} investissements</p>
+        </div>
+    </div>
+
+    <!-- Graphiques -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <!-- Graphique d'évolution -->
+        <div class="bg-white rounded-lg shadow p-6">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">
+                <i class="fas fa-chart-line text-blue-600 mr-2"></i>
+                Évolution du Portefeuille
+            </h3>
+            <canvas id="portfolioEvolutionChart" height="250"></canvas>
+        </div>
+
+        <!-- Graphique de répartition -->
+        <div class="bg-white rounded-lg shadow p-6">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">
+                <i class="fas fa-chart-pie text-purple-600 mr-2"></i>
+                Répartition par Secteur
+            </h3>
+            <canvas id="sectorDistributionChart" height="250"></canvas>
+        </div>
+    </div>
+
+    <!-- Tableau des performances -->
+    <div class="bg-white rounded-lg shadow overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-200">
+            <h3 class="text-lg font-semibold text-gray-900">
+                <i class="fas fa-table text-green-600 mr-2"></i>
+                Détail des Investissements
+            </h3>
+        </div>
+
+        {% if portfolio_data %}
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Projet
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Secteur
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Date
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Investi
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Valeur Actuelle
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Gain/Perte
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            ROI
+                        </th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    {% for item in portfolio_data %}
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <a href="{% url 'projects:detail' item.investment.project.slug %}" class="text-blue-600 hover:text-blue-800 font-medium">
+                                {{ item.investment.project.title|truncatewords:5 }}
+                            </a>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">
+                                {{ item.investment.project.get_sector_display }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                            {{ item.investment.investment_date|date:"d/m/Y" }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium text-gray-900">
+                            ${{ item.investment.amount|floatformat:0 }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium text-blue-600">
+                            ${{ item.current_value|floatformat:0 }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-bold {% if item.roi_amount >= 0 %}text-green-600{% else %}text-red-600{% endif %}">
+                            {% if item.roi_amount >= 0 %}+{% endif %}${{ item.roi_amount|floatformat:0 }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-bold {% if item.roi_percentage >= 0 %}text-green-600{% else %}text-red-600{% endif %}">
+                            {% if item.roi_percentage >= 0 %}+{% endif %}{{ item.roi_percentage|floatformat:1 }}%
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot class="bg-gray-50 font-semibold">
+                    <tr>
+                        <td colspan="3" class="px-6 py-4 text-left text-gray-900">
+                            TOTAL
+                        </td>
+                        <td class="px-6 py-4 text-right text-gray-900">
+                            ${{ total_invested|floatformat:0 }}
+                        </td>
+                        <td class="px-6 py-4 text-right text-blue-600">
+                            ${{ total_current_value|floatformat:0 }}
+                        </td>
+                        <td class="px-6 py-4 text-right {% if total_roi >= 0 %}text-green-600{% else %}text-red-600{% endif %}">
+                            {% if total_roi >= 0 %}+{% endif %}${{ total_roi|floatformat:0 }}
+                        </td>
+                        <td class="px-6 py-4 text-right {% if roi_percentage >= 0 %}text-green-600{% else %}text-red-600{% endif %}">
+                            {% if roi_percentage >= 0 %}+{% endif %}{{ roi_percentage|floatformat:1 }}%
+                        </td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+        {% else %}
+        <div class="p-12 text-center">
+            <i class="fas fa-chart-bar text-gray-300 text-6xl mb-4"></i>
+            <p class="text-gray-600">Aucun investissement confirmé à afficher</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Actions -->
+    <div class="mt-8 flex justify-center space-x-4">
+        <a href="{% url 'projects:my_investments' %}" class="btn-secondary">
+            <i class="fas fa-arrow-left mr-2"></i>
+            Retour aux investissements
+        </a>
+        <button onclick="window.print()" class="btn-outline">
+            <i class="fas fa-print mr-2"></i>
+            Imprimer le rapport
+        </button>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Données pour les graphiques
+    const evolutionData = {{ evolution_data|safe }};
+    const sectorLabels = {{ sector_labels|safe }};
+    const sectorValues = {{ sector_values|safe }};
+
+    // Graphique d'évolution du portefeuille
+    const evolutionCtx = document.getElementById('portfolioEvolutionChart');
+    if (evolutionCtx && evolutionData.length > 0) {
+        new Chart(evolutionCtx, {
+            type: 'line',
+            data: {
+                labels: evolutionData.map(d => d.date),
+                datasets: [
+                    {
+                        label: 'Valeur du portefeuille',
+                        data: evolutionData.map(d => d.value),
+                        borderColor: 'rgb(59, 130, 246)',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    },
+                    {
+                        label: 'Montant investi',
+                        data: evolutionData.map(d => d.invested),
+                        borderColor: 'rgb(16, 185, 129)',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'bottom'
+                    },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false,
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.dataset.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                label += '$' + context.parsed.y.toLocaleString();
+                                return label;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return '$' + value.toLocaleString();
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // Graphique de répartition par secteur
+    const sectorCtx = document.getElementById('sectorDistributionChart');
+    if (sectorCtx && sectorLabels.length > 0) {
+        new Chart(sectorCtx, {
+            type: 'doughnut',
+            data: {
+                labels: sectorLabels,
+                datasets: [{
+                    data: sectorValues,
+                    backgroundColor: [
+                        'rgb(59, 130, 246)',
+                        'rgb(16, 185, 129)',
+                        'rgb(251, 146, 60)',
+                        'rgb(168, 85, 247)',
+                        'rgb(236, 72, 153)',
+                        'rgb(34, 197, 94)',
+                        'rgb(239, 68, 68)',
+                        'rgb(14, 165, 233)',
+                    ],
+                    borderWidth: 2,
+                    borderColor: '#fff'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'right'
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const label = context.label || '';
+                                const value = context.parsed || 0;
+                                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                const percentage = ((value / total) * 100).toFixed(1);
+                                return label + ': $' + value.toLocaleString() + ' (' + percentage + '%)';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+});
+</script>
+
+<style>
+@media print {
+    nav, .btn-secondary, .btn-outline, button {
+        display: none !important;
+    }
+}
+</style>
+{% endblock %}

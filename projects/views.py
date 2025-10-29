@@ -6,7 +6,9 @@ from django.db import transaction
 from django.utils import timezone
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
-from .models import Project, ProjectDocument, ProjectFavorite
+from django.db.models import Sum, Count, Avg
+from decimal import Decimal
+from .models import Project, ProjectDocument, ProjectFavorite, Investment, ProjectPerformance
 from .forms import ProjectSubmissionForm, ProjectUpdateForm, ProjectValidationForm
 from notifications.models import Notification
 
@@ -397,3 +399,187 @@ def my_favorites(request):
     }
     return render(request, 'projects/my_favorites.html', context)
 
+
+# ============================================================
+# GESTION DES INVESTISSEMENTS
+# ============================================================
+
+@login_required
+def declare_investment(request, project_id):
+    """Déclarer un investissement dans un projet"""
+    # Vérifier que l'utilisateur est un investisseur
+    if request.user.user_type != 'investisseur':
+        messages.error(request, 'Seuls les investisseurs peuvent déclarer des investissements.')
+        return redirect('core:home')
+    
+    project = get_object_or_404(Project, id=project_id, status='approved')
+    
+    if request.method == 'POST':
+        amount = request.POST.get('amount')
+        investment_date = request.POST.get('investment_date')
+        notes = request.POST.get('notes', '')
+        
+        try:
+            amount = Decimal(amount)
+            if amount < project.min_investment:
+                messages.error(
+                    request,
+                    f'Le montant minimum d\'investissement est de ${project.min_investment}'
+                )
+            else:
+                # Créer l'investissement
+                investment = Investment.objects.create(
+                    investor=request.user,
+                    project=project,
+                    amount=amount,
+                    investment_date=investment_date,
+                    notes=notes,
+                    status='pending'
+                )
+                
+                # Notifier l'admin
+                Notification.objects.create(
+                    recipient=project.owner,
+                    notification_type='investment',
+                    title='Nouvel investissement déclaré',
+                    message=f'{request.user.get_full_name()} a déclaré un investissement de ${amount} dans votre projet "{project.title}".'
+                )
+                
+                messages.success(
+                    request,
+                    'Votre investissement a été déclaré avec succès ! Il sera validé par l\'administrateur.'
+                )
+                return redirect('projects:my_investments')
+        except (ValueError, TypeError):
+            messages.error(request, 'Montant invalide.')
+    
+    context = {
+        'project': project,
+    }
+    return render(request, 'projects/declare_investment.html', context)
+
+
+@login_required
+def my_investments(request):
+    """Liste des investissements de l'investisseur"""
+    # Vérifier que l'utilisateur est un investisseur
+    if request.user.user_type != 'investisseur':
+        messages.error(request, 'Cette page est réservée aux investisseurs.')
+        return redirect('core:home')
+    
+    # Récupérer les investissements
+    investments = Investment.objects.filter(
+        investor=request.user
+    ).select_related('project', 'project__owner').order_by('-investment_date')
+    
+    # Filtres
+    status = request.GET.get('status')
+    if status:
+        investments = investments.filter(status=status)
+    
+    # Statistiques
+    confirmed_investments = investments.filter(status='confirmed')
+    stats = {
+        'total_invested': confirmed_investments.aggregate(
+            total=Sum('amount')
+        )['total'] or Decimal('0'),
+        'total_investments': confirmed_investments.count(),
+        'pending_count': investments.filter(status='pending').count(),
+        'projects_count': confirmed_investments.values('project').distinct().count(),
+    }
+    
+    # Calculer la valeur actuelle et le ROI
+    total_current_value = Decimal('0')
+    for investment in confirmed_investments:
+        total_current_value += Decimal(str(investment.current_value))
+    
+    stats['current_value'] = total_current_value
+    stats['total_roi'] = total_current_value - stats['total_invested']
+    if stats['total_invested'] > 0:
+        stats['roi_percentage'] = (stats['total_roi'] / stats['total_invested']) * 100
+    else:
+        stats['roi_percentage'] = 0
+    
+    context = {
+        'investments': investments,
+        'stats': stats,
+        'status_choices': Investment.STATUS_CHOICES,
+    }
+    return render(request, 'projects/my_investments.html', context)
+
+
+@login_required
+def financial_dashboard(request):
+    """Dashboard des états financiers mensuels de l'investisseur"""
+    # Vérifier que l'utilisateur est un investisseur
+    if request.user.user_type != 'investisseur':
+        messages.error(request, 'Cette page est réservée aux investisseurs.')
+        return redirect('core:home')
+    
+    # Récupérer les investissements confirmés
+    investments = Investment.objects.filter(
+        investor=request.user,
+        status='confirmed'
+    ).select_related('project').order_by('-investment_date')
+    
+    # Statistiques globales
+    total_invested = investments.aggregate(total=Sum('amount'))['total'] or Decimal('0')
+    
+    # Calculer les valeurs actuelles et ROI
+    portfolio_data = []
+    total_current_value = Decimal('0')
+    sector_distribution = {}
+    
+    for investment in investments:
+        current_value = Decimal(str(investment.current_value))
+        total_current_value += current_value
+        
+        portfolio_data.append({
+            'investment': investment,
+            'current_value': current_value,
+            'roi_amount': investment.roi_amount,
+            'roi_percentage': investment.roi_percentage,
+        })
+        
+        # Distribution par secteur
+        sector = investment.project.get_sector_display()
+        if sector not in sector_distribution:
+            sector_distribution[sector] = Decimal('0')
+        sector_distribution[sector] += investment.amount
+    
+    # Calcul du ROI global
+    total_roi = total_current_value - total_invested
+    if total_invested > 0:
+        roi_percentage = (total_roi / total_invested) * 100
+    else:
+        roi_percentage = 0
+    
+    # Préparer les données pour les graphiques
+    sector_labels = list(sector_distribution.keys())
+    sector_values = [float(v) for v in sector_distribution.values()]
+    
+    # Données d'évolution du portefeuille (simulation - à remplacer par des données réelles)
+    # Pour l'instant, on utilise les dates d'investissement
+    evolution_data = []
+    cumulative_invested = Decimal('0')
+    for investment in investments.order_by('investment_date'):
+        cumulative_invested += investment.amount
+        evolution_data.append({
+            'date': investment.investment_date.strftime('%Y-%m-%d'),
+            'invested': float(cumulative_invested),
+            'value': float(cumulative_invested * Decimal('1.05'))  # Simulation +5%
+        })
+    
+    context = {
+        'investments': investments,
+        'portfolio_data': portfolio_data,
+        'total_invested': total_invested,
+        'total_current_value': total_current_value,
+        'total_roi': total_roi,
+        'roi_percentage': roi_percentage,
+        'projects_count': investments.values('project').distinct().count(),
+        'sector_labels': sector_labels,
+        'sector_values': sector_values,
+        'evolution_data': evolution_data,
+    }
+    return render(request, 'projects/financial_dashboard.html', context)

@@ -1,0 +1,166 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Déclarer un Investissement - {{ project.title }} - InvestLink{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- En-tête -->
+    <div class="mb-8">
+        <a href="{% url 'projects:detail' project.slug %}" class="text-blue-600 hover:text-blue-800 mb-4 inline-block">
+            <i class="fas fa-arrow-left mr-2"></i>Retour au projet
+        </a>
+        <h1 class="text-3xl font-bold text-gray-900 mb-2">
+            <i class="fas fa-hand-holding-usd text-green-600 mr-2"></i>
+            Déclarer un Investissement
+        </h1>
+        <p class="text-gray-600">
+            Déclarez votre investissement dans le projet "{{ project.title }}"
+        </p>
+    </div>
+
+    <!-- Informations du projet -->
+    <div class="bg-blue-50 border-l-4 border-blue-500 p-6 mb-8 rounded-lg">
+        <div class="flex items-start">
+            <div class="flex-shrink-0">
+                <i class="fas fa-info-circle text-blue-600 text-2xl"></i>
+            </div>
+            <div class="ml-4 flex-1">
+                <h3 class="text-lg font-semibold text-blue-900 mb-2">{{ project.title }}</h3>
+                <div class="grid grid-cols-2 gap-4 text-sm text-blue-800">
+                    <div>
+                        <strong>Secteur:</strong> {{ project.get_sector_display }}
+                    </div>
+                    <div>
+                        <strong>Objectif:</strong> ${{ project.funding_goal|floatformat:0 }}
+                    </div>
+                    <div>
+                        <strong>Investissement minimum:</strong> ${{ project.min_investment|floatformat:0 }}
+                    </div>
+                    <div>
+                        <strong>Financé:</strong> {{ project.funding_percentage|floatformat:1 }}%
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Formulaire -->
+    <div class="bg-white rounded-lg shadow p-8">
+        <form method="post" class="space-y-6">
+            {% csrf_token %}
+            
+            <!-- Montant -->
+            <div>
+                <label for="amount" class="block text-sm font-medium text-gray-700 mb-2">
+                    Montant de l'investissement ($) *
+                </label>
+                <div class="relative">
+                    <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-lg">$</span>
+                    <input 
+                        type="number" 
+                        name="amount" 
+                        id="amount"
+                        min="{{ project.min_investment }}"
+                        step="0.01"
+                        required
+                        class="input-field pl-8"
+                        placeholder="Ex: {{ project.min_investment }}"
+                    >
+                </div>
+                <p class="mt-1 text-sm text-gray-500">
+                    Minimum: ${{ project.min_investment|floatformat:0 }}
+                </p>
+            </div>
+
+            <!-- Date d'investissement -->
+            <div>
+                <label for="investment_date" class="block text-sm font-medium text-gray-700 mb-2">
+                    Date de l'investissement *
+                </label>
+                <input 
+                    type="date" 
+                    name="investment_date" 
+                    id="investment_date"
+                    required
+                    max="{% now 'Y-m-d' %}"
+                    class="input-field"
+                >
+                <p class="mt-1 text-sm text-gray-500">
+                    Date à laquelle vous avez réalisé l'investissement
+                </p>
+            </div>
+
+            <!-- Notes -->
+            <div>
+                <label for="notes" class="block text-sm font-medium text-gray-700 mb-2">
+                    Notes (optionnel)
+                </label>
+                <textarea 
+                    name="notes" 
+                    id="notes"
+                    rows="4"
+                    class="input-field resize-none"
+                    placeholder="Ajoutez des informations complémentaires sur votre investissement..."
+                ></textarea>
+            </div>
+
+            <!-- Avertissement -->
+            <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-exclamation-triangle text-yellow-600"></i>
+                    </div>
+                    <div class="ml-3">
+                        <h3 class="text-sm font-medium text-yellow-800 mb-1">
+                            Validation requise
+                        </h3>
+                        <p class="text-sm text-yellow-700">
+                            Votre déclaration d'investissement sera soumise à validation par l'administrateur de la plateforme.
+                            Vous serez notifié une fois la validation effectuée.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Boutons -->
+            <div class="flex space-x-4 pt-4">
+                <a href="{% url 'projects:detail' project.slug %}" class="btn-secondary flex-1 text-center">
+                    <i class="fas fa-times mr-2"></i>
+                    Annuler
+                </a>
+                <button type="submit" class="btn-primary flex-1">
+                    <i class="fas fa-check mr-2"></i>
+                    Déclarer l'investissement
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Informations complémentaires -->
+    <div class="mt-8 bg-gray-50 rounded-lg p-6">
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">
+            <i class="fas fa-question-circle text-blue-600 mr-2"></i>
+            Pourquoi déclarer mon investissement ?
+        </h3>
+        <ul class="space-y-3 text-gray-700">
+            <li class="flex items-start">
+                <i class="fas fa-check-circle text-green-500 mr-3 mt-1"></i>
+                <span>Suivez les performances de vos investissements sur votre dashboard</span>
+            </li>
+            <li class="flex items-start">
+                <i class="fas fa-check-circle text-green-500 mr-3 mt-1"></i>
+                <span>Recevez des rapports mensuels sur l'évolution des projets</span>
+            </li>
+            <li class="flex items-start">
+                <i class="fas fa-check-circle text-green-500 mr-3 mt-1"></i>
+                <span>Visualisez votre portefeuille d'investissements global</span>
+            </li>
+            <li class="flex items-start">
+                <i class="fas fa-check-circle text-green-500 mr-3 mt-1"></i>
+                <span>Calculez automatiquement votre retour sur investissement (ROI)</span>
+            </li>
+        </ul>
+    </div>
+</div>
+{% endblock %}

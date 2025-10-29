@@ -1,0 +1,214 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Mes Investissements - InvestLink{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- En-tête -->
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-900 mb-2">
+            <i class="fas fa-hand-holding-usd text-green-600 mr-2"></i>
+            Mes Investissements
+        </h1>
+        <p class="text-gray-600">
+            Gérez et suivez tous vos investissements
+        </p>
+    </div>
+
+    <!-- Statistiques -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div class="bg-white rounded-lg shadow p-6">
+            <div class="flex items-center">
+                <div class="flex-shrink-0 bg-green-100 rounded-full p-3">
+                    <i class="fas fa-dollar-sign text-green-600 text-xl"></i>
+                </div>
+                <div class="ml-4">
+                    <p class="text-sm font-medium text-gray-600">Total Investi</p>
+                    <p class="text-2xl font-bold text-gray-900">${{ stats.total_invested|floatformat:0 }}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-lg shadow p-6">
+            <div class="flex items-center">
+                <div class="flex-shrink-0 bg-blue-100 rounded-full p-3">
+                    <i class="fas fa-chart-line text-blue-600 text-xl"></i>
+                </div>
+                <div class="ml-4">
+                    <p class="text-sm font-medium text-gray-600">Valeur Actuelle</p>
+                    <p class="text-2xl font-bold text-gray-900">${{ stats.current_value|floatformat:0 }}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-lg shadow p-6">
+            <div class="flex items-center">
+                <div class="flex-shrink-0 {% if stats.total_roi >= 0 %}bg-green-100{% else %}bg-red-100{% endif %} rounded-full p-3">
+                    <i class="fas fa-{% if stats.total_roi >= 0 %}arrow-up{% else %}arrow-down{% endif %} {% if stats.total_roi >= 0 %}text-green-600{% else %}text-red-600{% endif %} text-xl"></i>
+                </div>
+                <div class="ml-4">
+                    <p class="text-sm font-medium text-gray-600">ROI Total</p>
+                    <p class="text-2xl font-bold {% if stats.total_roi >= 0 %}text-green-600{% else %}text-red-600{% endif %}">
+                        {% if stats.total_roi >= 0 %}+{% endif %}${{ stats.total_roi|floatformat:0 }}
+                    </p>
+                    <p class="text-xs text-gray-500">{{ stats.roi_percentage|floatformat:1 }}%</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-lg shadow p-6">
+            <div class="flex items-center">
+                <div class="flex-shrink-0 bg-purple-100 rounded-full p-3">
+                    <i class="fas fa-folder text-purple-600 text-xl"></i>
+                </div>
+                <div class="ml-4">
+                    <p class="text-sm font-medium text-gray-600">Projets</p>
+                    <p class="text-2xl font-bold text-gray-900">{{ stats.projects_count }}</p>
+                    <p class="text-xs text-gray-500">{{ stats.total_investments }} investissements</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Actions rapides -->
+    <div class="flex justify-between items-center mb-6">
+        <div class="flex space-x-3">
+            <a href="{% url 'projects:financial_dashboard' %}" class="btn-primary">
+                <i class="fas fa-chart-pie mr-2"></i>
+                États Financiers
+            </a>
+            <a href="{% url 'projects:list' %}" class="btn-secondary">
+                <i class="fas fa-search mr-2"></i>
+                Découvrir des projets
+            </a>
+        </div>
+
+        {% if stats.pending_count > 0 %}
+        <span class="px-4 py-2 bg-yellow-100 text-yellow-800 rounded-lg text-sm font-medium">
+            <i class="fas fa-clock mr-2"></i>
+            {{ stats.pending_count }} en attente de validation
+        </span>
+        {% endif %}
+    </div>
+
+    <!-- Filtres -->
+    <div class="bg-white rounded-lg shadow p-4 mb-6">
+        <form method="get" class="flex items-center space-x-4">
+            <div class="flex-1">
+                <select name="status" class="input-field" onchange="this.form.submit()">
+                    <option value="">Tous les statuts</option>
+                    {% for value, label in status_choices %}
+                        <option value="{{ value }}" {% if request.GET.status == value %}selected{% endif %}>
+                            {{ label }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+        </form>
+    </div>
+
+    <!-- Liste des investissements -->
+    {% if investments %}
+        <div class="space-y-4">
+            {% for investment in investments %}
+            <div class="bg-white rounded-lg shadow overflow-hidden hover:shadow-lg transition-shadow">
+                <div class="p-6">
+                    <div class="flex items-start justify-between mb-4">
+                        <div class="flex-1">
+                            <h3 class="text-xl font-bold text-gray-900 mb-2">
+                                <a href="{% url 'projects:detail' investment.project.slug %}" class="hover:text-blue-600">
+                                    {{ investment.project.title }}
+                                </a>
+                            </h3>
+                            <div class="flex items-center space-x-4 text-sm text-gray-600">
+                                <span>
+                                    <i class="fas fa-calendar mr-1"></i>
+                                    {{ investment.investment_date|date:"d/m/Y" }}
+                                </span>
+                                <span>
+                                    <i class="fas fa-tag mr-1"></i>
+                                    {{ investment.project.get_sector_display }}
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <!-- Badge statut -->
+                        <span class="px-3 py-1 rounded-full text-sm font-medium
+                            {% if investment.status == 'confirmed' %}bg-green-100 text-green-800
+                            {% elif investment.status == 'pending' %}bg-yellow-100 text-yellow-800
+                            {% else %}bg-red-100 text-red-800{% endif %}">
+                            {% if investment.status == 'confirmed' %}
+                                <i class="fas fa-check-circle mr-1"></i>
+                            {% elif investment.status == 'pending' %}
+                                <i class="fas fa-clock mr-1"></i>
+                            {% else %}
+                                <i class="fas fa-times-circle mr-1"></i>
+                            {% endif %}
+                            {{ investment.get_status_display }}
+                        </span>
+                    </div>
+
+                    {% if investment.status == 'confirmed' %}
+                    <!-- Détails financiers -->
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 p-4 bg-gray-50 rounded-lg">
+                        <div>
+                            <p class="text-xs text-gray-600 mb-1">Investi</p>
+                            <p class="text-lg font-bold text-gray-900">${{ investment.amount|floatformat:0 }}</p>
+                        </div>
+                        <div>
+                            <p class="text-xs text-gray-600 mb-1">Valeur Actuelle</p>
+                            <p class="text-lg font-bold text-blue-600">${{ investment.current_value|floatformat:0 }}</p>
+                        </div>
+                        <div>
+                            <p class="text-xs text-gray-600 mb-1">Gain/Perte</p>
+                            <p class="text-lg font-bold {% if investment.roi_amount >= 0 %}text-green-600{% else %}text-red-600{% endif %}">
+                                {% if investment.roi_amount >= 0 %}+{% endif %}${{ investment.roi_amount|floatformat:0 }}
+                            </p>
+                        </div>
+                        <div>
+                            <p class="text-xs text-gray-600 mb-1">ROI</p>
+                            <p class="text-lg font-bold {% if investment.roi_percentage >= 0 %}text-green-600{% else %}text-red-600{% endif %}">
+                                {% if investment.roi_percentage >= 0 %}+{% endif %}{{ investment.roi_percentage|floatformat:1 }}%
+                            </p>
+                        </div>
+                    </div>
+                    {% elif investment.status == 'pending' %}
+                    <div class="p-4 bg-yellow-50 border-l-4 border-yellow-400 rounded">
+                        <p class="text-sm text-yellow-800">
+                            <i class="fas fa-info-circle mr-2"></i>
+                            Montant: <strong>${{ investment.amount|floatformat:0 }}</strong> - En attente de validation par l'administrateur
+                        </p>
+                    </div>
+                    {% endif %}
+
+                    {% if investment.notes %}
+                    <div class="mt-4 p-3 bg-blue-50 rounded">
+                        <p class="text-sm text-gray-700">
+                            <strong>Notes:</strong> {{ investment.notes }}
+                        </p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <!-- État vide -->
+        <div class="bg-white rounded-lg shadow p-12 text-center">
+            <i class="fas fa-hand-holding-usd text-gray-300 text-6xl mb-4"></i>
+            <h3 class="text-xl font-semibold text-gray-900 mb-2">Aucun investissement</h3>
+            <p class="text-gray-600 mb-6">
+                Vous n'avez pas encore déclaré d'investissements.
+                {% if request.GET.status %}
+                    <br>Essayez de modifier vos filtres.
+                {% endif %}
+            </p>
+            <a href="{% url 'projects:list' %}" class="btn-primary inline-flex items-center">
+                <i class="fas fa-search mr-2"></i>
+                Découvrir des projets
+            </a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

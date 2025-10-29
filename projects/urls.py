@@ -13,6 +13,11 @@ urlpatterns = [
     path('favorites/', views.my_favorites, name='my_favorites'),
     path('favorites/<int:project_id>/toggle/', views.toggle_favorite, name='toggle_favorite'),
     
+    # Investissements
+    path('investments/', views.my_investments, name='my_investments'),
+    path('investments/<int:project_id>/declare/', views.declare_investment, name='declare_investment'),
+    path('financial-dashboard/', views.financial_dashboard, name='financial_dashboard'),
+    
     # Administration - Validation des projets
     path('admin/pending/', views.admin_pending_projects, name='admin_pending'),
     path('admin/all/', views.admin_all_projects, name='admin_all'),
