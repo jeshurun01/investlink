@@ -87,6 +87,9 @@
 - [x] Notifications automatiques au porteur après validation
 - [x] Statistiques globales (projets soumis, en examen, validés, refusés)
 - [x] Liste de tous les projets avec filtres (statut, secteur)
+- [x] **Liste des investissements en attente de validation**
+- [x] **Validation/rejet des investissements avec notes admin**
+- [x] **Notifications automatiques aux investisseurs et porteurs**
 - [ ] Gestion des utilisateurs (activation/désactivation)
 - [ ] Outils de modération de contenu
 
@@ -182,6 +185,8 @@
 - [x] Page de modération des projets
 - [x] Page de validation détaillée d'un projet
 - [x] Page de gestion des utilisateurs
+- [x] **Page de validation des investissements**
+- [x] **Page de validation détaillée d'un investissement**
 - [ ] Page de gestion du contenu
 - [ ] Page de logs/activités
 
@@ -446,12 +451,13 @@
 - ✅ Système de favoris avec toggle AJAX et page dédiée
 - ✅ Système complet d'investissement et suivi financier
 - ✅ Calcul automatique du ROI par projet et global
+- ✅ **Workflow complet de validation des investissements par admin**
 - ⏳ Validation email (à faire)
 - ⏳ Reset mot de passe (à faire)
 - ⏳ 2FA (à faire)
 - ⏳ Envoi emails SMTP (à faire)
 
-### 🔄 Phase 3 : EN COURS (82%)
+### 🔄 Phase 3 : EN COURS (84%)
 - ✅ Charte graphique et composants de base
 - ✅ Pages d'authentification complètes
 - ✅ Navigation responsive
@@ -471,6 +477,8 @@
 - ✅ Page "Mes investissements" avec statistiques et filtres
 - ✅ Page "États financiers mensuels" avec graphiques Chart.js
 - ✅ Formulaire de déclaration d'investissement
+- ✅ **Page admin de validation des investissements avec statistiques**
+- ✅ **Page admin de validation détaillée d'un investissement**
 - ⏳ Pages légales manquantes (CGU, confidentialité, mentions légales)
 - ⏳ Page "Blog/Actualités" (à faire)
 - ⏳ Page de logs/activités admin (à faire)
@@ -492,10 +500,11 @@
 7. ✅ **Système de favoris pour investisseurs**
 8. ✅ **Système d'investissement et suivi financier complet**
 9. ✅ **Page "États financiers mensuels" investisseurs avec graphiques**
-10. **🆕 Amélioration page "Découvrir les projets" avec statistiques globales**
-11. Pages légales (CGU, confidentialité, mentions légales)
-12. Configuration SMTP pour envoi d'emails
-13. Responsive design (mobile/tablette)
+10. ✅ **Workflow complet de validation des investissements par admin**
+11. **🆕 Amélioration page "Découvrir les projets" avec statistiques globales**
+12. Pages légales (CGU, confidentialité, mentions légales)
+13. Configuration SMTP pour envoi d'emails
+14. Responsive design (mobile/tablette)
 
 ### 📋 Nouvelles Fonctionnalités Ajoutées (29 octobre 2025)
 
@@ -518,18 +527,14 @@
 - Statistiques globales : investi, valeur actuelle, ROI
 - Fonction d'impression pour rapports
 
-**🔹 Statistiques globales sur "Découvrir les projets" :**
-- Nombre total de projets soumis/validés
-- Pourcentage de projets financés
-- Classement par secteur avec ROI moyen
-- Restriction d'accès détails (investisseurs uniquement)
-
-**🔹 États financiers investisseurs :**
-- Suivi des investissements réalisés
-- Graphiques d'évolution du portefeuille
-- Distribution par secteur
-- Calcul automatique du ROI
-- Export PDF/Excel
+**🔹 Workflow de Validation des Investissements (Admin) :**
+- Page de liste des investissements avec filtres (statut, projet)
+- Statistiques globales (en attente, confirmés, rejetés)
+- Page de validation détaillée avec informations complètes
+- Actions : Confirmer / Rejeter avec notes administrateur
+- Notifications automatiques aux investisseurs et porteurs
+- Intégration au dashboard admin avec accès rapide
+- Types de notifications étendus (investment_confirmed, investment_rejected)
 
 ---
 
