@@ -76,24 +76,7 @@
                                         <i class="fas fa-chart-pie mr-2 text-blue-600"></i> États financiers
                                     </a>
                                 {% endif %}
-                                {% if user.is_staff %}
-                                    <hr class="my-2">
-                                    <a href="{% url 'users:admin_dashboard' %}" class="block px-4 py-2 hover:bg-gray-100 bg-purple-50">
-                                        <i class="fas fa-shield-alt mr-2 text-purple-600"></i> Dashboard Admin
-                                    </a>
-                                    <a href="{% url 'projects:admin_pending' %}" class="block px-4 py-2 hover:bg-gray-100 bg-yellow-50">
-                                        <i class="fas fa-check-circle mr-2 text-yellow-600"></i> Validation projets
-                                    </a>
-                                    <a href="{% url 'projects:admin_pending_investments' %}" class="block px-4 py-2 hover:bg-gray-100 bg-orange-50">
-                                        <i class="fas fa-wallet mr-2 text-orange-600"></i> Validation investissements
-                                    </a>
-                                    <a href="{% url 'users:admin_users' %}" class="block px-4 py-2 hover:bg-gray-100 bg-blue-50">
-                                        <i class="fas fa-users-cog mr-2 text-blue-600"></i> Gestion utilisateurs
-                                    </a>
-                                    <a href="{% url 'projects:admin_all' %}" class="block px-4 py-2 hover:bg-gray-100 bg-green-50">
-                                        <i class="fas fa-list mr-2 text-green-600"></i> Tous les projets
-                                    </a>
-                                {% endif %}
+                                
                                 <a href="{% url 'messaging:inbox' %}" class="block px-4 py-2 hover:bg-gray-100">
                                     <i class="fas fa-envelope mr-2"></i> Messages
                                     {% if unread_messages_count > 0 %}
@@ -110,6 +93,36 @@
                                         </span>
                                     {% endif %}
                                 </a>
+                                
+                                {% if user.is_staff %}
+                                    <hr class="my-2">
+                                    <!-- Menu Administration avec sous-menu -->
+                                    <div class="relative group/admin">
+                                        <a href="{% url 'users:admin_dashboard' %}" class="block px-4 py-2 hover:bg-purple-50 bg-purple-50 rounded font-semibold text-purple-700">
+                                            <i class="fas fa-shield-alt mr-2"></i> Administration
+                                            <i class="fas fa-chevron-right text-xs float-right mt-1"></i>
+                                        </a>
+                                        <!-- Sous-menu admin -->
+                                        <div class="absolute left-full top-0 ml-1 w-56 bg-white text-gray-800 rounded-lg shadow-xl opacity-0 invisible group-hover/admin:opacity-100 group-hover/admin:visible transition-all duration-200 border border-gray-200">
+                                            <a href="{% url 'users:admin_dashboard' %}" class="block px-4 py-3 hover:bg-gray-100 rounded-t-lg border-b border-gray-100">
+                                                <i class="fas fa-chart-line mr-2 text-purple-600"></i> Dashboard
+                                            </a>
+                                            <a href="{% url 'projects:admin_pending' %}" class="block px-4 py-3 hover:bg-gray-100 border-b border-gray-100">
+                                                <i class="fas fa-check-circle mr-2 text-yellow-600"></i> Validation projets
+                                            </a>
+                                            <a href="{% url 'projects:admin_pending_investments' %}" class="block px-4 py-3 hover:bg-gray-100 border-b border-gray-100">
+                                                <i class="fas fa-wallet mr-2 text-orange-600"></i> Validation investissements
+                                            </a>
+                                            <a href="{% url 'users:admin_users' %}" class="block px-4 py-3 hover:bg-gray-100 border-b border-gray-100">
+                                                <i class="fas fa-users-cog mr-2 text-blue-600"></i> Gestion utilisateurs
+                                            </a>
+                                            <a href="{% url 'projects:admin_all' %}" class="block px-4 py-3 hover:bg-gray-100 rounded-b-lg">
+                                                <i class="fas fa-list mr-2 text-green-600"></i> Tous les projets
+                                            </a>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                                
                                 <hr class="my-2">
                                 <a href="{% url 'users:logout' %}" class="block px-4 py-2 hover:bg-gray-100 rounded-b-lg text-red-600">
                                     <i class="fas fa-sign-out-alt mr-2"></i> Déconnexion

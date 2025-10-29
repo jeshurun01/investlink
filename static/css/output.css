@@ -985,8 +985,20 @@ input[type="file"].input-field::file-selector-button:hover {
   top: 0.75rem;
 }
 
+.left-full {
+  left: 100%;
+}
+
+.top-0 {
+  top: 0px;
+}
+
 .z-50 {
   z-index: 50;
+}
+
+.float-right {
+  float: right;
 }
 
 .mx-2 {
@@ -1254,6 +1266,10 @@ input[type="file"].input-field::file-selector-button:hover {
 
 .w-full {
   width: 100%;
+}
+
+.w-56 {
+  width: 14rem;
 }
 
 .min-w-0 {
@@ -1697,6 +1713,11 @@ input[type="file"].input-field::file-selector-button:hover {
 .border-red-200 {
   --tw-border-opacity: 1;
   border-color: rgb(254 202 202 / var(--tw-border-opacity, 1));
+}
+
+.border-gray-100 {
+  --tw-border-opacity: 1;
+  border-color: rgb(243 244 246 / var(--tw-border-opacity, 1));
 }
 
 .bg-blue-100 {
@@ -2498,6 +2519,11 @@ input[type="file"].input-field::file-selector-button:hover {
   color: rgb(233 213 255 / var(--tw-text-opacity, 1));
 }
 
+.text-purple-700 {
+  --tw-text-opacity: 1;
+  color: rgb(126 34 206 / var(--tw-text-opacity, 1));
+}
+
 .opacity-0 {
   opacity: 0;
 }
@@ -2538,6 +2564,12 @@ input[type="file"].input-field::file-selector-button:hover {
   box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
 }
 
+.shadow-xl {
+  --tw-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+  --tw-shadow-colored: 0 20px 25px -5px var(--tw-shadow-color), 0 8px 10px -6px var(--tw-shadow-color);
+  box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+}
+
 .transition {
   transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, -webkit-backdrop-filter;
   transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;
@@ -2572,6 +2604,10 @@ input[type="file"].input-field::file-selector-button:hover {
 
 .duration-300 {
   transition-duration: 300ms;
+}
+
+.duration-200 {
+  transition-duration: 200ms;
 }
 
 .animate-fade-in {
@@ -2893,6 +2929,11 @@ input[type="radio"] {
   background-color: rgb(126 34 206 / var(--tw-bg-opacity, 1));
 }
 
+.hover\:bg-purple-50:hover {
+  --tw-bg-opacity: 1;
+  background-color: rgb(250 245 255 / var(--tw-bg-opacity, 1));
+}
+
 .hover\:bg-opacity-20:hover {
   --tw-bg-opacity: 0.2;
 }
@@ -2999,7 +3040,15 @@ input[type="radio"] {
   visibility: visible;
 }
 
+.group\/admin:hover .group-hover\/admin\:visible {
+  visibility: visible;
+}
+
 .group:hover .group-hover\:opacity-100 {
+  opacity: 1;
+}
+
+.group\/admin:hover .group-hover\/admin\:opacity-100 {
   opacity: 1;
 }
 
