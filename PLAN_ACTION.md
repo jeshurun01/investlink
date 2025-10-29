@@ -71,7 +71,7 @@
 - [x] Filtres de recherche (secteur, montant, localisation)
 - [x] Recherche avancée
 - [x] Vue détaillée d'un projet validé
-- [ ] Système de favoris/projets suivis
+- [x] Système de favoris/projets suivis
 - [x] Dashboard investisseur
 - [ ] Modèle Investment (suivi des investissements)
 - [ ] Modèle ProjectPerformance (performances mensuelles)
@@ -164,7 +164,7 @@
 ### 3.5 Espace investisseur
 - [x] Dashboard investisseur
 - [x] Page de recherche/filtrage de projets
-- [ ] Page de projets favoris/suivis
+- [x] Page de projets favoris/suivis
 - [x] Page de profil investisseur (préférences)
 - [ ] Page "États financiers mensuels"
 - [ ] Graphique d'évolution du portefeuille global
@@ -441,10 +441,10 @@
 - ✅ Compteur de messages non lus
 - ✅ Système de notifications avec filtres et badges
 - ✅ Templates d'emails pour notifications importantes
+- ✅ Système de favoris avec toggle AJAX et page dédiée
 - ⏳ Validation email (à faire)
 - ⏳ Reset mot de passe (à faire)
 - ⏳ 2FA (à faire)
-- ⏳ Favoris investisseur (à faire)
 - ⏳ Envoi emails SMTP (à faire)
 
 ### 🔄 Phase 3 : EN COURS (75%)
@@ -463,6 +463,7 @@
 - ✅ Dashboard admin avec statistiques globales
 - ✅ Page de gestion des utilisateurs avec filtres
 - ✅ Page détail utilisateur avec activation/désactivation
+- ✅ Système de favoris pour investisseurs (toggle AJAX + page favoris)
 - ⏳ Pages légales manquantes (CGU, confidentialité, mentions légales)
 - ⏳ Page "Blog/Actualités" (à faire)
 - ⏳ Page de logs/activités admin (à faire)
