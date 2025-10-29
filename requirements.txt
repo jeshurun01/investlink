@@ -1,22 +1,42 @@
-# Core Djangoaiobotocore @ file:///croot/aiobotocore_1714464387507/work
+# Core Django# Core Djangoaiobotocore @ file:///croot/aiobotocore_1714464387507/work
 
-Django==5.2.5aiohappyeyeballs @ file:///croot/aiohappyeyeballs_1725434011349/work
+Django==5.2.5
 
-django-environ==0.11.2aiohttp @ file:///croot/aiohttp_1725527756643/work
+django-environ==0.11.2Django==5.2.5aiohappyeyeballs @ file:///croot/aiohappyeyeballs_1725434011349/work
 
-aioitertools @ file:///tmp/build/80754af9/aioitertools_1607109665762/work
 
-# Forms and UIaiosignal @ file:///tmp/build/80754af9/aiosignal_1637843061372/work
+
+# Forms and UIdjango-environ==0.11.2aiohttp @ file:///croot/aiohttp_1725527756643/work
+
+django-crispy-forms==2.3
+
+crispy-tailwind==1.0.3aioitertools @ file:///tmp/build/80754af9/aioitertools_1607109665762/work
+
+
+
+# Database (PostgreSQL for production)# Forms and UIaiosignal @ file:///tmp/build/80754af9/aiosignal_1637843061372/work
+
+psycopg2-binary==2.9.10
 
 django-crispy-forms==2.3alabaster @ file:///croot/alabaster_1718201490751/work
 
-crispy-tailwind==1.0.3altair @ file:///work/perseverance-python-buildout/croot/altair_1698866618831/work
+# Static files & Production
+
+gunicorn==23.0.0crispy-tailwind==1.0.3altair @ file:///work/perseverance-python-buildout/croot/altair_1698866618831/work
+
+whitenoise==6.8.2
 
 anaconda-anon-usage @ file:///croot/anaconda-anon-usage_1710965072196/work
 
-# Database (PostgreSQL for production)anaconda-catalogs @ file:///work/perseverance-python-buildout/croot/anaconda-catalogs_1701755653155/work
+# Security
 
-psycopg2-binary==2.9.10anaconda-client @ file:///croot/anaconda-client_1708640631824/work
+python-dotenv==1.0.1# Database (PostgreSQL for production)anaconda-catalogs @ file:///work/perseverance-python-buildout/croot/anaconda-catalogs_1701755653155/work
+
+
+
+# Image handlingpsycopg2-binary==2.9.10anaconda-client @ file:///croot/anaconda-client_1708640631824/work
+
+Pillow==11.1.0
 
 anaconda-cloud-auth @ file:///croot/anaconda-cloud-auth_1713991386423/work
 

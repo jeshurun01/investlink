@@ -10,7 +10,7 @@ pip install uv
 uv pip install -r requirements.txt --system
 
 # Collect static files
-uv run manage.py collectstatic --no-input
+python manage.py collectstatic --no-input
 
 # Run migrations
-uv run manage.py migrate
+python manage.py migrate
