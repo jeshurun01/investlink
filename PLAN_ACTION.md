@@ -73,10 +73,10 @@
 - [x] Vue détaillée d'un projet validé
 - [x] Système de favoris/projets suivis
 - [x] Dashboard investisseur
-- [ ] Modèle Investment (suivi des investissements)
-- [ ] Modèle ProjectPerformance (performances mensuelles)
-- [ ] Calcul automatique du ROI par projet
-- [ ] Agrégation des performances de portefeuille
+- [x] Modèle Investment (suivi des investissements)
+- [x] Modèle ProjectPerformance (performances mensuelles)
+- [x] Calcul automatique du ROI par projet
+- [x] Agrégation des performances de portefeuille
 
 ### 2.4 Workflow de validation (Admin)
 - [x] Liste des projets en attente de validation
@@ -166,11 +166,13 @@
 - [x] Page de recherche/filtrage de projets
 - [x] Page de projets favoris/suivis
 - [x] Page de profil investisseur (préférences)
-- [ ] Page "États financiers mensuels"
-- [ ] Graphique d'évolution du portefeuille global
-- [ ] Graphique de distribution par secteur (camembert/donut)
-- [ ] Tableau des performances par projet investi
-- [ ] Calcul et affichage du ROI réalisé vs estimé
+- [x] Page "États financiers mensuels"
+- [x] Graphique d'évolution du portefeuille global
+- [x] Graphique de distribution par secteur (camembert/donut)
+- [x] Tableau des performances par projet investi
+- [x] Calcul et affichage du ROI réalisé vs estimé
+- [x] Page de déclaration d'investissement
+- [x] Page "Mes investissements" avec filtres
 - [ ] Export des états financiers (PDF/Excel)
 - [ ] Page de messagerie
 - [ ] Page de notifications
@@ -382,7 +384,7 @@
 - [ ] Envoi automatique des rapports mensuels
 
 ### 8.4 Restrictions et incitations
-- [ ] Middleware de restriction d'accès projets
+- [ ] Middleware de restriction d'accès projets manag
 - [ ] Modal d'inscription pour non-connectés
 - [ ] Landing page spéciale investisseurs
 - [ ] Système de prévisualisation limitée
@@ -442,12 +444,14 @@
 - ✅ Système de notifications avec filtres et badges
 - ✅ Templates d'emails pour notifications importantes
 - ✅ Système de favoris avec toggle AJAX et page dédiée
+- ✅ Système complet d'investissement et suivi financier
+- ✅ Calcul automatique du ROI par projet et global
 - ⏳ Validation email (à faire)
 - ⏳ Reset mot de passe (à faire)
 - ⏳ 2FA (à faire)
 - ⏳ Envoi emails SMTP (à faire)
 
-### 🔄 Phase 3 : EN COURS (75%)
+### 🔄 Phase 3 : EN COURS (82%)
 - ✅ Charte graphique et composants de base
 - ✅ Pages d'authentification complètes
 - ✅ Navigation responsive
@@ -464,6 +468,9 @@
 - ✅ Page de gestion des utilisateurs avec filtres
 - ✅ Page détail utilisateur avec activation/désactivation
 - ✅ Système de favoris pour investisseurs (toggle AJAX + page favoris)
+- ✅ Page "Mes investissements" avec statistiques et filtres
+- ✅ Page "États financiers mensuels" avec graphiques Chart.js
+- ✅ Formulaire de déclaration d'investissement
 - ⏳ Pages légales manquantes (CGU, confidentialité, mentions légales)
 - ⏳ Page "Blog/Actualités" (à faire)
 - ⏳ Page de logs/activités admin (à faire)
@@ -482,15 +489,34 @@
 4. ✅ Système de notifications
 5. ✅ Pages publiques (à propos, contact, FAQ)
 6. ✅ Interface administrateur (dashboard, gestion utilisateurs)
-7. **🆕 Amélioration page "Découvrir les projets" avec statistiques globales**
-8. **🆕 Système d'investissement et suivi financier**
-9. **🆕 Page "États financiers mensuels" investisseurs avec graphiques**
-10. Favoris investisseur et système de rating
+7. ✅ **Système de favoris pour investisseurs**
+8. ✅ **Système d'investissement et suivi financier complet**
+9. ✅ **Page "États financiers mensuels" investisseurs avec graphiques**
+10. **🆕 Amélioration page "Découvrir les projets" avec statistiques globales**
 11. Pages légales (CGU, confidentialité, mentions légales)
 12. Configuration SMTP pour envoi d'emails
 13. Responsive design (mobile/tablette)
 
 ### 📋 Nouvelles Fonctionnalités Ajoutées (29 octobre 2025)
+
+**🔹 Système de Favoris :**
+- Toggle AJAX sur les cartes de projets
+- Page "Mes favoris" avec statistiques
+- Navigation intégrée pour investisseurs
+
+**🔹 Système d'Investissement Complet :**
+- Modèles Investment et ProjectPerformance
+- Déclaration d'investissement avec validation admin
+- Page "Mes investissements" avec filtres par statut
+- Calcul automatique du ROI (montant et pourcentage)
+- Suivi de la valeur actuelle vs montant investi
+
+**🔹 Dashboard Financier avec Chart.js :**
+- Graphique d'évolution du portefeuille (ligne)
+- Graphique de répartition par secteur (donut)
+- Tableau détaillé des performances par projet
+- Statistiques globales : investi, valeur actuelle, ROI
+- Fonction d'impression pour rapports
 
 **🔹 Statistiques globales sur "Découvrir les projets" :**
 - Nombre total de projets soumis/validés
