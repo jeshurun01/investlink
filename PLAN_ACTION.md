@@ -73,6 +73,10 @@
 - [x] Vue détaillée d'un projet validé
 - [ ] Système de favoris/projets suivis
 - [x] Dashboard investisseur
+- [ ] Modèle Investment (suivi des investissements)
+- [ ] Modèle ProjectPerformance (performances mensuelles)
+- [ ] Calcul automatique du ROI par projet
+- [ ] Agrégation des performances de portefeuille
 
 ### 2.4 Workflow de validation (Admin)
 - [x] Liste des projets en attente de validation
@@ -126,6 +130,11 @@
 ### 3.2 Pages publiques
 - [x] Page d'accueil (hero, appel à l'action)
 - [x] Page "Découvrir les projets"
+- [ ] Amélioration page "Découvrir" avec statistiques globales
+- [ ] Section classement par secteur d'activité
+- [ ] Cartes secteurs avec nombre de projets et ROI moyen
+- [ ] Restriction d'accès détails (investisseurs uniquement)
+- [ ] Modal d'incitation à l'inscription pour non-connectés
 - [x] Page détail d'un projet (vue publique)
 - [x] Page "À propos"
 - [ ] Page "Blog/Actualités"
@@ -157,6 +166,12 @@
 - [x] Page de recherche/filtrage de projets
 - [ ] Page de projets favoris/suivis
 - [x] Page de profil investisseur (préférences)
+- [ ] Page "États financiers mensuels"
+- [ ] Graphique d'évolution du portefeuille global
+- [ ] Graphique de distribution par secteur (camembert/donut)
+- [ ] Tableau des performances par projet investi
+- [ ] Calcul et affichage du ROI réalisé vs estimé
+- [ ] Export des états financiers (PDF/Excel)
 - [ ] Page de messagerie
 - [ ] Page de notifications
 
@@ -338,18 +353,55 @@
 
 ---
 
+## Phase 8 : Fonctionnalités Avancées (Semaine 12+)
+
+### 8.1 Statistiques globales et sectorielles
+- [ ] Modèle PlatformStatistics (statistiques globales)
+- [ ] Calcul automatique des métriques globales
+- [ ] Vue API pour statistiques en temps réel
+- [ ] Classement des secteurs par performance
+- [ ] Calcul du ROI moyen par secteur
+- [ ] Cache des statistiques (refresh quotidien)
+
+### 8.2 Système d'investissement et suivi financier
+- [ ] Modèle Investment (montant, date, projet, investisseur)
+- [ ] Modèle ProjectPerformance (performances mensuelles)
+- [ ] Workflow de déclaration d'investissement
+- [ ] Validation admin des investissements
+- [ ] Calcul automatique du ROI
+- [ ] Historique des performances mensuelles
+- [ ] Notifications de mise à jour financière
+
+### 8.3 Visualisations et reporting
+- [ ] Intégration Chart.js ou Apex Charts
+- [ ] Graphique en ligne (évolution portefeuille)
+- [ ] Graphique en donut (répartition sectorielle)
+- [ ] Tableaux de performances interactifs
+- [ ] Export PDF des états financiers
+- [ ] Export Excel des données d'investissement
+- [ ] Envoi automatique des rapports mensuels
+
+### 8.4 Restrictions et incitations
+- [ ] Middleware de restriction d'accès projets
+- [ ] Modal d'inscription pour non-connectés
+- [ ] Landing page spéciale investisseurs
+- [ ] Système de prévisualisation limitée
+- [ ] A/B testing des messages d'incitation
+
+---
+
 ## Évolutions Futures (Post-MVP)
 
 - [ ] Application mobile (iOS/Android)
 - [ ] Système de notation des projets
 - [ ] Système de notation des investisseurs
 - [ ] Automatisation partielle du contrôle documentaire (IA)
-- [ ] Intégration de solutions de paiement sécurisées
-- [ ] Outils de reporting avancés
-- [ ] Statistiques d'investissement détaillées
-- [ ] Système de recommandation de projets
+- [ ] Intégration de solutions de paiement sécurisées (Stripe, PayPal)
+- [ ] Système de recommandation de projets (ML)
 - [ ] Intégration avec des plateformes externes
 - [ ] API publique pour partenaires
+- [ ] Analyse prédictive du ROI (IA)
+- [ ] Dashboard de comparaison de projets
 
 ---
 
@@ -429,13 +481,31 @@
 4. ✅ Système de notifications
 5. ✅ Pages publiques (à propos, contact, FAQ)
 6. ✅ Interface administrateur (dashboard, gestion utilisateurs)
-7. Favoris investisseur et système de rating
-8. Pages légales (CGU, confidentialité, mentions légales)
-9. Configuration SMTP pour envoi d'emails
-10. Responsive design (mobile/tablette)
+7. **🆕 Amélioration page "Découvrir les projets" avec statistiques globales**
+8. **🆕 Système d'investissement et suivi financier**
+9. **🆕 Page "États financiers mensuels" investisseurs avec graphiques**
+10. Favoris investisseur et système de rating
+11. Pages légales (CGU, confidentialité, mentions légales)
+12. Configuration SMTP pour envoi d'emails
+13. Responsive design (mobile/tablette)
+
+### 📋 Nouvelles Fonctionnalités Ajoutées (29 octobre 2025)
+
+**🔹 Statistiques globales sur "Découvrir les projets" :**
+- Nombre total de projets soumis/validés
+- Pourcentage de projets financés
+- Classement par secteur avec ROI moyen
+- Restriction d'accès détails (investisseurs uniquement)
+
+**🔹 États financiers investisseurs :**
+- Suivi des investissements réalisés
+- Graphiques d'évolution du portefeuille
+- Distribution par secteur
+- Calcul automatique du ROI
+- Export PDF/Excel
 
 ---
 
-**Dernière mise à jour :** 28 octobre 2025  
-**Statut global :** ✨ En développement actif - Phase 2/3
+**Dernière mise à jour :** 29 octobre 2025  
+**Statut global :** ✨ En développement actif - Phase 2/3 + Nouvelles fonctionnalités
 

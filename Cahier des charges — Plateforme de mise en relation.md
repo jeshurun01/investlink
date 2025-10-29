@@ -59,11 +59,15 @@ La plateforme servira d’intermédiaire fiable, garantissant la **transparence*
 
 **4.2 Pour les investisseurs**
 
-- Création d’un **profil investisseur** précisant les préférences (secteur, montant, type de risque, localisation).
+- Création d'un **profil investisseur** précisant les préférences (secteur, montant, type de risque, localisation).
 - Accès uniquement aux projets **approuvés et publiés** par la plateforme.
 - Outils de recherche et filtres avancés (secteur, rendement estimé, statut du projet, etc.).
 - Messagerie interne sécurisée pour contacter les porteurs de projets.
 - Tableau de bord pour suivre les projets suivis ou contactés.
+- **Espace "États financiers mensuels"** présentant :
+    - Les performances et rendements des entreprises dans lesquelles l'investisseur a placé son argent.
+    - Des graphiques d'évolution du portefeuille.
+    - Distribution des investissements par secteur.
 
 **4.3 Pour l’administrateur (propriétaire de la plateforme)**
 
@@ -81,6 +85,24 @@ La plateforme servira d’intermédiaire fiable, garantissant la **transparence*
 - Notifications (email + tableau de bord).
 - Interface responsive (ordinateurs, tablettes, smartphones).
 - Gestion du RGPD et consentement des utilisateurs.
+
+**4.5 Améliorations fonctionnelles - Page "Découvrir les projets"**
+
+- **Statistiques globales de la plateforme** :
+    - Nombre total de projets soumis sur la plateforme.
+    - Nombre de projets validés et publiés.
+    - Pourcentage de projets financés via la plateforme.
+    - Montant total des financements réalisés.
+
+- **Classement par secteur d'activité** (agriculture, technologie, énergie, santé, immobilier, etc.) :
+    - Nombre de projets par secteur.
+    - Présentation des équipes porteuses (photos, vidéos, réalisations).
+    - Indicateur estimatif du **retour sur investissement (ROI)** potentiel.
+    - Bouton **"Aller plus loin"** pour accéder aux détails complets du projet.
+
+- **Restriction d'accès** :
+    - ⚠️ L'accès complet aux détails des projets nécessite d'être **connecté en tant qu'investisseur**.
+    - Les utilisateurs non connectés ou non investisseurs voient une version limitée avec incitation à s'inscrire.
 
 **5. Contraintes techniques**
 

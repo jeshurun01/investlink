@@ -4,7 +4,9 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib import messages
 from django.db import transaction
 from django.utils import timezone
-from .models import Project, ProjectDocument
+from django.http import JsonResponse
+from django.views.decorators.http import require_POST
+from .models import Project, ProjectDocument, ProjectFavorite
 from .forms import ProjectSubmissionForm, ProjectUpdateForm, ProjectValidationForm
 from notifications.models import Notification
 
@@ -22,8 +24,21 @@ def project_list(request):
     if search:
         projects = projects.filter(title__icontains=search)
     
+    # Si l'utilisateur est un investisseur connecté, récupérer ses favoris
+    user_favorites = []
+    if request.user.is_authenticated and request.user.user_type == 'investisseur':
+        user_favorites = list(
+            ProjectFavorite.objects.filter(user=request.user).values_list('project_id', flat=True)
+        )
+    
+    # Ajouter l'attribut is_favorite à chaque projet
+    projects_list = []
+    for project in projects:
+        project.is_favorite = project.id in user_favorites
+        projects_list.append(project)
+    
     context = {
-        'projects': projects,
+        'projects': projects_list,
         'sectors': Project.SECTOR_CHOICES,
     }
     return render(request, 'projects/list.html', context)
@@ -298,4 +313,87 @@ def admin_all_projects(request):
     return render(request, 'projects/admin_all_projects.html', context)
 
 
+# ============================================================
+# GESTION DES FAVORIS
+# ============================================================
+
+@login_required
+@require_POST
+def toggle_favorite(request, project_id):
+    """Ajouter ou retirer un projet des favoris (AJAX)"""
+    # Vérifier que l'utilisateur est un investisseur
+    if request.user.user_type != 'investisseur':
+        return JsonResponse({
+            'success': False,
+            'error': 'Seuls les investisseurs peuvent ajouter des favoris.'
+        }, status=403)
+    
+    project = get_object_or_404(Project, id=project_id)
+    
+    # Vérifier que le projet est validé
+    if project.status != 'approved':
+        return JsonResponse({
+            'success': False,
+            'error': 'Ce projet n\'est pas encore validé.'
+        }, status=400)
+    
+    # Toggle favori
+    favorite, created = ProjectFavorite.objects.get_or_create(
+        user=request.user,
+        project=project
+    )
+    
+    if not created:
+        # Favori existe déjà, on le supprime
+        favorite.delete()
+        is_favorite = False
+        # Décrémenter le compteur
+        project.favorites_count = max(0, project.favorites_count - 1)
+        project.save(update_fields=['favorites_count'])
+    else:
+        is_favorite = True
+        # Incrémenter le compteur
+        project.favorites_count += 1
+        project.save(update_fields=['favorites_count'])
+    
+    return JsonResponse({
+        'success': True,
+        'is_favorite': is_favorite,
+        'favorites_count': project.favorites_count
+    })
+
+
+@login_required
+def my_favorites(request):
+    """Liste des projets favoris de l'investisseur"""
+    # Vérifier que l'utilisateur est un investisseur
+    if request.user.user_type != 'investisseur':
+        messages.error(request, 'Cette page est réservée aux investisseurs.')
+        return redirect('core:home')
+    
+    # Récupérer les favoris avec les projets
+    favorites = ProjectFavorite.objects.filter(
+        user=request.user
+    ).select_related('project', 'project__owner').order_by('-created_at')
+    
+    # Filtres
+    sector = request.GET.get('sector')
+    if sector:
+        favorites = favorites.filter(project__sector=sector)
+    
+    search = request.GET.get('search')
+    if search:
+        favorites = favorites.filter(project__title__icontains=search)
+    
+    # Statistiques
+    total_favorites = favorites.count()
+    total_investment_goal = sum(f.project.funding_goal for f in favorites)
+    
+    context = {
+        'favorites': favorites,
+        'total_favorites': total_favorites,
+        'total_investment_goal': total_investment_goal,
+        'sectors': Project.SECTOR_CHOICES,
+    }
+    return render(request, 'projects/my_favorites.html', context)
 
