@@ -11,6 +11,7 @@ from decimal import Decimal
 from .models import Project, ProjectDocument, ProjectFavorite, Investment, ProjectPerformance
 from .forms import ProjectSubmissionForm, ProjectUpdateForm, ProjectValidationForm
 from notifications.models import Notification
+from core.models import ActivityLog
 
 
 def project_list(request):
@@ -723,6 +724,22 @@ def admin_validate_investment(request, investment_id):
             investment.admin_notes = admin_notes
             investment.save()
             
+            # Mettre à jour le financement actuel du projet
+            project = investment.project
+            project.current_funding += investment.amount
+            project.save(update_fields=['current_funding'])
+            
+            # Log de l'action
+            ActivityLog.log(
+                user=request.user,
+                action='validate',
+                entity_type='investment',
+                entity_id=investment.id,
+                entity_name=f'{investment.investor.get_full_name()} - {investment.project.title}',
+                description=f'Validation d\'un investissement de ${investment.amount} (Projet: {investment.project.title})',
+                request=request
+            )
+            
             # Notifier l'investisseur
             Notification.objects.create(
                 recipient=investment.investor,
@@ -743,13 +760,24 @@ def admin_validate_investment(request, investment_id):
             
             messages.success(
                 request,
-                f'L\'investissement de {investment.investor.get_full_name()} a été confirmé.'
+                f'L\'investissement de {investment.investor.get_full_name()} a été confirmé et le financement du projet a été mis à jour.'
             )
         
         elif action == 'reject':
             investment.status = 'rejected'
             investment.admin_notes = admin_notes
             investment.save()
+            
+            # Log de l'action
+            ActivityLog.log(
+                user=request.user,
+                action='reject',
+                entity_type='investment',
+                entity_id=investment.id,
+                entity_name=f'{investment.investor.get_full_name()} - {investment.project.title}',
+                description=f'Rejet d\'un investissement de ${investment.amount} (Projet: {investment.project.title})',
+                request=request
+            )
             
             # Notifier l'investisseur
             Notification.objects.create(

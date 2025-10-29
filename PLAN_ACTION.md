@@ -193,8 +193,8 @@
 - [x] **Page de validation des investissements**
 - [x] **Page de validation détaillée d'un investissement**
 - [x] **Actions utilisateurs : activation/désactivation, suppression, changement de type**
-- [ ] Page de gestion du contenu
-- [ ] Page de logs/activités
+- [x] Page de gestion du contenu
+- [x] Page de logs/activités
 
 ### 3.7 Responsive Design
 - [ ] Tester et ajuster version mobile (toutes pages)
