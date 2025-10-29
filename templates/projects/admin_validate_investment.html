@@ -1,0 +1,255 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Validation de l'Investissement - Administration{% endblock %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- En-tête -->
+    <div class="mb-8">
+        <div class="flex items-center justify-between mb-6">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-900">
+                    <i class="fas fa-clipboard-check text-blue-600 mr-3"></i>
+                    Validation de l'Investissement
+                </h1>
+                <p class="text-gray-600 mt-2">Examinez et validez cet investissement déclaré</p>
+            </div>
+            <a href="{% url 'projects:admin_pending_investments' %}" class="bg-gray-600 text-white px-6 py-2 rounded-lg hover:bg-gray-700 transition">
+                <i class="fas fa-arrow-left mr-2"></i>
+                Retour à la liste
+            </a>
+        </div>
+    </div>
+
+    <!-- Informations sur l'investissement -->
+    <div class="bg-white rounded-lg shadow-lg overflow-hidden mb-6">
+        <!-- En-tête coloré -->
+        <div class="bg-gradient-to-r from-blue-600 to-blue-800 p-6 text-white">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h2 class="text-2xl font-bold mb-2">Investissement de ${{ investment.amount|floatformat:0 }}</h2>
+                    <p class="text-blue-100">Déclaré le {{ investment.created_at|date:"d/m/Y à H:i" }}</p>
+                </div>
+                <div class="text-right">
+                    <span class="px-4 py-2 rounded-full text-sm font-bold bg-white
+                        {% if investment.status == 'pending' %}text-yellow-600
+                        {% elif investment.status == 'confirmed' %}text-green-600
+                        {% else %}text-red-600{% endif %}">
+                        {{ investment.get_status_display }}
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Corps -->
+        <div class="p-6">
+            <!-- Section Investisseur -->
+            <div class="mb-6 pb-6 border-b border-gray-200">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                    <i class="fas fa-user-tie text-blue-600 mr-2"></i>
+                    Informations sur l'investisseur
+                </h3>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                            <i class="fas fa-user text-blue-600 text-xl"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-600">Nom complet</p>
+                            <p class="font-semibold text-gray-900">{{ investment.investor.get_full_name }}</p>
+                        </div>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-600 mb-1">Email</p>
+                        <p class="font-semibold text-gray-900">{{ investment.investor.email }}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-600 mb-1">Type de compte</p>
+                        <p class="font-semibold text-blue-600">{{ investment.investor.get_user_type_display }}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-600 mb-1">Membre depuis</p>
+                        <p class="font-semibold text-gray-900">{{ investment.investor.date_joined|date:"d/m/Y" }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section Projet -->
+            <div class="mb-6 pb-6 border-b border-gray-200">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                    <i class="fas fa-project-diagram text-green-600 mr-2"></i>
+                    Informations sur le projet
+                </h3>
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <div class="flex items-start justify-between mb-4">
+                        <div class="flex-1">
+                            <a href="{% url 'projects:detail' investment.project.slug %}" 
+                               class="text-xl font-bold text-blue-600 hover:underline" target="_blank">
+                                {{ investment.project.title }}
+                                <i class="fas fa-external-link-alt text-sm ml-1"></i>
+                            </a>
+                            <p class="text-sm text-gray-600 mt-1">
+                                {{ investment.project.short_description|truncatewords:30 }}
+                            </p>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-3 gap-4">
+                        <div>
+                            <p class="text-xs text-gray-600 mb-1">Porteur du projet</p>
+                            <p class="font-semibold text-gray-900">{{ investment.project.owner.get_full_name }}</p>
+                        </div>
+                        <div>
+                            <p class="text-xs text-gray-600 mb-1">Secteur</p>
+                            <p class="font-semibold text-gray-900">{{ investment.project.get_sector_display }}</p>
+                        </div>
+                        <div>
+                            <p class="text-xs text-gray-600 mb-1">Financement recherché</p>
+                            <p class="font-semibold text-green-600">${{ investment.project.funding_goal|floatformat:0 }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section Détails financiers -->
+            <div class="mb-6 pb-6 border-b border-gray-200">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                    <i class="fas fa-dollar-sign text-green-600 mr-2"></i>
+                    Détails financiers
+                </h3>
+                <div class="grid grid-cols-3 gap-4">
+                    <div class="bg-green-50 rounded-lg p-4">
+                        <p class="text-sm text-gray-600 mb-1">Montant investi</p>
+                        <p class="text-2xl font-bold text-green-600">${{ investment.amount|floatformat:0 }}</p>
+                    </div>
+                    <div class="bg-blue-50 rounded-lg p-4">
+                        <p class="text-sm text-gray-600 mb-1">Date d'investissement</p>
+                        <p class="text-lg font-semibold text-blue-600">{{ investment.investment_date|date:"d/m/Y" }}</p>
+                    </div>
+                    <div class="bg-gray-50 rounded-lg p-4">
+                        <p class="text-sm text-gray-600 mb-1">Investissement minimum</p>
+                        <p class="text-lg font-semibold text-gray-900">${{ investment.project.min_investment|floatformat:0 }}</p>
+                        {% if investment.amount >= investment.project.min_investment %}
+                        <p class="text-xs text-green-600 mt-1">
+                            <i class="fas fa-check-circle"></i> Montant valide
+                        </p>
+                        {% else %}
+                        <p class="text-xs text-red-600 mt-1">
+                            <i class="fas fa-exclamation-triangle"></i> Montant insuffisant
+                        </p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Notes de l'investisseur -->
+            <div class="mb-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-3 flex items-center">
+                    <i class="fas fa-comment-alt text-blue-600 mr-2"></i>
+                    Notes de l'investisseur
+                </h3>
+                {% if investment.notes %}
+                <div class="bg-blue-50 border-l-4 border-blue-400 p-4 rounded">
+                    <p class="text-gray-800">{{ investment.notes }}</p>
+                </div>
+                {% else %}
+                <p class="text-gray-500 italic">Aucune note fournie par l'investisseur</p>
+                {% endif %}
+            </div>
+
+            <!-- Notes admin existantes (si rejets précédents) -->
+            {% if investment.admin_notes and investment.status != 'pending' %}
+            <div class="mb-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-3 flex items-center">
+                    <i class="fas fa-shield-alt text-purple-600 mr-2"></i>
+                    Notes administrateur précédentes
+                </h3>
+                <div class="bg-purple-50 border-l-4 border-purple-400 p-4 rounded">
+                    <p class="text-gray-800">{{ investment.admin_notes }}</p>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Formulaire de validation -->
+    {% if investment.status == 'pending' %}
+    <div class="bg-white rounded-lg shadow-lg p-6">
+        <h3 class="text-xl font-bold text-gray-900 mb-4">
+            <i class="fas fa-gavel text-blue-600 mr-2"></i>
+            Décision de validation
+        </h3>
+        <p class="text-gray-600 mb-6">
+            Après examen, vous pouvez confirmer ou rejeter cet investissement. 
+            En cas de rejet, veuillez expliquer la raison à l'investisseur.
+        </p>
+
+        <form method="post" id="validationForm">
+            {% csrf_token %}
+            
+            <!-- Notes administrateur -->
+            <div class="mb-6">
+                <label for="admin_notes" class="block text-sm font-medium text-gray-700 mb-2">
+                    Notes administrateur (optionnel pour confirmation, obligatoire pour rejet)
+                </label>
+                <textarea 
+                    id="admin_notes" 
+                    name="admin_notes" 
+                    rows="4" 
+                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="Ajoutez des notes concernant cette validation (raison de rejet, commentaires, etc.)"
+                >{{ investment.admin_notes }}</textarea>
+                <p class="text-xs text-gray-500 mt-1">
+                    <i class="fas fa-info-circle mr-1"></i>
+                    Ces notes seront visibles par l'investisseur en cas de rejet
+                </p>
+            </div>
+
+            <!-- Boutons d'action -->
+            <div class="flex items-center justify-end space-x-4">
+                <button 
+                    type="submit" 
+                    name="action" 
+                    value="reject" 
+                    onclick="return confirm('Êtes-vous sûr de vouloir rejeter cet investissement ?')"
+                    class="bg-red-600 text-white px-8 py-3 rounded-lg hover:bg-red-700 transition font-semibold">
+                    <i class="fas fa-times-circle mr-2"></i>
+                    Rejeter
+                </button>
+                <button 
+                    type="submit" 
+                    name="action" 
+                    value="confirm" 
+                    onclick="return confirm('Êtes-vous sûr de vouloir confirmer cet investissement ?')"
+                    class="bg-green-600 text-white px-8 py-3 rounded-lg hover:bg-green-700 transition font-semibold">
+                    <i class="fas fa-check-circle mr-2"></i>
+                    Confirmer l'investissement
+                </button>
+            </div>
+        </form>
+    </div>
+    {% else %}
+    <div class="bg-gray-50 rounded-lg p-8 text-center">
+        <i class="fas fa-info-circle text-gray-400 text-5xl mb-4"></i>
+        <h3 class="text-xl font-semibold text-gray-700 mb-2">Investissement déjà traité</h3>
+        <p class="text-gray-600">
+            Cet investissement a déjà été {{ investment.get_status_display|lower }}.
+        </p>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+// Validation du formulaire
+document.getElementById('validationForm')?.addEventListener('submit', function(e) {
+    const action = e.submitter.value;
+    const notes = document.getElementById('admin_notes').value.trim();
+    
+    if (action === 'reject' && notes === '') {
+        e.preventDefault();
+        alert('Veuillez fournir une raison pour le rejet de cet investissement.');
+        return false;
+    }
+});
+</script>
+{% endblock %}

@@ -23,6 +23,10 @@ urlpatterns = [
     path('admin/all/', views.admin_all_projects, name='admin_all'),
     path('admin/<slug:slug>/validate/', views.admin_validate_project, name='admin_validate'),
     
+    # Administration - Validation des investissements
+    path('admin/investments/', views.admin_pending_investments, name='admin_pending_investments'),
+    path('admin/investments/<int:investment_id>/validate/', views.admin_validate_investment, name='admin_validate_investment'),
+    
     # Détails et édition (doivent être en dernier pour éviter les conflits)
     path('<slug:slug>/', views.project_detail, name='detail'),
     path('<slug:slug>/edit/', views.edit_project, name='edit'),

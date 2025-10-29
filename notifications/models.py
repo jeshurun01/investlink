@@ -13,6 +13,9 @@ class Notification(models.Model):
         ('project_revision', 'Révision demandée'),
         ('new_message', 'Nouveau message'),
         ('project_favorite', 'Projet ajouté aux favoris'),
+        ('investment', 'Investissement déclaré'),
+        ('investment_confirmed', 'Investissement confirmé'),
+        ('investment_rejected', 'Investissement rejeté'),
         ('profile_update', 'Mise à jour du profil'),
         ('system', 'Notification système'),
     )

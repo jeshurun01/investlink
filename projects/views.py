@@ -583,3 +583,122 @@ def financial_dashboard(request):
         'evolution_data': evolution_data,
     }
     return render(request, 'projects/financial_dashboard.html', context)
+
+
+# ============================================================
+# ADMINISTRATION - VALIDATION DES INVESTISSEMENTS
+# ============================================================
+
+@staff_member_required
+def admin_pending_investments(request):
+    """Liste des investissements en attente de validation"""
+    # Récupérer tous les investissements
+    investments = Investment.objects.all().select_related(
+        'investor', 'project', 'project__owner'
+    ).order_by('status', '-created_at')
+    
+    # Filtres
+    status = request.GET.get('status')
+    if status:
+        investments = investments.filter(status=status)
+    
+    project_id = request.GET.get('project')
+    if project_id:
+        investments = investments.filter(project_id=project_id)
+    
+    # Statistiques
+    stats = {
+        'pending': Investment.objects.filter(status='pending').count(),
+        'confirmed': Investment.objects.filter(status='confirmed').count(),
+        'rejected': Investment.objects.filter(status='rejected').count(),
+        'total': Investment.objects.count(),
+        'total_amount_pending': Investment.objects.filter(status='pending').aggregate(
+            total=Sum('amount')
+        )['total'] or Decimal('0'),
+        'total_amount_confirmed': Investment.objects.filter(status='confirmed').aggregate(
+            total=Sum('amount')
+        )['total'] or Decimal('0'),
+    }
+    
+    # Liste des projets pour le filtre
+    projects_with_investments = Project.objects.filter(
+        investments__isnull=False
+    ).distinct().order_by('title')
+    
+    context = {
+        'investments': investments,
+        'stats': stats,
+        'status_choices': Investment.STATUS_CHOICES,
+        'projects': projects_with_investments,
+    }
+    return render(request, 'projects/admin_pending_investments.html', context)
+
+
+@staff_member_required
+def admin_validate_investment(request, investment_id):
+    """Valider ou rejeter un investissement"""
+    investment = get_object_or_404(
+        Investment.objects.select_related('investor', 'project'),
+        id=investment_id
+    )
+    
+    if request.method == 'POST':
+        action = request.POST.get('action')
+        admin_notes = request.POST.get('admin_notes', '')
+        
+        previous_status = investment.status
+        
+        if action == 'confirm':
+            investment.status = 'confirmed'
+            investment.validated_at = timezone.now()
+            investment.admin_notes = admin_notes
+            investment.save()
+            
+            # Notifier l'investisseur
+            Notification.objects.create(
+                recipient=investment.investor,
+                notification_type='investment_confirmed',
+                title='Investissement confirmé',
+                message=f'Votre investissement de ${investment.amount} dans le projet "{investment.project.title}" a été confirmé par l\'administrateur.',
+                link=f'/projects/investments/'
+            )
+            
+            # Notifier le porteur de projet
+            Notification.objects.create(
+                recipient=investment.project.owner,
+                notification_type='investment_confirmed',
+                title='Nouvel investissement confirmé',
+                message=f'Un investissement de ${investment.amount} dans votre projet "{investment.project.title}" a été confirmé.',
+                link=investment.project.get_absolute_url()
+            )
+            
+            messages.success(
+                request,
+                f'L\'investissement de {investment.investor.get_full_name()} a été confirmé.'
+            )
+        
+        elif action == 'reject':
+            investment.status = 'rejected'
+            investment.admin_notes = admin_notes
+            investment.save()
+            
+            # Notifier l'investisseur
+            Notification.objects.create(
+                recipient=investment.investor,
+                notification_type='investment_rejected',
+                title='Investissement rejeté',
+                message=f'Votre investissement de ${investment.amount} dans le projet "{investment.project.title}" a été rejeté. Raison: {admin_notes if admin_notes else "Non spécifiée"}',
+                link=f'/projects/investments/'
+            )
+            
+            messages.warning(
+                request,
+                f'L\'investissement de {investment.investor.get_full_name()} a été rejeté.'
+            )
+        
+        return redirect('projects:admin_pending_investments')
+    
+    context = {
+        'investment': investment,
+    }
+    return render(request, 'projects/admin_validate_investment.html', context)
