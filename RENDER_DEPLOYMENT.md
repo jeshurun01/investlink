@@ -4,11 +4,13 @@
 
 ✅ Fichiers créés/modifiés pour Render :
 - `requirements.txt` - Dépendances Python optimisées
-- `build.sh` - Script de build
+- `build.sh` - Script de build avec UV (gestionnaire de packages ultra-rapide)
 - `Procfile` - Commande de démarrage
 - `runtime.txt` - Version Python
 - `config/settings.py` - Sécurité et base de données
 - `.env.example` - Template variables d'environnement
+
+**Note:** Le script utilise `uv` au lieu de `pip` pour une installation 10-100x plus rapide !
 
 ## 📋 Étapes de Déploiement
 
@@ -156,6 +158,22 @@ git add build.sh
 git commit -m "fix: make build.sh executable"
 git push
 ```
+
+### Erreur d'installation UV
+
+Si UV ne s'installe pas, revenez à pip classique dans `build.sh` :
+
+```bash
+# Remplacer dans build.sh :
+pip install -r requirements.txt
+```
+
+### Avantages de UV
+
+- ⚡ **10-100x plus rapide** que pip
+- 📦 Résolution de dépendances optimisée
+- 🔒 Lockfile automatique pour reproductibilité
+- 💾 Cache intelligent
 
 ### Erreur de static files
 
