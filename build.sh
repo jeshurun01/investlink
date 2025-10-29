@@ -3,11 +3,8 @@
 
 set -o errexit
 
-# Install uv if not present
-pip install uv
-
-# Install dependencies with uv (much faster than pip)
-uv pip install -r requirements.txt --system
+# Install dependencies
+pip install -r requirements.txt
 
 # Collect static files
 python manage.py collectstatic --no-input
