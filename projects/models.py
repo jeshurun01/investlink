@@ -2,6 +2,7 @@ from django.db import models
 from django.conf import settings
 from django.urls import reverse
 from django.utils.text import slugify
+from decimal import Decimal
 
 
 class Project(models.Model):
@@ -234,6 +235,13 @@ class Investment(models.Model):
         decimal_places=2,
         verbose_name='Montant investi ($)'
     )
+    current_value = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
+        default=Decimal('0.00'),
+        verbose_name='Valeur actuelle ($)',
+        help_text='Valeur actuelle de l\'investissement (mise à jour périodiquement)'
+    )
     status = models.CharField(
         max_length=20,
         choices=STATUS_CHOICES,
@@ -262,25 +270,30 @@ class Investment(models.Model):
     def __str__(self):
         return f"{self.investor.username} - {self.project.title} - ${self.amount}"
     
-    @property
-    def current_value(self):
-        """Valeur actuelle de l'investissement basée sur les dernières performances"""
+    def save(self, *args, **kwargs):
+        """Initialiser current_value avec amount si non défini"""
+        if not self.current_value or self.current_value == 0:
+            self.current_value = self.amount
+        super().save(*args, **kwargs)
+    
+    def update_current_value(self):
+        """Mettre à jour la valeur actuelle basée sur les dernières performances"""
         latest_performance = self.project.performances.order_by('-report_date').first()
         if latest_performance and latest_performance.roi_percentage is not None:
-            return float(self.amount) * (1 + latest_performance.roi_percentage / 100)
-        return float(self.amount)
+            self.current_value = self.amount * (Decimal('1') + latest_performance.roi_percentage / Decimal('100'))
+            self.save(update_fields=['current_value'])
     
     @property
     def roi_amount(self):
         """Montant du retour sur investissement"""
-        return self.current_value - float(self.amount)
+        return self.current_value - self.amount
     
     @property
     def roi_percentage(self):
         """Pourcentage du retour sur investissement"""
         if self.amount > 0:
-            return (self.roi_amount / float(self.amount)) * 100
-        return 0
+            return (self.roi_amount / self.amount) * 100
+        return Decimal('0')
 
 
 class ProjectPerformance(models.Model):

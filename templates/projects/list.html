@@ -4,11 +4,52 @@
 
 {% block content %}
 <div class="min-h-screen bg-gray-50">
-    <!-- Hero Section -->
+    <!-- Hero Section with Stats -->
     <div class="bg-gradient-to-r from-blue-900 to-blue-700 text-white py-16">
         <div class="container mx-auto px-4">
             <h1 class="text-4xl font-bold mb-4">Découvrez des Projets Innovants</h1>
             <p class="text-xl text-blue-100 mb-8">Investissez dans l'avenir en soutenant des projets à fort potentiel</p>
+            
+            <!-- Statistiques Globales -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div class="bg-white/10 backdrop-blur rounded-lg p-6 border border-white/20">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-blue-200 text-sm mb-1">Projets Validés</p>
+                            <p class="text-3xl font-bold">{{ total_projects }}</p>
+                        </div>
+                        <div class="w-12 h-12 bg-blue-500/30 rounded-full flex items-center justify-center">
+                            <i class="fas fa-project-diagram text-2xl"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white/10 backdrop-blur rounded-lg p-6 border border-white/20">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-blue-200 text-sm mb-1">Capital Recherché</p>
+                            <p class="text-3xl font-bold">{{ total_funding|floatformat:0 }}€</p>
+                        </div>
+                        <div class="w-12 h-12 bg-green-500/30 rounded-full flex items-center justify-center">
+                            <i class="fas fa-coins text-2xl"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white/10 backdrop-blur rounded-lg p-6 border border-white/20">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-blue-200 text-sm mb-1">ROI Moyen</p>
+                            <p class="text-3xl font-bold {% if avg_roi >= 0 %}text-green-300{% else %}text-red-300{% endif %}">
+                                {{ avg_roi|floatformat:1 }}%
+                            </p>
+                        </div>
+                        <div class="w-12 h-12 {% if avg_roi >= 0 %}bg-green-500/30{% else %}bg-red-500/30{% endif %} rounded-full flex items-center justify-center">
+                            <i class="fas fa-chart-line text-2xl"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
             
             <!-- Barre de recherche -->
             <form method="get" class="max-w-4xl">
@@ -27,6 +68,56 @@
             </form>
         </div>
     </div>
+
+    <!-- Section Statistiques par Secteur -->
+    {% if not selected_sector and sector_stats %}
+    <div class="bg-white border-b">
+        <div class="container mx-auto px-4 py-12">
+            <h2 class="text-3xl font-bold text-gray-900 mb-8 flex items-center">
+                <i class="fas fa-chart-pie text-blue-600 mr-3"></i>
+                Classement par Secteur
+            </h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                {% for sector in sector_stats %}
+                    {% if sector.count > 0 %}
+                    <a href="?sector={{ sector.code }}" class="group">
+                        <div class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-6 border border-blue-200 hover:shadow-lg transition-all duration-300 hover:scale-105">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="font-bold text-gray-900 group-hover:text-blue-600 transition">
+                                    {{ sector.name }}
+                                </h3>
+                                <div class="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white text-sm font-bold">
+                                    {{ sector.count }}
+                                </div>
+                            </div>
+                            
+                            <div class="space-y-2 text-sm">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-gray-600">Capital recherché</span>
+                                    <span class="font-semibold text-gray-900">{{ sector.funding|floatformat:0 }}€</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-gray-600">ROI moyen</span>
+                                    <span class="font-bold {% if sector.roi >= 0 %}text-green-600{% else %}text-red-600{% endif %}">
+                                        {{ sector.roi|floatformat:1 }}%
+                                    </span>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-4 pt-4 border-t border-blue-200">
+                                <span class="text-blue-600 text-sm font-semibold group-hover:underline">
+                                    Voir les projets <i class="fas fa-arrow-right ml-1"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </a>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
 
     <div class="container mx-auto px-4 py-12">
         <div class="flex flex-col lg:flex-row gap-8">
@@ -60,13 +151,19 @@
                         <button type="submit" class="btn-primary w-full text-sm">
                             <i class="fas fa-check mr-2"></i>Appliquer
                         </button>
+                        
+                        {% if request.GET.sector or request.GET.search %}
+                        <a href="{% url 'projects:list' %}" class="block text-center mt-2 text-sm text-gray-600 hover:text-blue-600">
+                            <i class="fas fa-times-circle mr-1"></i>Réinitialiser
+                        </a>
+                        {% endif %}
                     </form>
 
                     <!-- Stats -->
                     <div class="mt-6 pt-6 border-t">
                         <div class="space-y-3 text-sm">
                             <div class="flex justify-between">
-                                <span class="text-gray-600">Projets actifs</span>
+                                <span class="text-gray-600">Projets affichés</span>
                                 <span class="font-semibold text-gray-800">{{ projects.count }}</span>
                             </div>
                         </div>
@@ -77,6 +174,15 @@
             <!-- Liste des projets -->
             <div class="flex-1">
                 {% if projects %}
+                    {% if selected_sector %}
+                    <div class="mb-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
+                        <p class="text-blue-800 flex items-center">
+                            <i class="fas fa-filter mr-2"></i>
+                            Filtré par secteur : <strong class="ml-2">{{ selected_sector|upper }}</strong>
+                        </p>
+                    </div>
+                    {% endif %}
+                    
                     <div class="mb-6 flex justify-between items-center">
                         <p class="text-gray-600">
                             <strong>{{ projects.count }}</strong> projet{{ projects.count|pluralize }} trouvé{{ projects.count|pluralize }}

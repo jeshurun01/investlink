@@ -6,6 +6,12 @@ from django.contrib import messages
 from django.urls import reverse
 from django.db.models import Count, Q
 from django.utils import timezone
+from django.contrib.auth.tokens import default_token_generator
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.utils.encoding import force_bytes, force_str
+from django.template.loader import render_to_string
+from django.core.mail import send_mail
+from django.conf import settings
 from datetime import timedelta
 from .forms import (
     ProjectOwnerRegistrationForm, 
@@ -92,6 +98,90 @@ def logout_view(request):
     logout(request)
     messages.info(request, 'Vous avez été déconnecté avec succès.')
     return redirect('core:home')
+
+
+def password_reset_request(request):
+    """Page de demande de réinitialisation de mot de passe"""
+    if request.method == 'POST':
+        email = request.POST.get('email')
+        try:
+            user = User.objects.get(email=email)
+            
+            # Générer le token de réinitialisation
+            token = default_token_generator.make_token(user)
+            uid = urlsafe_base64_encode(force_bytes(user.pk))
+            
+            # Créer le lien de réinitialisation
+            reset_link = request.build_absolute_uri(
+                reverse('users:password_reset_confirm', kwargs={'uidb64': uid, 'token': token})
+            )
+            
+            # Envoyer l'email
+            subject = 'Réinitialisation de votre mot de passe - InvestLink'
+            message = render_to_string('users/password_reset_email.html', {
+                'user': user,
+                'reset_link': reset_link,
+            })
+            
+            send_mail(
+                subject,
+                message,
+                settings.DEFAULT_FROM_EMAIL,
+                [user.email],
+                fail_silently=False,
+            )
+            
+            messages.success(request, 'Un email de réinitialisation a été envoyé à votre adresse email.')
+            return redirect('users:password_reset_done')
+            
+        except User.DoesNotExist:
+            # Pour des raisons de sécurité, on affiche le même message même si l'utilisateur n'existe pas
+            messages.success(request, 'Un email de réinitialisation a été envoyé à votre adresse email.')
+            return redirect('users:password_reset_done')
+    
+    return render(request, 'users/password_reset_form.html')
+
+
+def password_reset_done(request):
+    """Page de confirmation d'envoi de l'email de réinitialisation"""
+    return render(request, 'users/password_reset_done.html')
+
+
+def password_reset_confirm(request, uidb64, token):
+    """Page de confirmation de réinitialisation avec nouveau mot de passe"""
+    try:
+        uid = force_str(urlsafe_base64_decode(uidb64))
+        user = User.objects.get(pk=uid)
+    except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+        user = None
+    
+    if user is not None and default_token_generator.check_token(user, token):
+        if request.method == 'POST':
+            password1 = request.POST.get('password1')
+            password2 = request.POST.get('password2')
+            
+            if password1 and password1 == password2:
+                user.set_password(password1)
+                user.save()
+                messages.success(request, 'Votre mot de passe a été réinitialisé avec succès. Vous pouvez maintenant vous connecter.')
+                return redirect('users:password_reset_complete')
+            else:
+                messages.error(request, 'Les mots de passe ne correspondent pas.')
+        
+        return render(request, 'users/password_reset_confirm.html', {
+            'validlink': True,
+            'uidb64': uidb64,
+            'token': token,
+        })
+    else:
+        return render(request, 'users/password_reset_confirm.html', {
+            'validlink': False,
+        })
+
+
+def password_reset_complete(request):
+    """Page de confirmation finale de réinitialisation"""
+    return render(request, 'users/password_reset_complete.html')
 
 
 @login_required

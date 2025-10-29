@@ -14,8 +14,48 @@ from notifications.models import Notification
 
 
 def project_list(request):
-    """Liste des projets validés"""
+    """Liste des projets validés avec statistiques globales"""
     projects = Project.objects.filter(status='approved').select_related('owner')
+    
+    # Statistiques globales de la plateforme
+    total_projects = projects.count()
+    total_funding = projects.aggregate(total=Sum('funding_goal'))['total'] or 0
+    
+    # Calcul du ROI moyen global (basé sur les investissements confirmés)
+    confirmed_investments = Investment.objects.filter(status='confirmed')
+    avg_roi = Decimal('0')
+    if confirmed_investments.exists():
+        total_invested = confirmed_investments.aggregate(total=Sum('amount'))['total'] or 0
+        total_current = confirmed_investments.aggregate(total=Sum('current_value'))['total'] or 0
+        if total_invested > 0:
+            avg_roi = ((total_current - total_invested) / total_invested) * 100
+    
+    # Statistiques par secteur
+    sector_stats = []
+    for sector_code, sector_name in Project.SECTOR_CHOICES:
+        sector_projects = projects.filter(sector=sector_code)
+        sector_count = sector_projects.count()
+        sector_funding = sector_projects.aggregate(total=Sum('funding_goal'))['total'] or 0
+        
+        # ROI moyen du secteur
+        sector_investments = confirmed_investments.filter(project__sector=sector_code)
+        sector_roi = Decimal('0')
+        if sector_investments.exists():
+            sector_invested = sector_investments.aggregate(total=Sum('amount'))['total'] or 0
+            sector_current = sector_investments.aggregate(total=Sum('current_value'))['total'] or 0
+            if sector_invested > 0:
+                sector_roi = ((sector_current - sector_invested) / sector_invested) * 100
+        
+        sector_stats.append({
+            'code': sector_code,
+            'name': sector_name,
+            'count': sector_count,
+            'funding': sector_funding,
+            'roi': sector_roi,
+        })
+    
+    # Trier les secteurs par nombre de projets
+    sector_stats.sort(key=lambda x: x['count'], reverse=True)
     
     # Filtres
     sector = request.GET.get('sector')
@@ -42,24 +82,53 @@ def project_list(request):
     context = {
         'projects': projects_list,
         'sectors': Project.SECTOR_CHOICES,
+        'total_projects': total_projects,
+        'total_funding': total_funding,
+        'avg_roi': avg_roi,
+        'sector_stats': sector_stats,
+        'selected_sector': sector,
     }
     return render(request, 'projects/list.html', context)
 
 
 def project_detail(request, slug):
-    """Détail d'un projet"""
+    """Détail d'un projet - Accès restreint aux investisseurs connectés"""
     project = get_object_or_404(Project, slug=slug)
     
-    # Incrémenter le compteur de vues
-    project.views_count += 1
-    project.save(update_fields=['views_count'])
+    # Vérifier l'accès : seuls les investisseurs connectés peuvent voir les détails complets
+    has_full_access = False
+    show_signup_modal = False
     
-    # Charger les documents
-    documents = project.documents.all()
+    if request.user.is_authenticated:
+        if request.user.user_type == 'investisseur' or request.user.is_staff:
+            has_full_access = True
+        elif request.user.user_type == 'porteur':
+            # Les porteurs peuvent voir leurs propres projets
+            if project.owner == request.user:
+                has_full_access = True
+    else:
+        # Non connecté : on affiche une version limitée avec modal
+        show_signup_modal = True
+    
+    # Incrémenter le compteur de vues seulement pour les accès complets
+    if has_full_access:
+        project.views_count += 1
+        project.save(update_fields=['views_count'])
+    
+    # Charger les documents seulement si accès complet
+    documents = project.documents.all() if has_full_access else []
+    
+    # Vérifier si c'est un favori (pour les investisseurs connectés)
+    is_favorite = False
+    if request.user.is_authenticated and request.user.user_type == 'investisseur':
+        is_favorite = ProjectFavorite.objects.filter(user=request.user, project=project).exists()
     
     context = {
         'project': project,
         'documents': documents,
+        'has_full_access': has_full_access,
+        'show_signup_modal': show_signup_modal,
+        'is_favorite': is_favorite,
     }
     return render(request, 'projects/detail.html', context)
 

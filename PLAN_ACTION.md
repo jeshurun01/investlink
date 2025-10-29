@@ -135,18 +135,21 @@
 ### 3.2 Pages publiques
 - [x] Page d'accueil (hero, appel à l'action)
 - [x] Page "Découvrir les projets"
-- [ ] Amélioration page "Découvrir" avec statistiques globales
-- [ ] Section classement par secteur d'activité
-- [ ] Cartes secteurs avec nombre de projets et ROI moyen
-- [ ] Restriction d'accès détails (investisseurs uniquement)
-- [ ] Modal d'incitation à l'inscription pour non-connectés
+- [x] **Amélioration page "Découvrir" avec statistiques globales (3 cartes : projets, capital, ROI)**
+- [x] **Section classement par secteur d'activité avec cartes cliquables**
+- [x] **Cartes secteurs avec nombre de projets et ROI moyen**
+- [x] **Restriction d'accès détails (investisseurs uniquement)**
+- [x] **Modal d'incitation à l'inscription pour non-connectés (affichage automatique après 3s)**
 - [x] Page détail d'un projet (vue publique)
 - [x] Page "À propos"
-- [ ] Page "Blog/Actualités"
+- [x] Page "Blog/Actualités" avec filtres et pagination
+- [x] Page détail d'article de blog
+- [x] Catégories et tags pour articles
+- [x] Système de recherche dans le blog
 - [x] Page "Contact"
 - [x] Page "FAQ"
-- [ ] Pages mentions légales et CGU
-- [ ] Page politique de confidentialité (RGPD)
+- [x] Pages mentions légales et CGU
+- [x] Page politique de confidentialité (RGPD)
 
 ### 3.3 Pages d'authentification
 - [x] Page d'inscription (choix du type de compte)
@@ -456,12 +459,16 @@
 - ✅ Calcul automatique du ROI par projet et global
 - ✅ **Workflow complet de validation des investissements par admin**
 - ✅ **Gestion complète des utilisateurs (activation, suppression, changement de type)**
+- ✅ **Pages légales complètes (CGU, confidentialité, mentions légales) conformes RGPD**
+- ✅ **Système de blog complet avec catégories, tags, recherche, pagination**
+- ✅ **Amélioration page Découvrir : statistiques globales + classement sectoriel avec ROI**
+- ✅ **Restriction d'accès détails projets (investisseurs uniquement) + modal inscription**
 - ⏳ Validation email (à faire)
 - ⏳ Reset mot de passe (à faire)
 - ⏳ 2FA (à faire)
 - ⏳ Envoi emails SMTP (à faire)
 
-### 🔄 Phase 3 : EN COURS (85%)
+### 🔄 Phase 3 : EN COURS (95%)
 - ✅ Charte graphique et composants de base
 - ✅ Pages d'authentification complètes
 - ✅ Navigation responsive
@@ -471,6 +478,10 @@
 - ✅ Page "Mes projets" pour porteurs
 - ✅ Page détails de projet avec sidebar
 - ✅ Page liste publique des projets avec filtres
+- ✅ **Page "Découvrir" améliorée : 3 stats globales + classement secteurs**
+- ✅ **Cartes secteurs interactives (projets, capital, ROI moyen)**
+- ✅ **Restriction accès détails projets pour investisseurs**
+- ✅ **Modal d'inscription automatique pour non-connectés**
 - ✅ Page "À propos" complète avec mission et valeurs
 - ✅ Page "Contact" avec formulaire fonctionnel
 - ✅ Page "FAQ" avec accordéon et recherche
@@ -484,7 +495,8 @@
 - ✅ Formulaire de déclaration d'investissement
 - ✅ **Page admin de validation des investissements avec statistiques**
 - ✅ **Page admin de validation détaillée d'un investissement**
-- ⏳ Pages légales manquantes (CGU, confidentialité, mentions légales)
+- ✅ **Pages légales (CGU, Politique de confidentialité, Mentions légales)**
+- ✅ **Système de blog avec articles, catégories, tags, recherche et pagination**
 - ⏳ Page "Blog/Actualités" (à faire)
 - ⏳ Page de logs/activités admin (à faire)
 

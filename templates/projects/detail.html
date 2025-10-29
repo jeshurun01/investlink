@@ -100,6 +100,43 @@
                     </div>
                 </div>
 
+                <!-- Message de restriction d'accès -->
+                {% if not has_full_access %}
+                <div class="card bg-gradient-to-r from-blue-50 to-blue-100 border-2 border-blue-300">
+                    <div class="text-center py-8">
+                        <div class="w-20 h-20 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-lock text-3xl text-white"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-gray-900 mb-3">Contenu Réservé aux Investisseurs</h3>
+                        <p class="text-gray-700 mb-6 max-w-2xl mx-auto">
+                            Pour accéder aux détails complets du projet, aux documents et aux informations financières,
+                            {% if request.user.is_authenticated %}
+                                vous devez avoir un compte investisseur.
+                            {% else %}
+                                inscrivez-vous gratuitement en tant qu'investisseur.
+                            {% endif %}
+                        </p>
+                        {% if not request.user.is_authenticated %}
+                        <div class="flex justify-center gap-4">
+                            <a href="{% url 'users:register' %}" class="btn-primary px-8 py-3">
+                                <i class="fas fa-user-plus mr-2"></i>
+                                S'inscrire en tant qu'investisseur
+                            </a>
+                            <a href="{% url 'users:login' %}" class="btn-secondary px-8 py-3">
+                                <i class="fas fa-sign-in-alt mr-2"></i>
+                                Se connecter
+                            </a>
+                        </div>
+                        {% else %}
+                        <a href="{% url 'users:profile' %}" class="btn-primary px-8 py-3">
+                            <i class="fas fa-user mr-2"></i>
+                            Modifier mon profil
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+                {% else %}
+                
                 <!-- Description détaillée -->
                 <div class="card">
                     <h2 class="text-2xl font-bold text-gray-800 mb-4 flex items-center">
@@ -211,6 +248,8 @@
                         </div>
                     {% endif %}
                 {% endif %}
+                
+                {% endif %} <!-- Fin de has_full_access -->
             </div>
 
             <!-- Sidebar -->
@@ -222,22 +261,23 @@
                     <div class="mb-4">
                         <div class="flex justify-between mb-2">
                             <span class="text-sm text-gray-600">Objectif</span>
-                            <span class="text-sm font-semibold text-gray-800">${{ project.funding_goal|floatformat:0 }}</span>
+                            <span class="text-sm font-semibold text-gray-800">{{ project.funding_goal|floatformat:0 }}€</span>
                         </div>
                         <div class="w-full bg-gray-200 rounded-full h-2">
-                            <div class="bg-green-600 h-2 rounded-full" style="width: {{ project.funding_percentage }}%"></div>
+                            <div class="bg-green-600 h-2 rounded-full transition-all" style="width: {{ project.funding_percentage|default:0 }}%"></div>
                         </div>
-                        <p class="text-xs text-gray-600 mt-1">{{ project.funding_percentage|floatformat:1 }}% financé</p>
+                        <p class="text-xs text-gray-600 mt-1">{{ project.funding_percentage|floatformat:1|default:0 }}% financé</p>
                     </div>
 
+                    {% if has_full_access %}
                     <div class="space-y-3 mb-6">
                         <div class="flex justify-between">
                             <span class="text-gray-600">Montant levé</span>
-                            <span class="font-semibold text-green-600">${{ project.current_funding|floatformat:0 }}</span>
+                            <span class="font-semibold text-green-600">{{ project.current_funding|floatformat:0|default:0 }}€</span>
                         </div>
                         <div class="flex justify-between">
                             <span class="text-gray-600">Investissement min.</span>
-                            <span class="font-semibold text-gray-800">${{ project.min_investment|floatformat:0 }}</span>
+                            <span class="font-semibold text-gray-800">{{ project.min_investment|floatformat:0 }}€</span>
                         </div>
                     </div>
 
@@ -249,11 +289,20 @@
                             </a>
                             <button class="favorite-btn btn-outline w-full" 
                                     data-project-id="{{ project.id }}"
-                                    data-is-favorite="false">
-                                <i class="far fa-heart mr-2"></i>
-                                Ajouter aux favoris
+                                    data-is-favorite="{% if is_favorite %}true{% else %}false{% endif %}">
+                                <i class="{% if is_favorite %}fas{% else %}far{% endif %} fa-heart mr-2"></i>
+                                {% if is_favorite %}Retirer des favoris{% else %}Ajouter aux favoris{% endif %}
                             </button>
                         {% endif %}
+                    {% endif %}
+                    {% else %}
+                    <!-- Message de restriction pour non-connectés -->
+                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+                        <p class="text-sm text-blue-800 text-center">
+                            <i class="fas fa-lock mr-2"></i>
+                            Informations détaillées réservées aux investisseurs
+                        </p>
+                    </div>
                     {% endif %}
 
                     {% if request.user == project.owner and project.status != 'approved' %}
@@ -306,4 +355,107 @@
         </div>
     </div>
 </div>
+
+<!-- Modal d'inscription pour non-connectés -->
+{% if show_signup_modal %}
+<div id="signupModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+    <div class="bg-white rounded-lg shadow-2xl max-w-2xl w-full mx-4 overflow-hidden">
+        <div class="bg-gradient-to-r from-blue-600 to-blue-800 text-white p-6">
+            <div class="flex items-center justify-between">
+                <h3 class="text-2xl font-bold">Accédez au Contenu Complet</h3>
+                <button onclick="closeModal()" class="text-white hover:text-gray-200 text-2xl">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+        
+        <div class="p-8">
+            <div class="text-center mb-6">
+                <div class="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-unlock-alt text-4xl text-blue-600"></i>
+                </div>
+                <h4 class="text-xl font-bold text-gray-900 mb-3">
+                    Débloquez l'Accès aux Détails du Projet
+                </h4>
+                <p class="text-gray-600 mb-6">
+                    En créant un compte investisseur gratuit, vous accéderez à :
+                </p>
+            </div>
+            
+            <div class="grid md:grid-cols-2 gap-4 mb-8">
+                <div class="flex items-start space-x-3">
+                    <i class="fas fa-check-circle text-green-600 text-xl mt-1"></i>
+                    <div>
+                        <p class="font-semibold text-gray-900">Descriptions complètes</p>
+                        <p class="text-sm text-gray-600">Tous les détails des projets</p>
+                    </div>
+                </div>
+                <div class="flex items-start space-x-3">
+                    <i class="fas fa-check-circle text-green-600 text-xl mt-1"></i>
+                    <div>
+                        <p class="font-semibold text-gray-900">Documents officiels</p>
+                        <p class="text-sm text-gray-600">Business plans, bilans financiers</p>
+                    </div>
+                </div>
+                <div class="flex items-start space-x-3">
+                    <i class="fas fa-check-circle text-green-600 text-xl mt-1"></i>
+                    <div>
+                        <p class="font-semibold text-gray-900">Contact direct</p>
+                        <p class="text-sm text-gray-600">Messagerie avec les porteurs</p>
+                    </div>
+                </div>
+                <div class="flex items-start space-x-3">
+                    <i class="fas fa-check-circle text-green-600 text-xl mt-1"></i>
+                    <div>
+                        <p class="font-semibold text-gray-900">Suivi d'investissements</p>
+                        <p class="text-sm text-gray-600">Dashboard et statistiques</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="flex flex-col sm:flex-row gap-4">
+                <a href="{% url 'users:register' %}" class="flex-1 btn-primary text-center py-4">
+                    <i class="fas fa-user-plus mr-2"></i>
+                    Créer mon compte investisseur
+                </a>
+                <a href="{% url 'users:login' %}" class="flex-1 btn-secondary text-center py-4">
+                    <i class="fas fa-sign-in-alt mr-2"></i>
+                    J'ai déjà un compte
+                </a>
+            </div>
+            
+            <p class="text-center text-sm text-gray-500 mt-6">
+                <i class="fas fa-lock mr-1"></i>
+                Inscription 100% gratuite et sécurisée
+            </p>
+        </div>
+    </div>
+</div>
+
+<script>
+// Afficher la modal après 3 secondes
+setTimeout(function() {
+    document.getElementById('signupModal').classList.remove('hidden');
+}, 3000);
+
+function closeModal() {
+    document.getElementById('signupModal').classList.add('hidden');
+}
+
+// Fermer avec Echap
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+        closeModal();
+    }
+});
+
+// Fermer en cliquant à l'extérieur
+document.getElementById('signupModal').addEventListener('click', function(event) {
+    if (event.target === this) {
+        closeModal();
+    }
+});
+</script>
+{% endif %}
+
 {% endblock %}
