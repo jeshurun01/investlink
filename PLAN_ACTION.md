@@ -49,7 +49,7 @@
 - [x] Système d'inscription (formulaires pour porteurs et investisseurs)
 - [x] Système de connexion/déconnexion
 - [ ] Validation d'email
-- [ ] Réinitialisation de mot de passe
+- [x] Réinitialisation de mot de passe
 - [ ] Authentification à deux facteurs (2FA)
 - [x] Vues de profil utilisateur
 - [x] Édition de profil porteur
@@ -156,8 +156,8 @@
 - [x] Formulaire d'inscription porteur
 - [x] Formulaire d'inscription investisseur
 - [x] Page de connexion
-- [ ] Page de mot de passe oublié
-- [ ] Page de réinitialisation de mot de passe
+- [x] Page de mot de passe oublié
+- [x] Page de réinitialisation de mot de passe
 - [ ] Page de configuration 2FA
 
 ### 3.4 Espace porteur de projet
@@ -439,8 +439,9 @@
 - Base de données SQLite opérationnelle
 - Interface admin configurée
 
-### 🔄 Phase 2 : EN COURS (92%)
+### 🔄 Phase 2 : EN COURS (94%)
 - ✅ Système d'authentification complet (inscription, login, logout)
+- ✅ **Système de réinitialisation de mot de passe complet**
 - ✅ Formulaires porteur et investisseur avec validation
 - ✅ Dashboards utilisateurs personnalisés
 - ✅ Profils utilisateurs (affichage et édition)
@@ -464,13 +465,12 @@
 - ✅ **Amélioration page Découvrir : statistiques globales + classement sectoriel avec ROI**
 - ✅ **Restriction d'accès détails projets (investisseurs uniquement) + modal inscription**
 - ⏳ Validation email (à faire)
-- ⏳ Reset mot de passe (à faire)
 - ⏳ 2FA (à faire)
 - ⏳ Envoi emails SMTP (à faire)
 
-### 🔄 Phase 3 : EN COURS (95%)
+### 🔄 Phase 3 : EN COURS (97%)
 - ✅ Charte graphique et composants de base
-- ✅ Pages d'authentification complètes
+- ✅ **Pages d'authentification complètes avec reset mot de passe**
 - ✅ Navigation responsive
 - ✅ Page d'accueil
 - ✅ Dashboards porteur et investisseur
@@ -497,7 +497,6 @@
 - ✅ **Page admin de validation détaillée d'un investissement**
 - ✅ **Pages légales (CGU, Politique de confidentialité, Mentions légales)**
 - ✅ **Système de blog avec articles, catégories, tags, recherche et pagination**
-- ⏳ Page "Blog/Actualités" (à faire)
 - ⏳ Page de logs/activités admin (à faire)
 
 ### 🎨 Améliorations UX Récentes
@@ -524,6 +523,14 @@
 14. Responsive design (mobile/tablette)
 
 ### 📋 Nouvelles Fonctionnalités Ajoutées (29 octobre 2025)
+
+**🔹 Système de Réinitialisation de Mot de Passe :**
+- Flux complet en 4 étapes (demande, confirmation, nouveau mot de passe, succès)
+- Génération de tokens sécurisés avec expiration 24h
+- 5 templates stylisés avec Tailwind CSS
+- Email de réinitialisation (backend console pour dev)
+- Protection contre l'énumération d'utilisateurs
+- Lien intégré dans la page de connexion
 
 **🔹 Système de Favoris :**
 - Toggle AJAX sur les cartes de projets
