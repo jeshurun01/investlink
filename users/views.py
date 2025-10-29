@@ -354,3 +354,59 @@ def admin_toggle_user_status(request, user_id):
         return redirect('users:admin_user_detail', user_id=user_id)
     
     return redirect('users:admin_users')
+
+
+@staff_member_required
+def admin_delete_user(request, user_id):
+    """Supprimer un utilisateur"""
+    if request.method == 'POST':
+        user_obj = get_object_or_404(User, id=user_id)
+        
+        # Ne pas permettre de se supprimer soi-même
+        if user_obj == request.user:
+            messages.error(request, 'Vous ne pouvez pas supprimer votre propre compte.')
+            return redirect('users:admin_user_detail', user_id=user_id)
+        
+        # Ne pas permettre de supprimer un super admin
+        if user_obj.is_superuser:
+            messages.error(request, 'Vous ne pouvez pas supprimer un compte super administrateur.')
+            return redirect('users:admin_user_detail', user_id=user_id)
+        
+        user_name = user_obj.get_full_name()
+        user_obj.delete()
+        
+        messages.success(request, f'Le compte de {user_name} a été supprimé définitivement.')
+        return redirect('users:admin_users')
+    
+    return redirect('users:admin_users')
+
+
+@staff_member_required
+def admin_change_user_type(request, user_id):
+    """Changer le type d'utilisateur (porteur <-> investisseur)"""
+    if request.method == 'POST':
+        user_obj = get_object_or_404(User, id=user_id)
+        
+        # Ne pas permettre de modifier son propre type
+        if user_obj == request.user:
+            messages.error(request, 'Vous ne pouvez pas modifier votre propre type de compte.')
+            return redirect('users:admin_user_detail', user_id=user_id)
+        
+        new_type = request.POST.get('new_type')
+        
+        if new_type not in ['porteur', 'investisseur']:
+            messages.error(request, 'Type de compte invalide.')
+            return redirect('users:admin_user_detail', user_id=user_id)
+        
+        old_type = user_obj.get_user_type_display()
+        user_obj.user_type = new_type
+        user_obj.save()
+        
+        messages.success(
+            request,
+            f'Le type de compte de {user_obj.get_full_name()} a été changé de {old_type} à {user_obj.get_user_type_display()}.'
+        )
+        
+        return redirect('users:admin_user_detail', user_id=user_id)
+    
+    return redirect('users:admin_users')

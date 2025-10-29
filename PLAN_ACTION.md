@@ -90,7 +90,9 @@
 - [x] **Liste des investissements en attente de validation**
 - [x] **Validation/rejet des investissements avec notes admin**
 - [x] **Notifications automatiques aux investisseurs et porteurs**
-- [ ] Gestion des utilisateurs (activation/désactivation)
+- [x] **Gestion des utilisateurs (activation/désactivation)**
+- [x] **Suppression de comptes utilisateurs**
+- [x] **Changement du type d'utilisateur (porteur ↔ investisseur)**
 - [ ] Outils de modération de contenu
 
 ### 2.5 Messagerie interne
@@ -187,6 +189,7 @@
 - [x] Page de gestion des utilisateurs
 - [x] **Page de validation des investissements**
 - [x] **Page de validation détaillée d'un investissement**
+- [x] **Actions utilisateurs : activation/désactivation, suppression, changement de type**
 - [ ] Page de gestion du contenu
 - [ ] Page de logs/activités
 
@@ -433,7 +436,7 @@
 - Base de données SQLite opérationnelle
 - Interface admin configurée
 
-### 🔄 Phase 2 : EN COURS (90%)
+### 🔄 Phase 2 : EN COURS (92%)
 - ✅ Système d'authentification complet (inscription, login, logout)
 - ✅ Formulaires porteur et investisseur avec validation
 - ✅ Dashboards utilisateurs personnalisés
@@ -452,12 +455,13 @@
 - ✅ Système complet d'investissement et suivi financier
 - ✅ Calcul automatique du ROI par projet et global
 - ✅ **Workflow complet de validation des investissements par admin**
+- ✅ **Gestion complète des utilisateurs (activation, suppression, changement de type)**
 - ⏳ Validation email (à faire)
 - ⏳ Reset mot de passe (à faire)
 - ⏳ 2FA (à faire)
 - ⏳ Envoi emails SMTP (à faire)
 
-### 🔄 Phase 3 : EN COURS (84%)
+### 🔄 Phase 3 : EN COURS (85%)
 - ✅ Charte graphique et composants de base
 - ✅ Pages d'authentification complètes
 - ✅ Navigation responsive
@@ -473,6 +477,7 @@
 - ✅ Dashboard admin avec statistiques globales
 - ✅ Page de gestion des utilisateurs avec filtres
 - ✅ Page détail utilisateur avec activation/désactivation
+- ✅ **Page détail utilisateur avec suppression et changement de type**
 - ✅ Système de favoris pour investisseurs (toggle AJAX + page favoris)
 - ✅ Page "Mes investissements" avec statistiques et filtres
 - ✅ Page "États financiers mensuels" avec graphiques Chart.js
@@ -535,6 +540,14 @@
 - Notifications automatiques aux investisseurs et porteurs
 - Intégration au dashboard admin avec accès rapide
 - Types de notifications étendus (investment_confirmed, investment_rejected)
+
+**🔹 Gestion Complète des Utilisateurs (Admin) :**
+- Activation et désactivation de comptes utilisateurs
+- Suppression définitive de comptes (sauf super admins)
+- Changement du type d'utilisateur (porteur ↔ investisseur)
+- Protection contre auto-modification
+- Interface avec formulaires et confirmations JavaScript
+- Messages de succès Django pour chaque action
 
 ---
 
