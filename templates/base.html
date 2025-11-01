@@ -149,29 +149,232 @@
                 </div>
                 
                 <!-- Mobile Menu Button -->
-                <button class="md:hidden" id="mobile-menu-button">
+                <button class="md:hidden text-white" id="mobile-menu-button">
                     <i class="fas fa-bars text-2xl"></i>
                 </button>
             </div>
             
-            <!-- Mobile Menu -->
-            <div class="md:hidden hidden mt-4" id="mobile-menu">
-                <a href="{% url 'core:home' %}" class="block py-2 hover:text-green-400 transition">Accueil</a>
-                <a href="{% url 'projects:list' %}" class="block py-2 hover:text-green-400 transition">Découvrir les projets</a>
-                <a href="{% url 'core:about' %}" class="block py-2 hover:text-green-400 transition">À propos</a>
-                <a href="{% url 'core:blog' %}" class="block py-2 hover:text-green-400 transition">Blog</a>
-                <a href="{% url 'core:contact' %}" class="block py-2 hover:text-green-400 transition">Contact</a>
+            <!-- Mobile Menu Overlay -->
+            <div class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden opacity-0 transition-opacity duration-300" id="mobile-menu-overlay"></div>
+            
+            <!-- Mobile Menu Sidebar -->
+            <div class="fixed top-0 right-0 h-full w-80 bg-white shadow-2xl z-50 transform translate-x-full transition-transform duration-300 overflow-y-auto md:hidden" id="mobile-menu">
+                <!-- Header -->
+                <div class="bg-blue-900 text-white p-4 flex justify-between items-center sticky top-0 z-10">
+                    <div class="flex items-center space-x-2">
+                        <i class="fas fa-link text-green-500"></i>
+                        <span class="font-bold text-lg">InvestLink</span>
+                    </div>
+                    <button id="mobile-menu-close" class="text-white hover:text-green-400">
+                        <i class="fas fa-times text-2xl"></i>
+                    </button>
+                </div>
                 
-                {% if user.is_authenticated %}
-                    <hr class="my-2 border-blue-700">
-                    <a href="{% url 'users:dashboard' %}" class="block py-2 hover:text-green-400 transition">Dashboard</a>
-                    <a href="{% url 'users:profile' %}" class="block py-2 hover:text-green-400 transition">Mon profil</a>
-                    <a href="{% url 'messaging:inbox' %}" class="block py-2 hover:text-green-400 transition">Messages</a>
-                    <a href="{% url 'users:logout' %}" class="block py-2 hover:text-green-400 transition">Déconnexion</a>
-                {% else %}
-                    <a href="{% url 'users:login' %}" class="block py-2 hover:text-green-400 transition">Connexion</a>
-                    <a href="{% url 'users:register' %}" class="block py-2 hover:text-green-400 transition">S'inscrire</a>
-                {% endif %}
+                <div class="p-4">
+                    {% if user.is_authenticated %}
+                        <!-- User Info -->
+                        <div class="mb-4 pb-4 border-b border-gray-200">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-lg">
+                                    {{ user.first_name|first|upper }}{{ user.last_name|first|upper }}
+                                </div>
+                                <div>
+                                    <p class="font-semibold text-gray-800">{{ user.get_full_name|default:user.username }}</p>
+                                    <p class="text-xs text-gray-500">{{ user.email }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Navigation Links -->
+                        <div class="space-y-1">
+                            <!-- Dashboard -->
+                            <a href="{% url 'users:dashboard' %}" class="flex items-center space-x-3 px-3 py-2.5 rounded-lg hover:bg-blue-50 text-gray-700 hover:text-blue-700 transition">
+                                <i class="fas fa-chart-line w-5 text-blue-600"></i>
+                                <span class="font-medium">Dashboard</span>
+                            </a>
+                            
+                            <!-- Profile -->
+                            <a href="{% url 'users:profile' %}" class="flex items-center space-x-3 px-3 py-2.5 rounded-lg hover:bg-gray-50 text-gray-700 transition">
+                                <i class="fas fa-user w-5 text-gray-600"></i>
+                                <span>Mon profil</span>
+                            </a>
+                            
+                            <!-- Divider -->
+                            <div class="border-t border-gray-200 my-2"></div>
+                            
+                            <!-- Projets (Porteur) -->
+                            {% if user.can_access_porteur_features %}
+                                <div class="mb-2">
+                                    <p class="text-xs font-semibold text-gray-400 uppercase px-3 mb-1">Mes Projets</p>
+                                    <a href="{% url 'projects:my_projects' %}" class="flex items-center space-x-3 px-3 py-2.5 rounded-lg hover:bg-gray-50 text-gray-700 transition">
+                                        <i class="fas fa-folder w-5 text-green-600"></i>
+                                        <span>Mes projets</span>
+                                    </a>
+                                    <a href="{% url 'projects:submit' %}" class="flex items-center space-x-3 px-3 py-2.5 rounded-lg hover:bg-gray-50 text-gray-700 transition">
+                                        <i class="fas fa-plus-circle w-5 text-blue-600"></i>
+                                        <span>Nouveau projet</span>
+                                    </a>
+                                </div>
+                                <div class="border-t border-gray-200 my-2"></div>
+                            {% endif %}
+                            
+                            <!-- Investissements (Investisseur) -->
+                            {% if user.can_access_investisseur_features %}
+                                <div class="mb-2">
+                                    <p class="text-xs font-semibold text-gray-400 uppercase px-3 mb-1">Investissements</p>
+                                    <a href="{% url 'projects:my_favorites' %}" class="flex items-center space-x-3 px-3 py-2.5 rounded-lg hover:bg-gray-50 text-gray-700 transition">
+                                        <i class="fas fa-heart w-5 text-red-500"></i>
+                                        <span>Mes favoris</span>
+                                    </a>
+                                    <a href="{% url 'projects:my_investments' %}" class="flex items-center space-x-3 px-3 py-2.5 rounded-lg hover:bg-gray-50 text-gray-700 transition">
+                                        <i class="fas fa-hand-holding-usd w-5 text-green-600"></i>
+                                        <span>Mes investissements</span>
+                                    </a>
+                                    <a href="{% url 'projects:financial_dashboard' %}" class="flex items-center space-x-3 px-3 py-2.5 rounded-lg hover:bg-gray-50 text-gray-700 transition">
+                                        <i class="fas fa-chart-pie w-5 text-purple-600"></i>
+                                        <span>États financiers</span>
+                                    </a>
+                                </div>
+                                <div class="border-t border-gray-200 my-2"></div>
+                            {% endif %}
+                            
+                            <!-- Communication -->
+                            <div class="mb-2">
+                                <p class="text-xs font-semibold text-gray-400 uppercase px-3 mb-1">Communication</p>
+                                <a href="{% url 'messaging:inbox' %}" class="flex items-center justify-between px-3 py-2.5 rounded-lg hover:bg-gray-50 text-gray-700 transition">
+                                    <div class="flex items-center space-x-3">
+                                        <i class="fas fa-envelope w-5 text-blue-500"></i>
+                                        <span>Messages</span>
+                                    </div>
+                                    {% if unread_messages_count > 0 %}
+                                        <span class="px-2 py-0.5 text-xs font-bold text-white bg-red-600 rounded-full">
+                                            {{ unread_messages_count }}
+                                        </span>
+                                    {% endif %}
+                                </a>
+                                <a href="{% url 'notifications:list' %}" class="flex items-center justify-between px-3 py-2.5 rounded-lg hover:bg-gray-50 text-gray-700 transition">
+                                    <div class="flex items-center space-x-3">
+                                        <i class="fas fa-bell w-5 text-orange-500"></i>
+                                        <span>Notifications</span>
+                                    </div>
+                                    {% if unread_notifications_count > 0 %}
+                                        <span class="px-2 py-0.5 text-xs font-bold text-white bg-red-600 rounded-full">
+                                            {{ unread_notifications_count }}
+                                        </span>
+                                    {% endif %}
+                                </a>
+                            </div>
+                            
+                            <!-- Divider -->
+                            <div class="border-t border-gray-200 my-2"></div>
+                            
+                            <!-- Administration -->
+                            {% if user.is_staff %}
+                                <div class="mb-2">
+                                    <p class="text-xs font-semibold text-gray-400 uppercase px-3 mb-1">Administration</p>
+                                    <a href="{% url 'users:admin_dashboard' %}" class="flex items-center space-x-3 px-3 py-2.5 rounded-lg hover:bg-purple-50 text-purple-700 transition">
+                                        <i class="fas fa-chart-line w-5 text-purple-600"></i>
+                                        <span>Dashboard Admin</span>
+                                    </a>
+                                    <a href="{% url 'projects:admin_pending' %}" class="flex items-center space-x-3 px-3 py-2.5 rounded-lg hover:bg-gray-50 text-gray-700 transition">
+                                        <i class="fas fa-check-circle w-5 text-yellow-600"></i>
+                                        <span>Validation projets</span>
+                                    </a>
+                                    <a href="{% url 'projects:admin_pending_investments' %}" class="flex items-center space-x-3 px-3 py-2.5 rounded-lg hover:bg-gray-50 text-gray-700 transition">
+                                        <i class="fas fa-wallet w-5 text-orange-600"></i>
+                                        <span>Validation invest.</span>
+                                    </a>
+                                    <a href="{% url 'users:admin_users' %}" class="flex items-center space-x-3 px-3 py-2.5 rounded-lg hover:bg-gray-50 text-gray-700 transition">
+                                        <i class="fas fa-users-cog w-5 text-blue-600"></i>
+                                        <span>Utilisateurs</span>
+                                    </a>
+                                    <a href="{% url 'projects:admin_all' %}" class="flex items-center space-x-3 px-3 py-2.5 rounded-lg hover:bg-gray-50 text-gray-700 transition">
+                                        <i class="fas fa-list w-5 text-green-600"></i>
+                                        <span>Tous les projets</span>
+                                    </a>
+                                    <a href="{% url 'core:admin_content_dashboard' %}" class="flex items-center space-x-3 px-3 py-2.5 rounded-lg hover:bg-gray-50 text-gray-700 transition">
+                                        <i class="fas fa-file-alt w-5 text-indigo-600"></i>
+                                        <span>Gestion contenu</span>
+                                    </a>
+                                    <a href="{% url 'core:admin_activity_logs' %}" class="flex items-center space-x-3 px-3 py-2.5 rounded-lg hover:bg-gray-50 text-gray-700 transition">
+                                        <i class="fas fa-history w-5 text-gray-600"></i>
+                                        <span>Logs d'activité</span>
+                                    </a>
+                                </div>
+                                <div class="border-t border-gray-200 my-2"></div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Public Pages -->
+                        <div class="mb-2">
+                            <p class="text-xs font-semibold text-gray-400 uppercase px-3 mb-1">Navigation</p>
+                            <a href="{% url 'core:home' %}" class="flex items-center space-x-3 px-3 py-2.5 rounded-lg hover:bg-gray-50 text-gray-700 transition">
+                                <i class="fas fa-home w-5 text-gray-600"></i>
+                                <span>Accueil</span>
+                            </a>
+                            <a href="{% url 'projects:list' %}" class="flex items-center space-x-3 px-3 py-2.5 rounded-lg hover:bg-gray-50 text-gray-700 transition">
+                                <i class="fas fa-search w-5 text-gray-600"></i>
+                                <span>Découvrir les projets</span>
+                            </a>
+                            <a href="{% url 'core:about' %}" class="flex items-center space-x-3 px-3 py-2.5 rounded-lg hover:bg-gray-50 text-gray-700 transition">
+                                <i class="fas fa-info-circle w-5 text-gray-600"></i>
+                                <span>À propos</span>
+                            </a>
+                            <a href="{% url 'core:blog' %}" class="flex items-center space-x-3 px-3 py-2.5 rounded-lg hover:bg-gray-50 text-gray-700 transition">
+                                <i class="fas fa-newspaper w-5 text-gray-600"></i>
+                                <span>Blog</span>
+                            </a>
+                            <a href="{% url 'core:contact' %}" class="flex items-center space-x-3 px-3 py-2.5 rounded-lg hover:bg-gray-50 text-gray-700 transition">
+                                <i class="fas fa-envelope w-5 text-gray-600"></i>
+                                <span>Contact</span>
+                            </a>
+                        </div>
+                        
+                        <!-- Divider -->
+                        <div class="border-t border-gray-200 my-2"></div>
+                        
+                        <!-- Logout -->
+                        <a href="{% url 'users:logout' %}" class="flex items-center space-x-3 px-3 py-2.5 rounded-lg hover:bg-red-50 text-red-600 transition">
+                            <i class="fas fa-sign-out-alt w-5"></i>
+                            <span class="font-medium">Déconnexion</span>
+                        </a>
+                        
+                    {% else %}
+                        <!-- Not Authenticated -->
+                        <div class="space-y-1">
+                            <a href="{% url 'core:home' %}" class="flex items-center space-x-3 px-3 py-2.5 rounded-lg hover:bg-gray-50 text-gray-700 transition">
+                                <i class="fas fa-home w-5"></i>
+                                <span>Accueil</span>
+                            </a>
+                            <a href="{% url 'projects:list' %}" class="flex items-center space-x-3 px-3 py-2.5 rounded-lg hover:bg-gray-50 text-gray-700 transition">
+                                <i class="fas fa-search w-5"></i>
+                                <span>Découvrir les projets</span>
+                            </a>
+                            <a href="{% url 'core:about' %}" class="flex items-center space-x-3 px-3 py-2.5 rounded-lg hover:bg-gray-50 text-gray-700 transition">
+                                <i class="fas fa-info-circle w-5"></i>
+                                <span>À propos</span>
+                            </a>
+                            <a href="{% url 'core:blog' %}" class="flex items-center space-x-3 px-3 py-2.5 rounded-lg hover:bg-gray-50 text-gray-700 transition">
+                                <i class="fas fa-newspaper w-5"></i>
+                                <span>Blog</span>
+                            </a>
+                            <a href="{% url 'core:contact' %}" class="flex items-center space-x-3 px-3 py-2.5 rounded-lg hover:bg-gray-50 text-gray-700 transition">
+                                <i class="fas fa-envelope w-5"></i>
+                                <span>Contact</span>
+                            </a>
+                            
+                            <!-- Divider -->
+                            <div class="border-t border-gray-200 my-4"></div>
+                            
+                            <a href="{% url 'users:login' %}" class="block w-full text-center px-4 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium">
+                                <i class="fas fa-sign-in-alt mr-2"></i> Connexion
+                            </a>
+                            <a href="{% url 'users:register' %}" class="block w-full text-center px-4 py-2.5 bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-medium mt-2">
+                                <i class="fas fa-user-plus mr-2"></i> S'inscrire
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
             </div>
         </div>
     </nav>
@@ -285,12 +488,42 @@
     <script>
         // Mobile menu toggle
         const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenuClose = document.getElementById('mobile-menu-close');
         const mobileMenu = document.getElementById('mobile-menu');
+        const mobileMenuOverlay = document.getElementById('mobile-menu-overlay');
+        
+        function openMobileMenu() {
+            // Show overlay first
+            mobileMenuOverlay.classList.remove('hidden');
+            // Force reflow for animation
+            setTimeout(() => {
+                mobileMenuOverlay.classList.remove('opacity-0');
+                mobileMenu.classList.remove('translate-x-full');
+            }, 10);
+            document.body.style.overflow = 'hidden'; // Prevent scrolling
+        }
+        
+        function closeMobileMenu() {
+            // Animate out
+            mobileMenu.classList.add('translate-x-full');
+            mobileMenuOverlay.classList.add('opacity-0');
+            // Hide after animation
+            setTimeout(() => {
+                mobileMenuOverlay.classList.add('hidden');
+            }, 300);
+            document.body.style.overflow = ''; // Restore scrolling
+        }
         
         if (mobileMenuButton) {
-            mobileMenuButton.addEventListener('click', () => {
-                mobileMenu.classList.toggle('hidden');
-            });
+            mobileMenuButton.addEventListener('click', openMobileMenu);
+        }
+        
+        if (mobileMenuClose) {
+            mobileMenuClose.addEventListener('click', closeMobileMenu);
+        }
+        
+        if (mobileMenuOverlay) {
+            mobileMenuOverlay.addEventListener('click', closeMobileMenu);
         }
         
         // Toast notifications management
