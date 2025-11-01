@@ -188,77 +188,174 @@ def password_reset_complete(request):
 def dashboard(request):
     """Tableau de bord utilisateur"""
     user = request.user
+    from projects.models import Project, ProjectFavorite, Investment
+    from messaging.models import Message, Conversation
+    from notifications.models import Notification
+    from datetime import timedelta
+    from django.utils import timezone
+    from django.db.models import Sum, Count
+    
     context = {
         'user': user,
     }
     
-    # Ajouter des données spécifiques selon le type d'utilisateur
-    if user.user_type == 'porteur':
-        from projects.models import Project
-        context['my_projects'] = Project.objects.filter(owner=user).order_by('-created_at')[:5]
-        context['projects_count'] = Project.objects.filter(owner=user).count()
-        context['approved_count'] = Project.objects.filter(owner=user, status='approved').count()
-        context['pending_count'] = Project.objects.filter(owner=user, status__in=['submitted', 'under_review']).count()
+    # Données communes
+    context['unread_messages'] = Message.objects.filter(
+        conversation__participants=user, 
+        is_read=False
+    ).exclude(sender=user).count()
+    context['unread_notifications'] = Notification.objects.filter(recipient=user, is_read=False).count()
     
-    elif user.user_type == 'investisseur':
-        from projects.models import ProjectFavorite, Project
+    # Données porteur de projet
+    if user.can_access_porteur_features():
+        my_projects = Project.objects.filter(owner=user)
+        context['my_projects'] = my_projects.order_by('-created_at')[:5]
+        context['projects_count'] = my_projects.count()
+        context['approved_count'] = my_projects.filter(status='approved').count()
+        context['pending_count'] = my_projects.filter(status__in=['submitted', 'under_review']).count()
+        context['rejected_count'] = my_projects.filter(status='rejected').count()
+        context['revision_count'] = my_projects.filter(status='revision_requested').count()
+        
+        # Statistiques d'investissement reçus
+        context['total_investments'] = Investment.objects.filter(project__owner=user).count()
+        context['total_funding_received'] = Investment.objects.filter(
+            project__owner=user, 
+            status='confirmed'
+        ).aggregate(Sum('amount'))['amount__sum'] or 0
+        
+        # Activité récente (7 derniers jours)
+        week_ago = timezone.now() - timedelta(days=7)
+        context['projects_week'] = my_projects.filter(created_at__gte=week_ago).count()
+        context['investments_week'] = Investment.objects.filter(
+            project__owner=user,
+            created_at__gte=week_ago
+        ).count()
+        context['messages_received_week'] = Message.objects.filter(
+            conversation__participants=user,
+            created_at__gte=week_ago
+        ).exclude(sender=user).count()
+    
+    # Données investisseur
+    if user.can_access_investisseur_features():
         context['favorite_projects'] = ProjectFavorite.objects.filter(user=user).select_related('project')[:5]
         context['favorites_count'] = ProjectFavorite.objects.filter(user=user).count()
         context['available_projects'] = Project.objects.filter(status='approved').count()
+        
+        # Mes investissements
+        my_investments = Investment.objects.filter(investor=user)
+        context['investments_count'] = my_investments.count()
+        context['investments_confirmed'] = my_investments.filter(status='confirmed').count()
+        context['investments_pending'] = my_investments.filter(status='pending').count()
+        context['total_invested'] = my_investments.filter(status='confirmed').aggregate(
+            Sum('amount')
+        )['amount__sum'] or 0
+        
+        # Projets par secteur (favoris)
+        context['favorite_sectors'] = ProjectFavorite.objects.filter(user=user).values(
+            'project__sector'
+        ).annotate(count=Count('id')).order_by('-count')[:3]
+        
+        # Activité récente
+        week_ago = timezone.now() - timedelta(days=7)
+        context['favorites_week'] = ProjectFavorite.objects.filter(
+            user=user,
+            created_at__gte=week_ago
+        ).count()
+        context['investments_week'] = my_investments.filter(created_at__gte=week_ago).count()
+        context['new_projects_week'] = Project.objects.filter(
+            status='approved',
+            created_at__gte=week_ago
+        ).count()
     
     return render(request, 'users/dashboard.html', context)
 
 
 @login_required
 def profile(request):
-    """Page de profil utilisateur"""
+    """Page de profil utilisateur - Mode lecture"""
+    user = request.user
+    
+    context = {
+        'user': user,
+    }
+    
+    # Récupérer les profils spécifiques s'ils existent
+    if user.can_access_porteur_features():
+        try:
+            context['porteur_profile'] = ProjectOwnerProfile.objects.get(user=user)
+        except ProjectOwnerProfile.DoesNotExist:
+            context['porteur_profile'] = None
+    
+    if user.can_access_investisseur_features():
+        try:
+            context['investisseur_profile'] = InvestorProfile.objects.get(user=user)
+        except InvestorProfile.DoesNotExist:
+            context['investisseur_profile'] = None
+    
+    return render(request, 'users/profile.html', context)
+
+
+@login_required
+def profile_edit(request):
+    """Page d'édition du profil utilisateur"""
     user = request.user
     
     if request.method == 'POST':
         user_form = ProfileUpdateForm(request.POST, request.FILES, instance=user)
         
-        # Formulaire spécifique selon le type d'utilisateur
-        profile_form = None
-        if user.user_type == 'porteur':
-            # Créer le profil s'il n'existe pas
+        # Formulaires spécifiques selon le type d'utilisateur
+        porteur_profile_form = None
+        investisseur_profile_form = None
+        
+        if user.can_access_porteur_features():
             porteur_profile, created = ProjectOwnerProfile.objects.get_or_create(user=user)
-            profile_form = ProjectOwnerProfileUpdateForm(
+            porteur_profile_form = ProjectOwnerProfileUpdateForm(
                 request.POST, 
                 instance=porteur_profile
             )
-        elif user.user_type == 'investisseur':
-            # Créer le profil s'il n'existe pas
+        
+        if user.can_access_investisseur_features():
             investisseur_profile, created = InvestorProfile.objects.get_or_create(user=user)
-            profile_form = InvestorProfileUpdateForm(
+            investisseur_profile_form = InvestorProfileUpdateForm(
                 request.POST, 
                 instance=investisseur_profile
             )
         
-        if user_form.is_valid() and (profile_form is None or profile_form.is_valid()):
+        # Validation des formulaires
+        forms_valid = user_form.is_valid()
+        if porteur_profile_form:
+            forms_valid = forms_valid and porteur_profile_form.is_valid()
+        if investisseur_profile_form:
+            forms_valid = forms_valid and investisseur_profile_form.is_valid()
+        
+        if forms_valid:
             user_form.save()
-            if profile_form:
-                profile_form.save()
+            if porteur_profile_form:
+                porteur_profile_form.save()
+            if investisseur_profile_form:
+                investisseur_profile_form.save()
             messages.success(request, 'Votre profil a été mis à jour avec succès.')
             return redirect('users:profile')
     else:
         user_form = ProfileUpdateForm(instance=user)
-        profile_form = None
+        porteur_profile_form = None
+        investisseur_profile_form = None
         
-        if user.user_type == 'porteur':
-            # Créer le profil s'il n'existe pas
+        if user.can_access_porteur_features():
             porteur_profile, created = ProjectOwnerProfile.objects.get_or_create(user=user)
-            profile_form = ProjectOwnerProfileUpdateForm(instance=porteur_profile)
-        elif user.user_type == 'investisseur':
-            # Créer le profil s'il n'existe pas
+            porteur_profile_form = ProjectOwnerProfileUpdateForm(instance=porteur_profile)
+        
+        if user.can_access_investisseur_features():
             investisseur_profile, created = InvestorProfile.objects.get_or_create(user=user)
-            profile_form = InvestorProfileUpdateForm(instance=investisseur_profile)
+            investisseur_profile_form = InvestorProfileUpdateForm(instance=investisseur_profile)
     
     context = {
         'user_form': user_form,
-        'profile_form': profile_form,
+        'porteur_profile_form': porteur_profile_form,
+        'investisseur_profile_form': investisseur_profile_form,
     }
     
-    return render(request, 'users/profile.html', context)
+    return render(request, 'users/profile_edit.html', context)
 
 
 # ============================================
@@ -400,7 +497,7 @@ def admin_user_detail(request, user_id):
     from messaging.models import Message
     
     # Statistiques de l'utilisateur
-    if user_obj.user_type == 'porteur':
+    if user_obj.can_access_porteur_features():
         projects_count = Project.objects.filter(owner=user_obj).count()
         approved_projects = Project.objects.filter(owner=user_obj, status='approved').count()
     else:
@@ -410,7 +507,7 @@ def admin_user_detail(request, user_id):
     messages_sent = Message.objects.filter(sender=user_obj).count()
     
     # Projets de l'utilisateur
-    user_projects = Project.objects.filter(owner=user_obj).order_by('-created_at')[:10] if user_obj.user_type == 'porteur' else []
+    user_projects = Project.objects.filter(owner=user_obj).order_by('-created_at')[:10] if user_obj.can_access_porteur_features() else []
     
     context = {
         'user_obj': user_obj,

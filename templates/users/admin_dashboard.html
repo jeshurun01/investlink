@@ -3,19 +3,20 @@
 {% block title %}Dashboard Administrateur - InvestLink{% endblock %}
 
 {% block content %}
-<div class="bg-gradient-to-r from-blue-900 to-purple-900 text-white py-8">
+<!-- Header avec gradient -->
+<div class="bg-gradient-to-r from-blue-900 to-purple-900 text-white py-6">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex items-center justify-between">
             <div>
-                <h1 class="text-3xl font-bold mb-2">
+                <h1 class="text-3xl font-bold mb-1">
                     <i class="fas fa-shield-alt mr-2"></i>
                     Dashboard Administrateur
                 </h1>
-                <p class="text-blue-100">Vue d'ensemble de la plateforme</p>
+                <p class="text-blue-100 text-sm">Bienvenue, {{ user.get_full_name }}</p>
             </div>
-            <div class="text-right">
-                <p class="text-sm text-blue-200">Dernière mise à jour</p>
-                <p class="font-semibold">{{ "now"|date:"d/m/Y H:i" }}</p>
+            <div class="text-right bg-white/10 rounded-lg px-4 py-2">
+                <p class="text-xs text-blue-200">Dernière mise à jour</p>
+                <p class="font-semibold text-sm">{{ "now"|date:"d/m/Y à H:i" }}</p>
             </div>
         </div>
     </div>
@@ -23,279 +24,426 @@
 
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     
-    <!-- Statistiques Principales -->
-    <section class="mb-12">
-        <h2 class="text-2xl font-bold text-gray-900 mb-6">Statistiques Globales</h2>
-        
-        <!-- Utilisateurs -->
-        <div class="mb-8">
-            <h3 class="text-lg font-semibold text-gray-700 mb-4 flex items-center">
-                <i class="fas fa-users text-blue-600 mr-2"></i>
-                Utilisateurs
-            </h3>
-            <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
-                <div class="bg-white rounded-lg shadow p-6 border-l-4 border-blue-600">
-                    <div class="text-3xl font-bold text-blue-600 mb-1">{{ total_users }}</div>
-                    <div class="text-sm text-gray-600">Total utilisateurs</div>
-                </div>
-                <div class="bg-white rounded-lg shadow p-6 border-l-4 border-green-600">
-                    <div class="text-3xl font-bold text-green-600 mb-1">{{ porteurs_count }}</div>
-                    <div class="text-sm text-gray-600">Porteurs</div>
-                </div>
-                <div class="bg-white rounded-lg shadow p-6 border-l-4 border-purple-600">
-                    <div class="text-3xl font-bold text-purple-600 mb-1">{{ investisseurs_count }}</div>
-                    <div class="text-sm text-gray-600">Investisseurs</div>
-                </div>
-                <div class="bg-white rounded-lg shadow p-6 border-l-4 border-yellow-600">
-                    <div class="text-3xl font-bold text-yellow-600 mb-1">{{ new_users_week }}</div>
-                    <div class="text-sm text-gray-600">Nouveaux (7j)</div>
-                </div>
-                <div class="bg-white rounded-lg shadow p-6 border-l-4 border-indigo-600">
-                    <div class="text-3xl font-bold text-indigo-600 mb-1">{{ active_users_month }}</div>
-                    <div class="text-sm text-gray-600">Actifs (30j)</div>
-                </div>
+    <!-- 🚨 Alertes et Actions Urgentes -->
+    {% if pending_projects > 0 or pending_investments > 0 %}
+    <div class="mb-8">
+        <div class="bg-yellow-50 border-l-4 border-yellow-400 rounded-lg shadow-lg p-6">
+            <div class="flex items-center mb-4">
+                <i class="fas fa-exclamation-triangle text-yellow-600 text-2xl mr-3"></i>
+                <h2 class="text-xl font-bold text-gray-900">Actions Requises</h2>
             </div>
-        </div>
-        
-        <!-- Projets -->
-        <div class="mb-8">
-            <h3 class="text-lg font-semibold text-gray-700 mb-4 flex items-center">
-                <i class="fas fa-folder text-green-600 mr-2"></i>
-                Projets
-            </h3>
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div class="bg-white rounded-lg shadow p-6 border-l-4 border-gray-600">
-                    <div class="text-3xl font-bold text-gray-600 mb-1">{{ total_projects }}</div>
-                    <div class="text-sm text-gray-600">Total projets</div>
-                </div>
-                <div class="bg-white rounded-lg shadow p-6 border-l-4 border-yellow-600">
-                    <div class="text-3xl font-bold text-yellow-600 mb-1">{{ pending_projects }}</div>
-                    <div class="text-sm text-gray-600">En attente</div>
-                    <a href="{% url 'projects:admin_pending' %}" class="text-xs text-yellow-600 hover:underline mt-2 block">
-                        Voir les projets →
-                    </a>
-                </div>
-                <div class="bg-white rounded-lg shadow p-6 border-l-4 border-green-600">
-                    <div class="text-3xl font-bold text-green-600 mb-1">{{ approved_projects }}</div>
-                    <div class="text-sm text-gray-600">Validés</div>
-                </div>
-                <div class="bg-white rounded-lg shadow p-6 border-l-4 border-red-600">
-                    <div class="text-3xl font-bold text-red-600 mb-1">{{ rejected_projects }}</div>
-                    <div class="text-sm text-gray-600">Refusés</div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Messagerie et Notifications -->
-        <div>
-            <h3 class="text-lg font-semibold text-gray-700 mb-4 flex items-center">
-                <i class="fas fa-comments text-purple-600 mr-2"></i>
-                Activité
-            </h3>
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div class="bg-white rounded-lg shadow p-6 border-l-4 border-blue-600">
-                    <div class="text-3xl font-bold text-blue-600 mb-1">{{ total_messages }}</div>
-                    <div class="text-sm text-gray-600">Messages envoyés</div>
-                </div>
-                <div class="bg-white rounded-lg shadow p-6 border-l-4 border-purple-600">
-                    <div class="text-3xl font-bold text-purple-600 mb-1">{{ total_conversations }}</div>
-                    <div class="text-sm text-gray-600">Conversations</div>
-                </div>
-                <div class="bg-white rounded-lg shadow p-6 border-l-4 border-green-600">
-                    <div class="text-3xl font-bold text-green-600 mb-1">{{ messages_week }}</div>
-                    <div class="text-sm text-gray-600">Messages (7j)</div>
-                </div>
-                <div class="bg-white rounded-lg shadow p-6 border-l-4 border-orange-600">
-                    <div class="text-3xl font-bold text-orange-600 mb-1">{{ total_notifications }}</div>
-                    <div class="text-sm text-gray-600">Notifications</div>
-                </div>
-            </div>
-        </div>
-    </section>
-    
-    <!-- Projets par secteur -->
-    <section class="mb-12">
-        <h2 class="text-2xl font-bold text-gray-900 mb-6">Top 5 Secteurs</h2>
-        <div class="bg-white rounded-lg shadow overflow-hidden">
-            <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-gray-50">
-                    <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Secteur</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre de projets</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Pourcentage</th>
-                    </tr>
-                </thead>
-                <tbody class="bg-white divide-y divide-gray-200">
-                    {% for item in projects_by_sector %}
-                    <tr>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <span class="font-medium text-gray-900">{{ item.get_sector_display|default:item.sector }}</span>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <span class="text-2xl font-bold text-blue-600">{{ item.count }}</span>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            {% widthratio item.count total_projects 100 as percentage %}
-                            <div class="flex items-center">
-                                <div class="w-full bg-gray-200 rounded-full h-2 mr-2" style="max-width: 200px;">
-                                    <div class="bg-blue-600 h-2 rounded-full" style="width: {{ percentage }}%"></div>
-                                </div>
-                                <span class="text-sm text-gray-600">{{ percentage }}%</span>
-                            </div>
-                        </td>
-                    </tr>
-                    {% empty %}
-                    <tr>
-                        <td colspan="3" class="px-6 py-4 text-center text-gray-500">Aucun projet pour le moment</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    </section>
-    
-    <!-- Activité Récente -->
-    <div class="grid md:grid-cols-3 gap-8 mb-12">
-        
-        <!-- Derniers utilisateurs -->
-        <div>
-            <h3 class="text-xl font-bold text-gray-900 mb-4 flex items-center">
-                <i class="fas fa-user-plus text-blue-600 mr-2"></i>
-                Derniers utilisateurs
-            </h3>
-            <div class="bg-white rounded-lg shadow overflow-hidden">
-                {% for user in recent_users %}
-                <div class="p-4 border-b border-gray-200 hover:bg-gray-50">
+            <div class="grid md:grid-cols-2 gap-4">
+                {% if pending_projects > 0 %}
+                <a href="{% url 'projects:admin_pending' %}" class="bg-white border-2 border-yellow-300 rounded-lg p-4 hover:shadow-md transition group">
                     <div class="flex items-center justify-between">
                         <div>
-                            <p class="font-semibold text-gray-900">{{ user.get_full_name }}</p>
-                            <p class="text-sm text-gray-500">{{ user.email }}</p>
+                            <p class="text-sm text-gray-600 mb-1">Projets en attente</p>
+                            <p class="text-3xl font-bold text-yellow-600">{{ pending_projects }}</p>
                         </div>
-                        <span class="px-2 py-1 text-xs font-semibold rounded-full
-                            {% if user.user_type == 'porteur' %}bg-green-100 text-green-800
-                            {% elif user.user_type == 'investisseur' %}bg-blue-100 text-blue-800
-                            {% endif %}">
-                            {{ user.get_user_type_display }}
-                        </span>
+                        <i class="fas fa-folder-open text-4xl text-yellow-400 group-hover:scale-110 transition"></i>
                     </div>
-                    <p class="text-xs text-gray-400 mt-1">{{ user.date_joined|timesince }} ago</p>
-                </div>
-                {% empty %}
-                <p class="p-4 text-gray-500 text-center">Aucun utilisateur</p>
-                {% endfor %}
-                <div class="p-4 bg-gray-50 text-center">
-                    <a href="{% url 'users:admin_users' %}" class="text-blue-600 hover:text-blue-800 font-semibold text-sm">
-                        Voir tous les utilisateurs →
-                    </a>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Derniers projets -->
-        <div>
-            <h3 class="text-xl font-bold text-gray-900 mb-4 flex items-center">
-                <i class="fas fa-folder-plus text-green-600 mr-2"></i>
-                Derniers projets
-            </h3>
-            <div class="bg-white rounded-lg shadow overflow-hidden">
-                {% for project in recent_projects %}
-                <div class="p-4 border-b border-gray-200 hover:bg-gray-50">
-                    <p class="font-semibold text-gray-900">{{ project.title|truncatewords:5 }}</p>
-                    <p class="text-sm text-gray-500">Par {{ project.owner.get_full_name }}</p>
-                    <div class="flex items-center justify-between mt-2">
-                        <span class="px-2 py-1 text-xs font-semibold rounded-full
-                            {% if project.status == 'submitted' %}bg-yellow-100 text-yellow-800
-                            {% elif project.status == 'under_review' %}bg-blue-100 text-blue-800
-                            {% elif project.status == 'approved' %}bg-green-100 text-green-800
-                            {% elif project.status == 'rejected' %}bg-red-100 text-red-800
-                            {% endif %}">
-                            {{ project.get_status_display }}
-                        </span>
-                        <p class="text-xs text-gray-400">{{ project.created_at|timesince }} ago</p>
+                    <p class="text-xs text-gray-500 mt-2">
+                        <i class="fas fa-arrow-right mr-1"></i>Valider maintenant
+                    </p>
+                </a>
+                {% endif %}
+                
+                {% if pending_investments > 0 %}
+                <a href="{% url 'projects:admin_pending_investments' %}" class="bg-white border-2 border-orange-300 rounded-lg p-4 hover:shadow-md transition group">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-gray-600 mb-1">Investissements en attente</p>
+                            <p class="text-3xl font-bold text-orange-600">{{ pending_investments }}</p>
+                        </div>
+                        <i class="fas fa-wallet text-4xl text-orange-400 group-hover:scale-110 transition"></i>
                     </div>
-                </div>
-                {% empty %}
-                <p class="p-4 text-gray-500 text-center">Aucun projet</p>
-                {% endfor %}
-                <div class="p-4 bg-gray-50 text-center">
-                    <a href="{% url 'projects:admin_all' %}" class="text-blue-600 hover:text-blue-800 font-semibold text-sm">
-                        Voir tous les projets →
-                    </a>
-                </div>
+                    <p class="text-xs text-gray-500 mt-2">
+                        <i class="fas fa-arrow-right mr-1"></i>Valider maintenant
+                    </p>
+                </a>
+                {% endif %}
             </div>
         </div>
-        
-        <!-- Derniers messages -->
-        <div>
-            <h3 class="text-xl font-bold text-gray-900 mb-4 flex items-center">
-                <i class="fas fa-envelope text-purple-600 mr-2"></i>
-                Derniers messages
-            </h3>
-            <div class="bg-white rounded-lg shadow overflow-hidden">
-                {% for message in recent_messages %}
-                <div class="p-4 border-b border-gray-200 hover:bg-gray-50">
-                    <p class="font-semibold text-gray-900">{{ message.sender.get_full_name }}</p>
-                    <p class="text-sm text-gray-600 mt-1">{{ message.content|truncatewords:10 }}</p>
-                    <p class="text-xs text-gray-400 mt-1">{{ message.created_at|timesince }} ago</p>
-                </div>
-                {% empty %}
-                <p class="p-4 text-gray-500 text-center">Aucun message</p>
-                {% endfor %}
-            </div>
-        </div>
-        
     </div>
+    {% endif %}
     
-    <!-- Actions Rapides -->
-    <section>
-        <h2 class="text-2xl font-bold text-gray-900 mb-6">Actions Rapides</h2>
-        <div class="grid md:grid-cols-5 gap-4 mb-6">
-            <a href="{% url 'projects:admin_pending' %}" class="bg-yellow-50 border-2 border-yellow-200 rounded-lg p-6 hover:shadow-lg transition text-center">
-                <i class="fas fa-tasks text-yellow-600 text-3xl mb-3"></i>
-                <h3 class="font-bold text-gray-900 mb-1">Validation projets</h3>
-                <p class="text-sm text-gray-600">{{ pending_projects }} en attente</p>
+    <!-- 📊 Métriques KPI Principales -->
+    <section class="mb-8">
+        <h2 class="text-2xl font-bold text-gray-900 mb-6 flex items-center">
+            <i class="fas fa-chart-line text-blue-600 mr-2"></i>
+            Indicateurs Clés
+        </h2>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+            <!-- Total Utilisateurs -->
+            <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl shadow-lg p-6 text-white transform hover:scale-105 transition">
+                <div class="flex items-center justify-between mb-3">
+                    <i class="fas fa-users text-3xl opacity-80"></i>
+                    <span class="bg-white/20 px-2 py-1 rounded text-xs font-medium">Total</span>
+                </div>
+                <p class="text-4xl font-bold mb-1">{{ total_users }}</p>
+                <p class="text-blue-100 text-sm">Utilisateurs</p>
+            </div>
+            
+            <!-- Total Projets -->
+            <div class="bg-gradient-to-br from-green-500 to-green-600 rounded-xl shadow-lg p-6 text-white transform hover:scale-105 transition">
+                <div class="flex items-center justify-between mb-3">
+                    <i class="fas fa-folder text-3xl opacity-80"></i>
+                    <span class="bg-white/20 px-2 py-1 rounded text-xs font-medium">Total</span>
+                </div>
+                <p class="text-4xl font-bold mb-1">{{ total_projects }}</p>
+                <p class="text-green-100 text-sm">Projets</p>
+            </div>
+            
+            <!-- Projets Validés -->
+            <div class="bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl shadow-lg p-6 text-white transform hover:scale-105 transition">
+                <div class="flex items-center justify-between mb-3">
+                    <i class="fas fa-check-circle text-3xl opacity-80"></i>
+                    <span class="bg-white/20 px-2 py-1 rounded text-xs font-medium">Validés</span>
+                </div>
+                <p class="text-4xl font-bold mb-1">{{ approved_projects }}</p>
+                <p class="text-purple-100 text-sm">Projets actifs</p>
+            </div>
+            
+            <!-- Nouveaux Utilisateurs -->
+            <div class="bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl shadow-lg p-6 text-white transform hover:scale-105 transition">
+                <div class="flex items-center justify-between mb-3">
+                    <i class="fas fa-user-plus text-3xl opacity-80"></i>
+                    <span class="bg-white/20 px-2 py-1 rounded text-xs font-medium">7 jours</span>
+                </div>
+                <p class="text-4xl font-bold mb-1">{{ new_users_week }}</p>
+                <p class="text-orange-100 text-sm">Nouveaux</p>
+            </div>
+        </div>
+    </section>
+    
+    <!-- 🎯 Actions Rapides -->
+    <section class="mb-8">
+        <h2 class="text-2xl font-bold text-gray-900 mb-6 flex items-center">
+            <i class="fas fa-bolt text-yellow-500 mr-2"></i>
+            Actions Rapides
+        </h2>
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+            <a href="{% url 'projects:admin_pending' %}" class="bg-white border-2 border-gray-200 rounded-lg p-4 hover:border-yellow-500 hover:shadow-md transition text-center group">
+                <i class="fas fa-tasks text-3xl text-yellow-500 mb-2 group-hover:scale-110 transition"></i>
+                <p class="font-semibold text-gray-900 text-sm">Validation Projets</p>
+                {% if pending_projects > 0 %}
+                <span class="inline-block mt-1 px-2 py-1 bg-yellow-100 text-yellow-800 text-xs font-bold rounded-full">{{ pending_projects }}</span>
+                {% endif %}
             </a>
-            <a href="{% url 'projects:admin_pending_investments' %}" class="bg-orange-50 border-2 border-orange-200 rounded-lg p-6 hover:shadow-lg transition text-center">
-                <i class="fas fa-wallet text-orange-600 text-3xl mb-3"></i>
-                <h3 class="font-bold text-gray-900 mb-1">Validation investissements</h3>
-                <p class="text-sm text-gray-600">Gérer les investissements</p>
+            
+            <a href="{% url 'projects:admin_pending_investments' %}" class="bg-white border-2 border-gray-200 rounded-lg p-4 hover:border-orange-500 hover:shadow-md transition text-center group">
+                <i class="fas fa-wallet text-3xl text-orange-500 mb-2 group-hover:scale-110 transition"></i>
+                <p class="font-semibold text-gray-900 text-sm">Validation Invest.</p>
             </a>
-            <a href="{% url 'users:admin_users' %}" class="bg-blue-50 border-2 border-blue-200 rounded-lg p-6 hover:shadow-lg transition text-center">
-                <i class="fas fa-users-cog text-blue-600 text-3xl mb-3"></i>
-                <h3 class="font-bold text-gray-900 mb-1">Gérer utilisateurs</h3>
-                <p class="text-sm text-gray-600">{{ total_users }} utilisateurs</p>
+            
+            <a href="{% url 'users:admin_users' %}" class="bg-white border-2 border-gray-200 rounded-lg p-4 hover:border-blue-500 hover:shadow-md transition text-center group">
+                <i class="fas fa-users-cog text-3xl text-blue-500 mb-2 group-hover:scale-110 transition"></i>
+                <p class="font-semibold text-gray-900 text-sm">Utilisateurs</p>
             </a>
-            <a href="{% url 'projects:admin_all' %}" class="bg-green-50 border-2 border-green-200 rounded-lg p-6 hover:shadow-lg transition text-center">
-                <i class="fas fa-list text-green-600 text-3xl mb-3"></i>
-                <h3 class="font-bold text-gray-900 mb-1">Tous les projets</h3>
-                <p class="text-sm text-gray-600">{{ total_projects }} projets</p>
+            
+            <a href="{% url 'projects:admin_all' %}" class="bg-white border-2 border-gray-200 rounded-lg p-4 hover:border-green-500 hover:shadow-md transition text-center group">
+                <i class="fas fa-list text-3xl text-green-500 mb-2 group-hover:scale-110 transition"></i>
+                <p class="font-semibold text-gray-900 text-sm">Tous Projets</p>
             </a>
-            <a href="/admin/" class="bg-purple-50 border-2 border-purple-200 rounded-lg p-6 hover:shadow-lg transition text-center">
-                <i class="fas fa-cog text-purple-600 text-3xl mb-3"></i>
-                <h3 class="font-bold text-gray-900 mb-1">Admin Django</h3>
-                <p class="text-sm text-gray-600">Configuration avancée</p>
+            
+            <a href="{% url 'core:admin_content_dashboard' %}" class="bg-white border-2 border-gray-200 rounded-lg p-4 hover:border-teal-500 hover:shadow-md transition text-center group">
+                <i class="fas fa-newspaper text-3xl text-teal-500 mb-2 group-hover:scale-110 transition"></i>
+                <p class="font-semibold text-gray-900 text-sm">Contenu</p>
+            </a>
+            
+            <a href="{% url 'core:admin_blog_post_create' %}" class="bg-white border-2 border-gray-200 rounded-lg p-4 hover:border-pink-500 hover:shadow-md transition text-center group">
+                <i class="fas fa-pen-fancy text-3xl text-pink-500 mb-2 group-hover:scale-110 transition"></i>
+                <p class="font-semibold text-gray-900 text-sm">Nouvel Article</p>
+            </a>
+            
+            <a href="{% url 'core:admin_contact_messages' %}" class="bg-white border-2 border-gray-200 rounded-lg p-4 hover:border-cyan-500 hover:shadow-md transition text-center group">
+                <i class="fas fa-envelope-open-text text-3xl text-cyan-500 mb-2 group-hover:scale-110 transition"></i>
+                <p class="font-semibold text-gray-900 text-sm">Messages Contact</p>
+            </a>
+            
+            <a href="{% url 'core:admin_activity_logs' %}" class="bg-white border-2 border-gray-200 rounded-lg p-4 hover:border-indigo-500 hover:shadow-md transition text-center group">
+                <i class="fas fa-history text-3xl text-indigo-500 mb-2 group-hover:scale-110 transition"></i>
+                <p class="font-semibold text-gray-900 text-sm">Logs</p>
             </a>
         </div>
-        
-        <!-- Nouvelles actions pour contenu et logs -->
-        <div class="grid md:grid-cols-3 gap-4">
-            <a href="{% url 'core:admin_content_dashboard' %}" class="bg-teal-50 border-2 border-teal-200 rounded-lg p-6 hover:shadow-lg transition text-center">
-                <i class="fas fa-newspaper text-teal-600 text-3xl mb-3"></i>
-                <h3 class="font-bold text-gray-900 mb-1">Gestion du Contenu</h3>
-                <p class="text-sm text-gray-600">Articles et catégories du blog</p>
-            </a>
-            <a href="{% url 'core:admin_activity_logs' %}" class="bg-indigo-50 border-2 border-indigo-200 rounded-lg p-6 hover:shadow-lg transition text-center">
-                <i class="fas fa-history text-indigo-600 text-3xl mb-3"></i>
-                <h3 class="font-bold text-gray-900 mb-1">Journal d'Activités</h3>
-                <p class="text-sm text-gray-600">Logs et traçabilité système</p>
-            </a>
-            <a href="{% url 'core:blog' %}" target="_blank" class="bg-gray-50 border-2 border-gray-200 rounded-lg p-6 hover:shadow-lg transition text-center">
-                <i class="fas fa-external-link-alt text-gray-600 text-3xl mb-3"></i>
-                <h3 class="font-bold text-gray-900 mb-1">Voir le Blog</h3>
-                <p class="text-sm text-gray-600">Vue publique du blog</p>
-            </a>
+    </section>
+    
+    <!-- 📈 Statistiques Détaillées (Accordéon) -->
+    <section class="mb-8">
+        <div class="bg-white rounded-lg shadow">
+            <!-- En-tête accordéon -->
+            <button onclick="toggleSection('stats-details')" class="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition">
+                <div class="flex items-center">
+                    <i class="fas fa-chart-bar text-gray-600 mr-3"></i>
+                    <h2 class="text-xl font-bold text-gray-900">Statistiques Détaillées</h2>
+                </div>
+                <i class="fas fa-chevron-down text-gray-400 transform transition-transform" id="stats-details-icon"></i>
+            </button>
+            
+            <!-- Contenu accordéon -->
+            <div id="stats-details" class="hidden border-t border-gray-200">
+                <div class="p-6">
+                    <!-- Utilisateurs détaillés -->
+                    <div class="mb-6">
+                        <h3 class="text-lg font-semibold text-gray-700 mb-4 flex items-center">
+                            <i class="fas fa-users text-blue-600 mr-2"></i>
+                            Répartition Utilisateurs
+                        </h3>
+                        <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+                            <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                                <p class="text-sm text-gray-600 mb-1">Total</p>
+                                <p class="text-2xl font-bold text-gray-900">{{ total_users }}</p>
+                            </div>
+                            <div class="bg-green-50 rounded-lg p-4 border border-green-200">
+                                <p class="text-sm text-gray-600 mb-1">Porteurs</p>
+                                <p class="text-2xl font-bold text-green-600">{{ porteurs_count }}</p>
+                            </div>
+                            <div class="bg-purple-50 rounded-lg p-4 border border-purple-200">
+                                <p class="text-sm text-gray-600 mb-1">Investisseurs</p>
+                                <p class="text-2xl font-bold text-purple-600">{{ investisseurs_count }}</p>
+                            </div>
+                            <div class="bg-yellow-50 rounded-lg p-4 border border-yellow-200">
+                                <p class="text-sm text-gray-600 mb-1">Nouveaux (7j)</p>
+                                <p class="text-2xl font-bold text-yellow-600">{{ new_users_week }}</p>
+                            </div>
+                            <div class="bg-indigo-50 rounded-lg p-4 border border-indigo-200">
+                                <p class="text-sm text-gray-600 mb-1">Actifs (30j)</p>
+                                <p class="text-2xl font-bold text-indigo-600">{{ active_users_month }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Projets détaillés -->
+                    <div class="mb-6">
+                        <h3 class="text-lg font-semibold text-gray-700 mb-4 flex items-center">
+                            <i class="fas fa-folder text-green-600 mr-2"></i>
+                            État des Projets
+                        </h3>
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                                <p class="text-sm text-gray-600 mb-1">Total</p>
+                                <p class="text-2xl font-bold text-gray-900">{{ total_projects }}</p>
+                            </div>
+                            <div class="bg-yellow-50 rounded-lg p-4 border border-yellow-200">
+                                <p class="text-sm text-gray-600 mb-1">En attente</p>
+                                <p class="text-2xl font-bold text-yellow-600">{{ pending_projects }}</p>
+                            </div>
+                            <div class="bg-green-50 rounded-lg p-4 border border-green-200">
+                                <p class="text-sm text-gray-600 mb-1">Validés</p>
+                                <p class="text-2xl font-bold text-green-600">{{ approved_projects }}</p>
+                            </div>
+                            <div class="bg-red-50 rounded-lg p-4 border border-red-200">
+                                <p class="text-sm text-gray-600 mb-1">Refusés</p>
+                                <p class="text-2xl font-bold text-red-600">{{ rejected_projects }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Activité Messagerie -->
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-700 mb-4 flex items-center">
+                            <i class="fas fa-comments text-purple-600 mr-2"></i>
+                            Activité Messagerie
+                        </h3>
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            <div class="bg-blue-50 rounded-lg p-4 border border-blue-200">
+                                <p class="text-sm text-gray-600 mb-1">Messages Total</p>
+                                <p class="text-2xl font-bold text-blue-600">{{ total_messages }}</p>
+                            </div>
+                            <div class="bg-purple-50 rounded-lg p-4 border border-purple-200">
+                                <p class="text-sm text-gray-600 mb-1">Conversations</p>
+                                <p class="text-2xl font-bold text-purple-600">{{ total_conversations }}</p>
+                            </div>
+                            <div class="bg-green-50 rounded-lg p-4 border border-green-200">
+                                <p class="text-sm text-gray-600 mb-1">Messages (7j)</p>
+                                <p class="text-2xl font-bold text-green-600">{{ messages_week }}</p>
+                            </div>
+                            <div class="bg-orange-50 rounded-lg p-4 border border-orange-200">
+                                <p class="text-sm text-gray-600 mb-1">Notifications</p>
+                                <p class="text-2xl font-bold text-orange-600">{{ total_notifications }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- 🏆 Top Secteurs (Accordéon) -->
+    <section class="mb-8">
+        <div class="bg-white rounded-lg shadow">
+            <button onclick="toggleSection('sectors')" class="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition">
+                <div class="flex items-center">
+                    <i class="fas fa-trophy text-gray-600 mr-3"></i>
+                    <h2 class="text-xl font-bold text-gray-900">Top 5 Secteurs</h2>
+                </div>
+                <i class="fas fa-chevron-down text-gray-400 transform transition-transform" id="sectors-icon"></i>
+            </button>
+            
+            <div id="sectors" class="hidden border-t border-gray-200">
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Secteur</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Projets</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Pourcentage</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            {% for item in projects_by_sector %}
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-6 py-4">
+                                    <span class="font-medium text-gray-900">{{ item.get_sector_display|default:item.sector }}</span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="text-xl font-bold text-blue-600">{{ item.count }}</span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    {% widthratio item.count total_projects 100 as percentage %}
+                                    <div class="flex items-center">
+                                        <div class="w-48 bg-gray-200 rounded-full h-2 mr-2">
+                                            <div class="bg-blue-600 h-2 rounded-full" style="width: {{ percentage }}%"></div>
+                                        </div>
+                                        <span class="text-sm font-medium text-gray-600">{{ percentage }}%</span>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="3" class="px-6 py-8 text-center text-gray-500">
+                                    <i class="fas fa-inbox text-4xl text-gray-300 mb-2"></i>
+                                    <p>Aucun projet pour le moment</p>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- 📰 Activité Récente (Accordéon) -->
+    <section class="mb-8">
+        <div class="bg-white rounded-lg shadow">
+            <button onclick="toggleSection('activity')" class="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition">
+                <div class="flex items-center">
+                    <i class="fas fa-stream text-gray-600 mr-3"></i>
+                    <h2 class="text-xl font-bold text-gray-900">Activité Récente</h2>
+                </div>
+                <i class="fas fa-chevron-down text-gray-400 transform transition-transform" id="activity-icon"></i>
+            </button>
+            
+            <div id="activity" class="hidden border-t border-gray-200">
+                <div class="grid md:grid-cols-3 gap-6 p-6">
+                    <!-- Derniers utilisateurs -->
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-700 mb-4 flex items-center">
+                            <i class="fas fa-user-plus text-blue-500 mr-2"></i>
+                            Derniers Utilisateurs
+                        </h3>
+                        <div class="space-y-2">
+                            {% for user in recent_users %}
+                            <div class="bg-gray-50 rounded-lg p-3 hover:bg-gray-100 transition">
+                                <div class="flex items-center justify-between mb-1">
+                                    <p class="font-semibold text-gray-900 text-sm">{{ user.get_full_name }}</p>
+                                    <span class="px-2 py-1 text-xs font-semibold rounded-full
+                                        {% if user.user_type == 'porteur' %}bg-green-100 text-green-800
+                                        {% elif user.user_type == 'investisseur' %}bg-blue-100 text-blue-800
+                                        {% endif %}">
+                                        {{ user.get_user_type_display }}
+                                    </span>
+                                </div>
+                                <p class="text-xs text-gray-500">{{ user.email }}</p>
+                                <p class="text-xs text-gray-400 mt-1">
+                                    <i class="fas fa-clock mr-1"></i>{{ user.date_joined|timesince }}
+                                </p>
+                            </div>
+                            {% empty %}
+                            <p class="text-sm text-gray-500 text-center py-4">Aucun utilisateur</p>
+                            {% endfor %}
+                        </div>
+                        <a href="{% url 'users:admin_users' %}" class="block mt-4 text-center text-sm text-blue-600 hover:text-blue-800 font-medium">
+                            Voir tous →
+                        </a>
+                    </div>
+                    
+                    <!-- Derniers projets -->
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-700 mb-4 flex items-center">
+                            <i class="fas fa-folder-plus text-green-500 mr-2"></i>
+                            Derniers Projets
+                        </h3>
+                        <div class="space-y-2">
+                            {% for project in recent_projects %}
+                            <div class="bg-gray-50 rounded-lg p-3 hover:bg-gray-100 transition">
+                                <p class="font-semibold text-gray-900 text-sm mb-1">{{ project.title|truncatewords:5 }}</p>
+                                <p class="text-xs text-gray-500 mb-2">Par {{ project.owner.get_full_name }}</p>
+                                <div class="flex items-center justify-between">
+                                    <span class="px-2 py-1 text-xs font-semibold rounded-full
+                                        {% if project.status == 'submitted' %}bg-yellow-100 text-yellow-800
+                                        {% elif project.status == 'under_review' %}bg-blue-100 text-blue-800
+                                        {% elif project.status == 'approved' %}bg-green-100 text-green-800
+                                        {% elif project.status == 'rejected' %}bg-red-100 text-red-800
+                                        {% endif %}">
+                                        {{ project.get_status_display }}
+                                    </span>
+                                    <p class="text-xs text-gray-400">
+                                        <i class="fas fa-clock mr-1"></i>{{ project.created_at|timesince }}
+                                    </p>
+                                </div>
+                            </div>
+                            {% empty %}
+                            <p class="text-sm text-gray-500 text-center py-4">Aucun projet</p>
+                            {% endfor %}
+                        </div>
+                        <a href="{% url 'projects:admin_all' %}" class="block mt-4 text-center text-sm text-blue-600 hover:text-blue-800 font-medium">
+                            Voir tous →
+                        </a>
+                    </div>
+                    
+                    <!-- Derniers messages -->
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-700 mb-4 flex items-center">
+                            <i class="fas fa-envelope text-purple-500 mr-2"></i>
+                            Derniers Messages
+                        </h3>
+                        <div class="space-y-2">
+                            {% for message in recent_messages %}
+                            <div class="bg-gray-50 rounded-lg p-3 hover:bg-gray-100 transition">
+                                <p class="font-semibold text-gray-900 text-sm mb-1">{{ message.sender.get_full_name }}</p>
+                                <p class="text-xs text-gray-600 line-clamp-2">{{ message.content|truncatewords:10 }}</p>
+                                <p class="text-xs text-gray-400 mt-1">
+                                    <i class="fas fa-clock mr-1"></i>{{ message.created_at|timesince }}
+                                </p>
+                            </div>
+                            {% empty %}
+                            <p class="text-sm text-gray-500 text-center py-4">Aucun message</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </section>
     
 </div>
+
+<!-- Script pour les accordéons -->
+<script>
+function toggleSection(sectionId) {
+    const section = document.getElementById(sectionId);
+    const icon = document.getElementById(sectionId + '-icon');
+    
+    if (section.classList.contains('hidden')) {
+        section.classList.remove('hidden');
+        icon.classList.add('rotate-180');
+    } else {
+        section.classList.add('hidden');
+        icon.classList.remove('rotate-180');
+    }
+}
+</script>
+
 {% endblock %}

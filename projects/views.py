@@ -101,9 +101,9 @@ def project_detail(request, slug):
     show_signup_modal = False
     
     if request.user.is_authenticated:
-        if request.user.user_type == 'investisseur' or request.user.is_staff:
+        if request.user.can_access_investisseur_features() or request.user.is_staff:
             has_full_access = True
-        elif request.user.user_type == 'porteur':
+        elif request.user.can_access_porteur_features():
             # Les porteurs peuvent voir leurs propres projets
             if project.owner == request.user:
                 has_full_access = True
@@ -124,12 +124,21 @@ def project_detail(request, slug):
     if request.user.is_authenticated and request.user.user_type == 'investisseur':
         is_favorite = ProjectFavorite.objects.filter(user=request.user, project=project).exists()
     
+    # Récupérer les investisseurs pour le propriétaire du projet
+    project_investments = []
+    if request.user.is_authenticated and request.user == project.owner:
+        project_investments = Investment.objects.filter(
+            project=project,
+            status__in=['pending', 'confirmed']
+        ).select_related('investor').order_by('-created_at')
+    
     context = {
         'project': project,
         'documents': documents,
         'has_full_access': has_full_access,
         'show_signup_modal': show_signup_modal,
         'is_favorite': is_favorite,
+        'project_investments': project_investments,
     }
     return render(request, 'projects/detail.html', context)
 

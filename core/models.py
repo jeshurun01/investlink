@@ -171,3 +171,53 @@ class ActivityLog(models.Model):
             log_data['user_agent'] = request.META.get('HTTP_USER_AGENT', '')[:255]
         
         return cls.objects.create(**log_data)
+
+
+class ContactMessage(models.Model):
+    """Messages reçus via le formulaire de contact"""
+    STATUS_CHOICES = [
+        ('new', 'Nouveau'),
+        ('read', 'Lu'),
+        ('in_progress', 'En cours'),
+        ('resolved', 'Résolu'),
+        ('archived', 'Archivé'),
+    ]
+    
+    name = models.CharField("Nom complet", max_length=200)
+    email = models.EmailField("Email")
+    phone = models.CharField("Téléphone", max_length=20, blank=True)
+    subject = models.CharField("Sujet", max_length=200)
+    message = models.TextField("Message")
+    
+    status = models.CharField("Statut", max_length=20, choices=STATUS_CHOICES, default='new')
+    admin_notes = models.TextField("Notes administrateur", blank=True)
+    
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True,
+                            verbose_name="Utilisateur", related_name='contact_messages',
+                            help_text="Si le message provient d'un utilisateur connecté")
+    
+    created_at = models.DateTimeField("Date d'envoi", auto_now_add=True)
+    read_at = models.DateTimeField("Date de lecture", null=True, blank=True)
+    resolved_at = models.DateTimeField("Date de résolution", null=True, blank=True)
+    
+    ip_address = models.GenericIPAddressField("Adresse IP", null=True, blank=True)
+    
+    class Meta:
+        verbose_name = "Message de contact"
+        verbose_name_plural = "Messages de contact"
+        ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['-created_at']),
+            models.Index(fields=['status', '-created_at']),
+        ]
+    
+    def __str__(self):
+        return f"{self.name} - {self.subject} ({self.created_at.strftime('%d/%m/%Y')})"
+    
+    def mark_as_read(self):
+        """Marquer le message comme lu"""
+        from django.utils import timezone
+        if self.status == 'new':
+            self.status = 'read'
+            self.read_at = timezone.now()
+            self.save(update_fields=['status', 'read_at'])

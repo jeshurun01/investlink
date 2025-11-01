@@ -249,6 +249,107 @@
                     {% endif %}
                 {% endif %}
                 
+                <!-- Liste des investisseurs (visible uniquement par le porteur) -->
+                {% if request.user == project.owner and project_investments %}
+                <div class="card">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                        <i class="fas fa-users text-green-600 mr-2"></i>
+                        Mes Investisseurs
+                        <span class="ml-2 bg-green-100 text-green-800 text-sm font-semibold px-2 py-1 rounded-full">
+                            {{ project_investments.count }}
+                        </span>
+                    </h3>
+                    
+                    <div class="space-y-4">
+                        {% for investment in project_investments %}
+                        <div class="bg-gray-50 rounded-lg p-4 border border-gray-200 hover:border-green-300 transition">
+                            <div class="flex items-start justify-between mb-3">
+                                <div class="flex items-center">
+                                    <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white font-bold text-lg mr-3">
+                                        {{ investment.investor.first_name|first|upper }}{{ investment.investor.last_name|first|upper }}
+                                    </div>
+                                    <div>
+                                        <p class="font-semibold text-gray-900">{{ investment.investor.get_full_name }}</p>
+                                        <p class="text-xs text-gray-500">
+                                            <i class="fas fa-calendar mr-1"></i>
+                                            {{ investment.created_at|date:"d M Y" }}
+                                        </p>
+                                    </div>
+                                </div>
+                                <span class="px-3 py-1 text-xs font-semibold rounded-full
+                                    {% if investment.status == 'confirmed' %}bg-green-100 text-green-800
+                                    {% elif investment.status == 'pending' %}bg-yellow-100 text-yellow-800
+                                    {% elif investment.status == 'rejected' %}bg-red-100 text-red-800
+                                    {% endif %}">
+                                    {% if investment.status == 'confirmed' %}
+                                        <i class="fas fa-check-circle mr-1"></i>Confirmé
+                                    {% elif investment.status == 'pending' %}
+                                        <i class="fas fa-clock mr-1"></i>En attente
+                                    {% elif investment.status == 'rejected' %}
+                                        <i class="fas fa-times-circle mr-1"></i>Refusé
+                                    {% endif %}
+                                </span>
+                            </div>
+                            
+                            <div class="grid grid-cols-2 gap-4 mt-3 pt-3 border-t border-gray-200">
+                                <div>
+                                    <p class="text-xs text-gray-600 mb-1">Montant</p>
+                                    <p class="text-lg font-bold text-green-600">{{ investment.amount|floatformat:0 }}€</p>
+                                </div>
+                                <div>
+                                    <p class="text-xs text-gray-600 mb-1">Type</p>
+                                    <p class="text-sm font-semibold text-gray-800">{{ investment.get_investment_type_display }}</p>
+                                </div>
+                            </div>
+                            
+                            {% if investment.message %}
+                            <div class="mt-3 pt-3 border-t border-gray-200">
+                                <p class="text-xs text-gray-600 mb-1">
+                                    <i class="fas fa-comment mr-1"></i>Message
+                                </p>
+                                <p class="text-sm text-gray-700 italic">"{{ investment.message|truncatewords:20 }}"</p>
+                            </div>
+                            {% endif %}
+                            
+                            <div class="mt-3 pt-3 border-t border-gray-200 flex gap-2">
+                                {% if investment.investor.is_active %}
+                                <a href="{% url 'messaging:start_conversation' investment.investor.username %}" 
+                                   class="btn-outline text-sm flex-1 text-center">
+                                    <i class="fas fa-envelope mr-1"></i>Contacter
+                                </a>
+                                {% else %}
+                                <span class="text-xs text-gray-500 flex-1 text-center py-2">
+                                    <i class="fas fa-user-slash mr-1"></i>Utilisateur inactif
+                                </span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    
+                    <div class="mt-4 pt-4 border-t border-gray-200">
+                        <div class="grid grid-cols-3 gap-4 text-center">
+                            <div>
+                                <p class="text-2xl font-bold text-gray-900">{{ project_investments.count }}</p>
+                                <p class="text-xs text-gray-600">Investisseurs</p>
+                            </div>
+                            <div>
+                                <p class="text-2xl font-bold text-green-600">{{ project.current_funding|floatformat:0 }}€</p>
+                                <p class="text-xs text-gray-600">Total levé</p>
+                            </div>
+                            <div>
+                                <p class="text-2xl font-bold text-blue-600">
+                                    {% with confirmed=project_investments|length %}
+                                        {{ confirmed }}
+                                    {% endwith %}
+                                </p>
+                                <p class="text-xs text-gray-600">Confirmés</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                
                 {% endif %} <!-- Fin de has_full_access -->
             </div>
 
@@ -264,9 +365,13 @@
                             <span class="text-sm font-semibold text-gray-800">{{ project.funding_goal|floatformat:0 }}€</span>
                         </div>
                         <div class="w-full bg-gray-200 rounded-full h-2">
-                            <div class="bg-green-600 h-2 rounded-full transition-all" style="width: {{ project.funding_percentage|default:0 }}%"></div>
+                            {% if project.funding_percentage >= 100 %}
+                                <div class="bg-green-700 h-2 rounded-full transition-all" style="width: 100%"></div>
+                            {% else %}
+                                <div class="bg-green-600 h-2 rounded-full transition-all" style="width: {{ project.funding_percentage|default:0 }}%"></div>
+                            {% endif %}
                         </div>
-                        <p class="text-xs text-gray-600 mt-1">{{ project.funding_percentage|floatformat:1|default:0 }}% financé</p>
+                        <p class="text-xs {% if project.funding_percentage >= 100 %}text-green-700 font-semibold{% else %}text-gray-600{% endif %} mt-1">{{ project.funding_percentage|floatformat:1|default:0 }}% financé</p>
                     </div>
 
                     {% if has_full_access %}
@@ -282,7 +387,7 @@
                     </div>
 
                     {% if project.status == 'approved' and request.user.is_authenticated %}
-                        {% if request.user.user_type == 'investisseur' %}
+                        {% if request.user.can_access_investisseur_features %}
                             <a href="{% url 'projects:declare_investment' project.id %}" class="btn-primary w-full mb-3 block text-center">
                                 <i class="fas fa-hand-holding-usd mr-2"></i>
                                 Déclarer un investissement

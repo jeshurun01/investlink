@@ -1,0 +1,165 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ contact_message.subject }} - Message de Contact{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 py-8">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <!-- Header -->
+        <div class="mb-8">
+            <a href="{% url 'core:admin_contact_messages' %}" class="text-blue-600 hover:text-blue-800 mb-4 inline-flex items-center">
+                <i class="fas fa-arrow-left mr-2"></i>Retour à la liste
+            </a>
+            <h1 class="text-3xl font-bold text-gray-900 mt-4">Message de Contact</h1>
+        </div>
+
+        <div class="grid md:grid-cols-3 gap-8">
+            <!-- Contenu principal -->
+            <div class="md:col-span-2 space-y-6">
+                <!-- Informations du message -->
+                <div class="card">
+                    <div class="flex items-start justify-between mb-6">
+                        <h2 class="text-2xl font-bold text-gray-900">{{ contact_message.subject }}</h2>
+                        <span class="px-3 py-1 text-sm font-semibold rounded-full
+                            {% if contact_message.status == 'new' %}bg-green-100 text-green-800
+                            {% elif contact_message.status == 'read' %}bg-yellow-100 text-yellow-800
+                            {% elif contact_message.status == 'in_progress' %}bg-purple-100 text-purple-800
+                            {% elif contact_message.status == 'resolved' %}bg-gray-100 text-gray-800
+                            {% elif contact_message.status == 'archived' %}bg-gray-100 text-gray-500
+                            {% endif %}">
+                            {{ contact_message.get_status_display }}
+                        </span>
+                    </div>
+
+                    <div class="mb-6">
+                        <div class="flex items-center mb-4">
+                            <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white font-bold text-lg mr-4">
+                                {{ contact_message.name|first|upper }}
+                            </div>
+                            <div>
+                                <p class="font-semibold text-gray-900">{{ contact_message.name }}</p>
+                                <p class="text-sm text-gray-600">
+                                    <i class="fas fa-envelope mr-1"></i>{{ contact_message.email }}
+                                </p>
+                                {% if contact_message.phone %}
+                                <p class="text-sm text-gray-600">
+                                    <i class="fas fa-phone mr-1"></i>{{ contact_message.phone }}
+                                </p>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        {% if contact_message.user %}
+                        <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4">
+                            <p class="text-sm text-blue-800">
+                                <i class="fas fa-info-circle mr-2"></i>
+                                Ce message provient d'un utilisateur inscrit :
+                                <a href="{% url 'users:admin_user_detail' contact_message.user.id %}" class="font-semibold hover:underline">
+                                    {{ contact_message.user.get_full_name }}
+                                </a>
+                            </p>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="prose max-w-none">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-3">Message :</h3>
+                        <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                            <p class="text-gray-700 whitespace-pre-wrap">{{ contact_message.message }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Notes administrateur -->
+                {% if contact_message.admin_notes %}
+                <div class="card bg-yellow-50 border-l-4 border-yellow-500">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-3 flex items-center">
+                        <i class="fas fa-sticky-note text-yellow-600 mr-2"></i>
+                        Notes administrateur
+                    </h3>
+                    <p class="text-gray-700 whitespace-pre-wrap">{{ contact_message.admin_notes }}</p>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Sidebar -->
+            <div class="space-y-6">
+                <!-- Informations -->
+                <div class="card">
+                    <h3 class="text-lg font-bold text-gray-800 mb-4">Informations</h3>
+                    
+                    <div class="space-y-3 text-sm">
+                        <div>
+                            <p class="text-gray-600 mb-1">Date de réception</p>
+                            <p class="font-semibold text-gray-900">
+                                <i class="fas fa-calendar mr-1"></i>{{ contact_message.created_at|date:"d/m/Y à H:i" }}
+                            </p>
+                        </div>
+
+                        {% if contact_message.read_at %}
+                        <div>
+                            <p class="text-gray-600 mb-1">Lu le</p>
+                            <p class="font-semibold text-gray-900">
+                                <i class="fas fa-eye mr-1"></i>{{ contact_message.read_at|date:"d/m/Y à H:i" }}
+                            </p>
+                        </div>
+                        {% endif %}
+
+                        {% if contact_message.resolved_at %}
+                        <div>
+                            <p class="text-gray-600 mb-1">Résolu le</p>
+                            <p class="font-semibold text-gray-900">
+                                <i class="fas fa-check-circle mr-1"></i>{{ contact_message.resolved_at|date:"d/m/Y à H:i" }}
+                            </p>
+                        </div>
+                        {% endif %}
+
+                        {% if contact_message.ip_address %}
+                        <div>
+                            <p class="text-gray-600 mb-1">Adresse IP</p>
+                            <p class="font-mono text-xs text-gray-900">{{ contact_message.ip_address }}</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Changer le statut -->
+                <div class="card">
+                    <h3 class="text-lg font-bold text-gray-800 mb-4">Gestion</h3>
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="update_status">
+                        
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Statut</label>
+                            <select name="status" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                                {% for value, label in status_choices %}
+                                    <option value="{{ value }}" {% if contact_message.status == value %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Notes (optionnel)</label>
+                            <textarea name="admin_notes" rows="4" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="Ajouter des notes...">{{ contact_message.admin_notes }}</textarea>
+                        </div>
+
+                        <button type="submit" class="btn-primary w-full">
+                            <i class="fas fa-save mr-2"></i>Enregistrer
+                        </button>
+                    </form>
+
+                    {% if contact_message.user %}
+                    <a href="{% url 'messaging:start_conversation' contact_message.user.username %}" class="btn-outline w-full mt-3">
+                        <i class="fas fa-envelope mr-2"></i>Répondre par message
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

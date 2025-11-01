@@ -48,6 +48,16 @@
 ### 2.1 Authentification et profils
 - [x] Système d'inscription (formulaires pour porteurs et investisseurs)
 - [x] Système de connexion/déconnexion
+- [ ] **Workflow d'activation de compte par admin**
+  - [ ] Ajout du champ `activation_request_message` au modèle User
+  - [ ] Ajout du champ `account_status` (pending, active, suspended, rejected)
+  - [ ] Formulaire de motivation lors de l'inscription
+  - [ ] Notification admin lors de nouvelle demande d'activation
+  - [ ] Page admin de gestion des demandes d'activation
+  - [ ] Actions : Approuver / Rejeter avec motif
+  - [ ] Email/notification à l'utilisateur après décision admin
+  - [ ] Restriction d'accès pour comptes non activés (message explicatif)
+  - [ ] Badge de statut dans la gestion des utilisateurs
 - [ ] Validation d'email
 - [x] Réinitialisation de mot de passe
 - [ ] Authentification à deux facteurs (2FA)
@@ -55,6 +65,12 @@
 - [x] Édition de profil porteur
 - [x] Édition de profil investisseur
 - [x] Gestion des permissions Django
+- [x] **Méthodes de permission universelles pour admins**
+  - [x] `can_access_porteur_features()` - Accès fonctionnalités porteur
+  - [x] `can_access_investisseur_features()` - Accès fonctionnalités investisseur
+  - [x] `is_admin_user()` - Vérification statut admin
+  - [x] Refactorisation de toutes les vues et templates
+  - [x] Admins ont accès à TOUTES les fonctionnalités (porteur + investisseur)
 
 ### 2.2 Gestion des projets (Porteurs)
 - [x] Formulaire de soumission de projet
@@ -166,8 +182,8 @@
 - [x] Page de mes projets
 - [x] Page d'édition de projet
 - [x] Page de profil porteur
-- [ ] Page de messagerie
-- [ ] Page de notifications
+- [x] Page de messagerie
+- [x] Page de notifications
 
 ### 3.5 Espace investisseur
 - [x] Dashboard investisseur
@@ -182,8 +198,8 @@
 - [x] Page de déclaration d'investissement
 - [x] Page "Mes investissements" avec filtres
 - [ ] Export des états financiers (PDF/Excel)
-- [ ] Page de messagerie
-- [ ] Page de notifications
+- [x] Page de messagerie
+- [x] Page de notifications
 
 ### 3.6 Interface administrateur
 - [x] Dashboard admin (statistiques)
@@ -193,6 +209,13 @@
 - [x] **Page de validation des investissements**
 - [x] **Page de validation détaillée d'un investissement**
 - [x] **Actions utilisateurs : activation/désactivation, suppression, changement de type**
+- [ ] **Page de gestion des demandes d'activation de compte**
+  - [ ] Liste des demandes en attente avec filtres
+  - [ ] Vue détaillée d'une demande (motivation, date, informations utilisateur)
+  - [ ] Actions : Approuver / Rejeter avec motif obligatoire pour rejet
+  - [ ] Statistiques : En attente / Approuvées / Rejetées
+  - [ ] Envoi de notifications automatiques après décision
+  - [ ] Intégration au dashboard admin (compteur demandes en attente)
 - [x] Page de gestion du contenu
 - [x] Page de logs/activités
 
@@ -442,6 +465,7 @@
 ### 🔄 Phase 2 : EN COURS (94%)
 - ✅ Système d'authentification complet (inscription, login, logout)
 - ✅ **Système de réinitialisation de mot de passe complet**
+- ✅ **Système de permissions universelles pour admins**
 - ✅ Formulaires porteur et investisseur avec validation
 - ✅ Dashboards utilisateurs personnalisés
 - ✅ Profils utilisateurs (affichage et édition)
@@ -464,11 +488,12 @@
 - ✅ **Système de blog complet avec catégories, tags, recherche, pagination**
 - ✅ **Amélioration page Découvrir : statistiques globales + classement sectoriel avec ROI**
 - ✅ **Restriction d'accès détails projets (investisseurs uniquement) + modal inscription**
+- ⏳ **Workflow d'activation de compte motivée (à faire)**
 - ⏳ Validation email (à faire)
 - ⏳ 2FA (à faire)
 - ⏳ Envoi emails SMTP (à faire)
 
-### 🔄 Phase 3 : EN COURS (97%)
+### 🔄 Phase 3 : EN COURS (99%)
 - ✅ Charte graphique et composants de base
 - ✅ **Pages d'authentification complètes avec reset mot de passe**
 - ✅ Navigation responsive
@@ -497,7 +522,10 @@
 - ✅ **Page admin de validation détaillée d'un investissement**
 - ✅ **Pages légales (CGU, Politique de confidentialité, Mentions légales)**
 - ✅ **Système de blog avec articles, catégories, tags, recherche et pagination**
-- ⏳ Page de logs/activités admin (à faire)
+- ✅ **Système de permissions universelles : admins accèdent à TOUTES les fonctionnalités**
+- ✅ **Pages de messagerie et notifications (porteurs + investisseurs)**
+- ⏳ **Page admin de gestion des demandes d'activation (à faire)**
+- ⏳ Responsive design mobile/tablette (à faire)
 
 ### 🎨 Améliorations UX Récentes
 - ✅ Refonte CSS des formulaires (padding, focus, transitions)
@@ -517,14 +545,16 @@
 8. ✅ **Système d'investissement et suivi financier complet**
 9. ✅ **Page "États financiers mensuels" investisseurs avec graphiques**
 10. ✅ **Workflow complet de validation des investissements par admin**
-11. **🆕 Amélioration page "Découvrir les projets" avec statistiques globales**
-12. Pages légales (CGU, confidentialité, mentions légales)
-13. Configuration SMTP pour envoi d'emails
-14. Responsive design (mobile/tablette)
+11. ✅ **Amélioration page "Découvrir les projets" avec statistiques globales**
+12. ✅ **Système de permissions universelles pour admins**
+13. ✅ Pages légales (CGU, confidentialité, mentions légales)
+14. **🆕 Workflow d'activation de compte motivée**
+15. Configuration SMTP pour envoi d'emails
+16. Responsive design (mobile/tablette)
 
-### 📋 Nouvelles Fonctionnalités Ajoutées (29 octobre 2025)
+### 📋 Nouvelles Fonctionnalités Ajoutées
 
-**🔹 Système de Réinitialisation de Mot de Passe :**
+**🔹 Système de Réinitialisation de Mot de Passe (29 octobre 2025) :**
 - Flux complet en 4 étapes (demande, confirmation, nouveau mot de passe, succès)
 - Génération de tokens sécurisés avec expiration 24h
 - 5 templates stylisés avec Tailwind CSS
@@ -532,26 +562,27 @@
 - Protection contre l'énumération d'utilisateurs
 - Lien intégré dans la page de connexion
 
-**🔹 Système de Favoris :**
+**🔹 Système de Favoris (29 octobre 2025) :**
 - Toggle AJAX sur les cartes de projets
 - Page "Mes favoris" avec statistiques
 - Navigation intégrée pour investisseurs
 
-**🔹 Système d'Investissement Complet :**
+**🔹 Système d'Investissement Complet (29 octobre 2025) :**
 - Modèles Investment et ProjectPerformance
 - Déclaration d'investissement avec validation admin
 - Page "Mes investissements" avec filtres par statut
 - Calcul automatique du ROI (montant et pourcentage)
 - Suivi de la valeur actuelle vs montant investi
 
-**🔹 Dashboard Financier avec Chart.js :**
+**🔹 Dashboard Financier avec Chart.js (29 octobre 2025) :**
 - Graphique d'évolution du portefeuille (ligne)
 - Graphique de répartition par secteur (donut)
 - Tableau détaillé des performances par projet
 - Statistiques globales : investi, valeur actuelle, ROI
 - Fonction d'impression pour rapports
+- Conteneurs de hauteur fixe pour stabilité des graphiques
 
-**🔹 Workflow de Validation des Investissements (Admin) :**
+**🔹 Workflow de Validation des Investissements - Admin (29 octobre 2025) :**
 - Page de liste des investissements avec filtres (statut, projet)
 - Statistiques globales (en attente, confirmés, rejetés)
 - Page de validation détaillée avec informations complètes
@@ -560,7 +591,7 @@
 - Intégration au dashboard admin avec accès rapide
 - Types de notifications étendus (investment_confirmed, investment_rejected)
 
-**🔹 Gestion Complète des Utilisateurs (Admin) :**
+**🔹 Gestion Complète des Utilisateurs - Admin (29 octobre 2025) :**
 - Activation et désactivation de comptes utilisateurs
 - Suppression définitive de comptes (sauf super admins)
 - Changement du type d'utilisateur (porteur ↔ investisseur)
@@ -568,8 +599,34 @@
 - Interface avec formulaires et confirmations JavaScript
 - Messages de succès Django pour chaque action
 
+**🔹 Système de Permissions Universelles - Admin (1er novembre 2025) :**
+- Ajout de 3 méthodes helper au modèle User :
+  - `can_access_porteur_features()` - Accès aux fonctionnalités porteur
+  - `can_access_investisseur_features()` - Accès aux fonctionnalités investisseur
+  - `is_admin_user()` - Vérification du statut administrateur
+- Refactorisation complète de 16 vérifications de permissions :
+  - 8 vérifications dans les vues Python (users/views.py, projects/views.py)
+  - 8 vérifications dans les templates (dashboard, profil, liste projets, détails)
+- **Philosophie** : Les admins ont maintenant accès à TOUTES les fonctionnalités :
+  - Peuvent créer des projets (fonctionnalité porteur)
+  - Peuvent déclarer des investissements (fonctionnalité investisseur)
+  - Peuvent gérer leurs favoris (fonctionnalité investisseur)
+  - Voient les deux types de profils sur leur page profil
+  - Dashboard affiche les sections porteur ET investisseur
+- Permission logic : `user_type in ['admin'] or is_staff or is_superuser`
+
+**🔹 Workflow d'Activation de Compte Motivée (À VENIR) :**
+- Motivation obligatoire lors de l'inscription (textarea)
+- Nouveau statut `account_status` : pending, active, suspended, rejected
+- Page admin dédiée aux demandes d'activation
+- Validation manuelle par admin avec motif de refus si rejet
+- Restriction d'accès pour comptes non activés
+- Notifications automatiques après décision admin
+- Badge de statut visible dans la gestion des utilisateurs
+- Message explicatif pour utilisateurs en attente d'activation
+
 ---
 
-**Dernière mise à jour :** 29 octobre 2025  
-**Statut global :** ✨ En développement actif - Phase 2/3 + Nouvelles fonctionnalités
+**Dernière mise à jour :** 1er novembre 2025  
+**Statut global :** ✨ En développement actif - Phase 2/3 + Nouvelles fonctionnalités avancées
 

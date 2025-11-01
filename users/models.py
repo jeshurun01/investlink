@@ -40,6 +40,18 @@ class User(AbstractUser):
     
     def get_absolute_url(self):
         return reverse('users:profile', kwargs={'pk': self.pk})
+    
+    def can_access_porteur_features(self):
+        """Vérifie si l'utilisateur peut accéder aux fonctionnalités porteur"""
+        return self.user_type in ['porteur', 'admin'] or self.is_staff
+    
+    def can_access_investisseur_features(self):
+        """Vérifie si l'utilisateur peut accéder aux fonctionnalités investisseur"""
+        return self.user_type in ['investisseur', 'admin'] or self.is_staff
+    
+    def is_admin_user(self):
+        """Vérifie si l'utilisateur est admin"""
+        return self.user_type == 'admin' or self.is_staff or self.is_superuser
 
 
 class ProjectOwnerProfile(models.Model):

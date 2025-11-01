@@ -101,15 +101,45 @@ def contact(request):
     if request.method == 'POST':
         form = ContactForm(request.POST)
         if form.is_valid():
-            # Ici on pourrait envoyer un email
-            # Pour l'instant on affiche juste un message de succès
+            # Créer un message de contact dans la base de données
+            from .models import ContactMessage
+            
+            contact_message = ContactMessage.objects.create(
+                name=form.cleaned_data['name'],
+                email=form.cleaned_data['email'],
+                phone=form.cleaned_data.get('phone', ''),
+                subject=form.cleaned_data['subject'],
+                message=form.cleaned_data['message'],
+                user=request.user if request.user.is_authenticated else None,
+                ip_address=request.META.get('REMOTE_ADDR')
+            )
+            
+            # Log de l'action
+            ActivityLog.log(
+                user=request.user if request.user.is_authenticated else None,
+                action='create',
+                entity_type='message',
+                entity_id=contact_message.id,
+                entity_name=f"{contact_message.name} - {contact_message.subject}",
+                description=f"Nouveau message de contact reçu",
+                request=request
+            )
+            
             messages.success(
                 request, 
                 'Votre message a été envoyé avec succès. Nous vous répondrons dans les plus brefs délais.'
             )
             return redirect('core:contact')
     else:
-        form = ContactForm()
+        # Pré-remplir le formulaire si l'utilisateur est connecté
+        initial_data = {}
+        if request.user.is_authenticated:
+            initial_data = {
+                'name': request.user.get_full_name(),
+                'email': request.user.email,
+                'phone': getattr(request.user, 'phone', ''),
+            }
+        form = ContactForm(initial=initial_data)
     
     return render(request, 'core/contact.html', {'form': form})
 
@@ -492,5 +522,120 @@ def admin_activity_logs(request):
         'search_query': search,
     }
     
+    
     return render(request, 'core/admin_activity_logs.html', context)
+
+
+# ============================================
+# VUES ADMIN - MESSAGES DE CONTACT
+# ============================================
+
+@login_required
+@user_passes_test(is_admin)
+def admin_contact_messages(request):
+    """Liste des messages de contact"""
+    from .models import ContactMessage
+    
+    # Filtres
+    status = request.GET.get('status', '')
+    search = request.GET.get('q', '')
+    
+    messages_list = ContactMessage.objects.select_related('user').order_by('-created_at')
+    
+    if status:
+        messages_list = messages_list.filter(status=status)
+    
+    if search:
+        messages_list = messages_list.filter(
+            Q(name__icontains=search) |
+            Q(email__icontains=search) |
+            Q(subject__icontains=search) |
+            Q(message__icontains=search)
+        )
+    
+    # Pagination
+    paginator = Paginator(messages_list, 20)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
+    # Statistiques
+    stats = {
+        'total': ContactMessage.objects.count(),
+        'new': ContactMessage.objects.filter(status='new').count(),
+        'read': ContactMessage.objects.filter(status='read').count(),
+        'in_progress': ContactMessage.objects.filter(status='in_progress').count(),
+        'resolved': ContactMessage.objects.filter(status='resolved').count(),
+    }
+    
+    context = {
+        'page_obj': page_obj,
+        'status_choices': ContactMessage.STATUS_CHOICES,
+        'current_status': status,
+        'search_query': search,
+        'stats': stats,
+    }
+    
+    return render(request, 'core/admin_contact_messages.html', context)
+
+
+@login_required
+@user_passes_test(is_admin)
+def admin_contact_message_detail(request, message_id):
+    """Détail d'un message de contact"""
+    from .models import ContactMessage
+    
+    contact_message = get_object_or_404(ContactMessage, id=message_id)
+    
+    # Marquer comme lu si nouveau
+    if contact_message.status == 'new':
+        contact_message.mark_as_read()
+        ActivityLog.log(
+            user=request.user,
+            action='view',
+            entity_type='message',
+            entity_id=contact_message.id,
+            entity_name=f"{contact_message.name} - {contact_message.subject}",
+            description="Consultation du message de contact",
+            request=request
+        )
+    
+    if request.method == 'POST':
+        action = request.POST.get('action')
+        
+        if action == 'update_status':
+            new_status = request.POST.get('status')
+            admin_notes = request.POST.get('admin_notes', '')
+            
+            old_status = contact_message.status
+            contact_message.status = new_status
+            if admin_notes:
+                contact_message.admin_notes = admin_notes
+            
+            if new_status == 'resolved':
+                from django.utils import timezone
+                contact_message.resolved_at = timezone.now()
+            
+            contact_message.save()
+            
+            # Log
+            ActivityLog.log(
+                user=request.user,
+                action='update',
+                entity_type='message',
+                entity_id=contact_message.id,
+                entity_name=f"{contact_message.name} - {contact_message.subject}",
+                description=f"Changement de statut: {old_status} → {new_status}",
+                request=request
+            )
+            
+            messages.success(request, "Le statut du message a été mis à jour.")
+            return redirect('core:admin_contact_message_detail', message_id=message_id)
+    
+    context = {
+        'contact_message': contact_message,
+        'status_choices': ContactMessage.STATUS_CHOICES,
+    }
+    
+    return render(request, 'core/admin_contact_message_detail.html', context)
+
 

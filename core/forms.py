@@ -22,6 +22,16 @@ class ContactForm(forms.Form):
         })
     )
     
+    phone = forms.CharField(
+        max_length=20,
+        required=False,
+        label='Téléphone (optionnel)',
+        widget=forms.TextInput(attrs={
+            'class': 'w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition',
+            'placeholder': '+243 XXX XXX XXX'
+        })
+    )
+    
     subject = forms.CharField(
         max_length=200,
         label='Sujet',
