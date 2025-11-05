@@ -111,9 +111,85 @@ python manage.py showmigrations
 
 ## 🔧 Configuration Avancée
 
-### Gestion des Fichiers Media
+### Gestion des Fichiers Media (IMAGES UPLOADÉES)
 
-Pour la production, configurez un stockage externe (AWS S3, Cloudinary, etc.) :
+⚠️ **PROBLÈME CONNU** : Les images uploadées (blog, projets) ne s'affichent pas en production sur Render.
+
+**Cause** : Le système de fichiers de Render est éphémère. Les fichiers uploadés sont supprimés à chaque redéploiement.
+
+#### ✅ Solution 1 : Persistent Disk (Recommandé pour Render)
+
+1. Dans votre service Render → **Settings** → **Disks**
+2. Cliquez **Add Disk**
+3. Configurez :
+   - **Name** : `media`
+   - **Mount Path** : `/opt/render/project/src/media`
+   - **Size** : 1GB (ou plus selon vos besoins)
+4. Cliquez **Add Disk**
+5. Redéployez votre service
+
+Le persistent disk garantit que vos fichiers media persistent entre les déploiements.
+
+#### ✅ Solution 2 : Cloudinary (Recommandé pour la production à grande échelle)
+
+**Avantages** :
+- ✅ CDN mondial pour chargements ultra-rapides
+- ✅ Optimisation automatique des images
+- ✅ Transformation d'images à la volée (resize, crop, webp)
+- ✅ Pas de problèmes de persistence
+- ✅ Plan gratuit : 25 crédits/mois
+
+**Installation** :
+
+```bash
+pip install cloudinary django-cloudinary-storage
+```
+
+Ajoutez à `requirements.txt` :
+```
+cloudinary==1.36.0
+django-cloudinary-storage==0.3.0
+```
+
+**Configuration dans settings.py** :
+
+```python
+INSTALLED_APPS = [
+    # ... autres apps
+    'cloudinary_storage',
+    'cloudinary',
+    # ... reste des apps
+]
+
+# Cloudinary Configuration
+import cloudinary
+
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': env('CLOUDINARY_CLOUD_NAME'),
+    'API_KEY': env('CLOUDINARY_API_KEY'),
+    'API_SECRET': env('CLOUDINARY_API_SECRET'),
+}
+
+# Use Cloudinary for media files
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+```
+
+**Variables d'environnement Cloudinary** (sur Render) :
+
+```bash
+CLOUDINARY_CLOUD_NAME=votre-cloud-name
+CLOUDINARY_API_KEY=votre-api-key
+CLOUDINARY_API_SECRET=votre-api-secret
+```
+
+Pour obtenir vos identifiants :
+1. Créez un compte sur [Cloudinary](https://cloudinary.com/)
+2. Dashboard → **API Keys**
+3. Copiez Cloud Name, API Key, API Secret
+
+#### ✅ Solution 3 : AWS S3 (Pour les grandes entreprises)
+
+Pour la production, configurez un stockage externe (AWS S3) :
 
 1. Installez `django-storages` :
    ```bash
@@ -122,7 +198,30 @@ Pour la production, configurez un stockage externe (AWS S3, Cloudinary, etc.) :
 
 2. Ajoutez à `requirements.txt`
 
-3. Configurez dans `settings.py`
+3. Configurez dans `settings.py` :
+   ```python
+   INSTALLED_APPS = [
+       # ...
+       'storages',
+   ]
+   
+   # AWS S3 Configuration
+   AWS_ACCESS_KEY_ID = env('AWS_ACCESS_KEY_ID')
+   AWS_SECRET_ACCESS_KEY = env('AWS_SECRET_ACCESS_KEY')
+   AWS_STORAGE_BUCKET_NAME = env('AWS_STORAGE_BUCKET_NAME')
+   AWS_S3_REGION_NAME = 'eu-central-1'
+   
+   DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+   ```
+
+### Vérification des fichiers media
+
+Après configuration, testez :
+
+1. Uploadez une image via l'admin Django
+2. Vérifiez qu'elle s'affiche : `/media/projects/...` ou URL Cloudinary
+3. Redéployez votre service
+4. Vérifiez que l'image est toujours accessible
 
 ### Variables d'environnement additionnelles (Production)
 

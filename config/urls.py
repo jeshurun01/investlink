@@ -29,8 +29,11 @@ urlpatterns = [
     path('notifications/', include('notifications.urls')),
 ]
 
-# Serve media files in development
+# Serve media files (development and production)
+# Note: For production, consider using cloud storage (AWS S3, Cloudinary, etc.)
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+# Serve static files in development
 if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 

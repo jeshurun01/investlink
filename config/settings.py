@@ -161,6 +161,13 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
+# For production: Ensure media files are served
+# WhiteNoise can serve media files in production when configured in urls.py
+# For better performance in production, consider using:
+# - Cloudinary: for image optimization and CDN
+# - AWS S3: for scalable cloud storage
+# - Azure Blob Storage: for Microsoft Azure deployments
+
 # Crispy Forms Configuration
 CRISPY_ALLOWED_TEMPLATE_PACKS = "tailwind"
 CRISPY_TEMPLATE_PACK = "tailwind"
