@@ -48,4 +48,7 @@ htmlcov/
 # Backup files
 *.bak
 *.tmp
+backups/*.json
+backups/*.sql
+!backups/README.md
 
