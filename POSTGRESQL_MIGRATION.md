@@ -52,6 +52,8 @@ Les fichiers seront créés dans le dossier `backups/`.
 
 4. **Sauvegardez** (Save Changes)
 
+**Note** : Les `settings.py` sont déjà configurés pour détecter automatiquement PostgreSQL via `DATABASE_URL`. Aucune modification de code n'est nécessaire ! Le package `psycopg2-binary` est déjà dans `requirements.txt`.
+
 ### 4️⃣ Déploiement automatique
 
 Render va redéployer automatiquement. Attendez la fin du build (2-5 minutes).

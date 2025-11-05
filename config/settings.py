@@ -108,12 +108,22 @@ WSGI_APPLICATION = "config.wsgi.application"
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
 # Default to SQLite for development, PostgreSQL for production
+# env.db_url() automatically detects the database type from DATABASE_URL
+# Format: postgresql://user:password@host:port/database
 DATABASES = {
     "default": env.db_url(
         'DATABASE_URL',
         default=f'sqlite:///{BASE_DIR / "db.sqlite3"}'
     )
 }
+
+# PostgreSQL optimizations for production
+if not DEBUG and 'postgresql' in DATABASES['default']['ENGINE']:
+    DATABASES['default']['CONN_MAX_AGE'] = env.int('CONN_MAX_AGE', default=600)
+    DATABASES['default']['OPTIONS'] = {
+        'connect_timeout': 10,
+        'options': '-c statement_timeout=30000'  # 30 seconds
+    }
 
 
 # Password validation
