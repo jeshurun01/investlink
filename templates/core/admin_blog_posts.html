@@ -69,74 +69,136 @@
 
         <!-- Liste des articles -->
         <div class="bg-white rounded-lg shadow-sm overflow-hidden">
-            <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-gray-50">
-                    <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Article
-                        </th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Catégorie
-                        </th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Statut
-                        </th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Date
-                        </th>
-                        <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Actions
-                        </th>
-                    </tr>
-                </thead>
-                <tbody class="bg-white divide-y divide-gray-200">
-                    {% for post in page_obj %}
-                    <tr class="hover:bg-gray-50">
-                        <td class="px-6 py-4">
-                            <div>
-                                <div class="text-sm font-medium text-gray-900">{{ post.title }}</div>
-                                <div class="text-sm text-gray-500">Par {{ post.author.get_full_name|default:post.author.email }}</div>
-                            </div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
+            <!-- Version Desktop : Tableau -->
+            <div class="hidden md:block">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Article
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Catégorie
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Statut
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Date
+                            </th>
+                            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Actions
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        {% for post in page_obj %}
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-6 py-4">
+                                <div>
+                                    <div class="text-sm font-medium text-gray-900">{{ post.title }}</div>
+                                    <div class="text-sm text-gray-500">Par {{ post.author.get_full_name|default:post.author.email }}</div>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                {% if post.category %}
+                                <span class="px-2 py-1 text-xs font-medium bg-purple-100 text-purple-800 rounded-full">
+                                    {{ post.category.name }}
+                                </span>
+                                {% else %}
+                                <span class="text-gray-400 text-sm">Sans catégorie</span>
+                                {% endif %}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                {% if post.status == 'published' %}
+                                <span class="px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full">
+                                    Publié
+                                </span>
+                                {% else %}
+                                <span class="px-2 py-1 text-xs font-medium bg-orange-100 text-orange-800 rounded-full">
+                                    Brouillon
+                                </span>
+                                {% endif %}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                {{ post.created_at|date:"d/m/Y" }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                <a href="{% url 'core:admin_blog_post_edit' post.id %}" 
+                                   class="text-blue-600 hover:text-blue-900 mr-3">Modifier</a>
+                                <a href="{% url 'core:admin_blog_post_delete' post.id %}" 
+                                   class="text-red-600 hover:text-red-900">Supprimer</a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="px-6 py-12 text-center text-gray-500">
+                                Aucun article trouvé.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Version Mobile : Cartes -->
+            <div class="md:hidden p-4 space-y-4">
+                {% for post in page_obj %}
+                <div class="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
+                    <!-- En-tête -->
+                    <div class="bg-purple-50 px-4 py-3 border-b border-purple-100">
+                        <h3 class="font-semibold text-gray-900 mb-1">{{ post.title }}</h3>
+                        <p class="text-xs text-gray-600">Par {{ post.author.get_full_name|default:post.author.email }}</p>
+                    </div>
+
+                    <!-- Contenu -->
+                    <div class="p-4 space-y-3">
+                        <div class="flex justify-between items-center text-sm">
+                            <span class="text-gray-600">Catégorie:</span>
                             {% if post.category %}
                             <span class="px-2 py-1 text-xs font-medium bg-purple-100 text-purple-800 rounded-full">
                                 {{ post.category.name }}
                             </span>
                             {% else %}
-                            <span class="text-gray-400 text-sm">Sans catégorie</span>
+                            <span class="text-gray-400 text-xs">Sans catégorie</span>
                             {% endif %}
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
+                        </div>
+
+                        <div class="flex justify-between items-center text-sm">
+                            <span class="text-gray-600">Statut:</span>
                             {% if post.status == 'published' %}
                             <span class="px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full">
-                                Publié
+                                ✓ Publié
                             </span>
                             {% else %}
                             <span class="px-2 py-1 text-xs font-medium bg-orange-100 text-orange-800 rounded-full">
-                                Brouillon
+                                ⚠ Brouillon
                             </span>
                             {% endif %}
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            {{ post.created_at|date:"d/m/Y" }}
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                            <a href="{% url 'core:admin_blog_post_edit' post.id %}" 
-                               class="text-blue-600 hover:text-blue-900 mr-3">Modifier</a>
-                            <a href="{% url 'core:admin_blog_post_delete' post.id %}" 
-                               class="text-red-600 hover:text-red-900">Supprimer</a>
-                        </td>
-                    </tr>
-                    {% empty %}
-                    <tr>
-                        <td colspan="5" class="px-6 py-12 text-center text-gray-500">
-                            Aucun article trouvé.
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+                        </div>
+
+                        <div class="flex justify-between items-center text-sm">
+                            <span class="text-gray-600">Date:</span>
+                            <span class="text-gray-900">{{ post.created_at|date:"d/m/Y" }}</span>
+                        </div>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="px-4 pb-4 flex gap-2">
+                        <a href="{% url 'core:admin_blog_post_edit' post.id %}" class="flex-1 text-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold text-sm">
+                            Modifier
+                        </a>
+                        <a href="{% url 'core:admin_blog_post_delete' post.id %}" class="flex-1 text-center px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 font-semibold text-sm">
+                            Supprimer
+                        </a>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="py-12 text-center text-gray-500">
+                    Aucun article trouvé.
+                </div>
+                {% endfor %}
+            </div>
         </div>
 
         <!-- Pagination -->

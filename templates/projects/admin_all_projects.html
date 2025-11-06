@@ -81,7 +81,8 @@
     <!-- Liste des projets -->
     <div class="bg-white rounded-lg shadow overflow-hidden">
         {% if projects %}
-            <div class="overflow-x-auto">
+            <!-- Version Desktop : Tableau -->
+            <div class="hidden md:block overflow-x-auto">
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50">
                         <tr>
@@ -153,6 +154,84 @@
                         {% endfor %}
                     </tbody>
                 </table>
+            </div>
+
+            <!-- Version Mobile : Cartes -->
+            <div class="md:hidden p-4 space-y-4">
+                {% for project in projects %}
+                <div class="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
+                    <!-- En-tête -->
+                    <div class="bg-gray-50 px-4 py-3 border-b border-gray-200">
+                        <h3 class="font-semibold text-gray-900">{{ project.title }}</h3>
+                        <p class="text-xs text-gray-600 mt-1">{{ project.summary|truncatewords:15 }}</p>
+                    </div>
+
+                    <!-- Contenu -->
+                    <div class="p-4 space-y-3">
+                        <div class="flex justify-between items-center text-sm">
+                            <span class="text-gray-600">Porteur:</span>
+                            <div class="text-right">
+                                <div class="text-gray-900 font-medium">{{ project.owner.get_full_name }}</div>
+                                <div class="text-xs text-gray-500">{{ project.owner.email|truncatewords:2 }}</div>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-between items-center text-sm">
+                            <span class="text-gray-600">Secteur:</span>
+                            <span class="px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
+                                {{ project.get_sector_display }}
+                            </span>
+                        </div>
+
+                        <div class="flex justify-between items-center text-sm">
+                            <span class="text-gray-600">Montant:</span>
+                            <span class="font-semibold text-gray-900">{{ project.funding_goal|floatformat:0 }} $</span>
+                        </div>
+
+                        <div class="flex justify-between items-center text-sm">
+                            <span class="text-gray-600">Statut:</span>
+                            {% if project.status == 'submitted' %}
+                                <span class="px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                                    Nouveau
+                                </span>
+                            {% elif project.status == 'under_review' %}
+                                <span class="px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
+                                    En examen
+                                </span>
+                            {% elif project.status == 'revision_requested' %}
+                                <span class="px-2 py-1 text-xs font-semibold rounded-full bg-orange-100 text-orange-800">
+                                    Révision
+                                </span>
+                            {% elif project.status == 'approved' %}
+                                <span class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
+                                    Validé
+                                </span>
+                            {% elif project.status == 'rejected' %}
+                                <span class="px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">
+                                    Refusé
+                                </span>
+                            {% endif %}
+                        </div>
+
+                        <div class="flex justify-between items-center text-sm">
+                            <span class="text-gray-600">Date:</span>
+                            <span class="text-gray-900">{{ project.created_at|date:"d/m/Y" }}</span>
+                        </div>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="px-4 pb-4 flex gap-2">
+                        <a href="{% url 'projects:detail' project.slug %}" class="flex-1 text-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold text-sm">
+                            Voir
+                        </a>
+                        {% if project.status != 'approved' %}
+                            <a href="{% url 'projects:admin_validate' project.slug %}" class="flex-1 text-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-semibold text-sm">
+                                Valider
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
             </div>
         {% else %}
             <div class="text-center py-12">

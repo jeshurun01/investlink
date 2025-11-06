@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Responsive - InvestLink</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Simulateur de différentes tailles d'écran */
+        .screen-simulator {
+            border: 3px solid #333;
+            margin: 20px auto;
+            overflow: auto;
+        }
+        .mobile { max-width: 375px; }
+        .tablet { max-width: 768px; }
+        .desktop { max-width: 1024px; }
+    </style>
+</head>
+<body class="bg-gray-100 p-4">
+    
+    <div class="max-w-7xl mx-auto">
+        <h1 class="text-3xl font-bold mb-6 text-center">Test Responsive Design - InvestLink</h1>
+        
+        <!-- Sélecteur de taille -->
+        <div class="flex gap-4 justify-center mb-6">
+            <button onclick="setScreen('mobile')" class="bg-blue-600 text-white px-4 py-2 rounded">📱 Mobile (375px)</button>
+            <button onclick="setScreen('tablet')" class="bg-green-600 text-white px-4 py-2 rounded">📱 Tablet (768px)</button>
+            <button onclick="setScreen('desktop')" class="bg-purple-600 text-white px-4 py-2 rounded">💻 Desktop (1024px)</button>
+        </div>
+
+        <!-- Simulateur -->
+        <div id="simulator" class="screen-simulator mobile bg-white shadow-xl">
+            
+            <!-- TEST 1: Tableau -->
+            <div class="p-4 border-b">
+                <h2 class="text-xl font-bold mb-3">Test 1: Tableau Standard</h2>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full bg-white border">
+                        <thead class="bg-gray-100">
+                            <tr>
+                                <th class="px-4 py-2 border">Projet</th>
+                                <th class="px-4 py-2 border">Secteur</th>
+                                <th class="px-4 py-2 border">Montant</th>
+                                <th class="px-4 py-2 border">Statut</th>
+                                <th class="px-4 py-2 border">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="px-4 py-2 border">Projet Test Très Long Nom</td>
+                                <td class="px-4 py-2 border">Technologie</td>
+                                <td class="px-4 py-2 border">50 000 €</td>
+                                <td class="px-4 py-2 border"><span class="bg-green-100 text-green-800 px-2 py-1 rounded text-sm">Validé</span></td>
+                                <td class="px-4 py-2 border">
+                                    <button class="bg-blue-500 text-white px-2 py-1 rounded text-sm">Voir</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p class="text-sm text-gray-600 mt-2">❌ Problème: Trop large sur mobile, scroll horizontal difficile</p>
+            </div>
+
+            <!-- TEST 2: Tableau en Cards (Solution) -->
+            <div class="p-4 border-b">
+                <h2 class="text-xl font-bold mb-3">Test 2: Tableau → Cards Mobile</h2>
+                
+                <!-- Desktop: Table -->
+                <div class="hidden md:block overflow-x-auto">
+                    <table class="min-w-full bg-white border">
+                        <thead class="bg-gray-100">
+                            <tr>
+                                <th class="px-4 py-2 border">Projet</th>
+                                <th class="px-4 py-2 border">Secteur</th>
+                                <th class="px-4 py-2 border">Montant</th>
+                                <th class="px-4 py-2 border">Statut</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="px-4 py-2 border">Projet Test</td>
+                                <td class="px-4 py-2 border">Tech</td>
+                                <td class="px-4 py-2 border">50 000 €</td>
+                                <td class="px-4 py-2 border"><span class="bg-green-100 text-green-800 px-2 py-1 rounded text-sm">Validé</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Mobile: Cards -->
+                <div class="md:hidden space-y-3">
+                    <div class="bg-white border rounded-lg p-4 shadow">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="font-bold text-gray-900">Projet Test Long Nom</h3>
+                            <span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs">Validé</span>
+                        </div>
+                        <div class="space-y-1 text-sm">
+                            <p><span class="text-gray-600">Secteur:</span> <span class="font-medium">Technologie</span></p>
+                            <p><span class="text-gray-600">Montant:</span> <span class="font-medium">50 000 €</span></p>
+                        </div>
+                        <button class="mt-3 w-full bg-blue-500 text-white px-4 py-2 rounded">Voir le projet</button>
+                    </div>
+                </div>
+                
+                <p class="text-sm text-green-600 mt-2">✅ Solution: Cards empilées sur mobile, tableau sur desktop</p>
+            </div>
+
+            <!-- TEST 3: Formulaire -->
+            <div class="p-4 border-b">
+                <h2 class="text-xl font-bold mb-3">Test 3: Formulaire Mobile</h2>
+                <form class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Nom du projet</label>
+                        <input type="text" class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="Entrez le nom">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Description</label>
+                        <textarea class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500" rows="4"></textarea>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Montant</label>
+                            <input type="number" class="w-full px-4 py-3 border rounded-lg" placeholder="50000">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Secteur</label>
+                            <select class="w-full px-4 py-3 border rounded-lg">
+                                <option>Technologie</option>
+                                <option>Agriculture</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button type="submit" class="w-full bg-blue-600 text-white py-3 rounded-lg font-medium text-lg">Soumettre le projet</button>
+                </form>
+                <p class="text-sm text-green-600 mt-2">✅ OK: Inputs full-width, bouton grand, grille responsive</p>
+            </div>
+
+            <!-- TEST 4: Dashboard KPI Cards -->
+            <div class="p-4 border-b">
+                <h2 class="text-xl font-bold mb-3">Test 4: Dashboard KPI Cards</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="bg-gradient-to-br from-blue-500 to-blue-700 text-white p-4 rounded-lg shadow">
+                        <div class="flex items-center justify-between mb-2">
+                            <i class="fas fa-folder text-2xl opacity-80"></i>
+                            <span class="text-2xl font-bold">12</span>
+                        </div>
+                        <p class="text-sm opacity-90">Projets</p>
+                    </div>
+                    <div class="bg-gradient-to-br from-green-500 to-green-700 text-white p-4 rounded-lg shadow">
+                        <div class="flex items-center justify-between mb-2">
+                            <i class="fas fa-check-circle text-2xl opacity-80"></i>
+                            <span class="text-2xl font-bold">8</span>
+                        </div>
+                        <p class="text-sm opacity-90">Validés</p>
+                    </div>
+                    <div class="bg-gradient-to-br from-yellow-500 to-yellow-700 text-white p-4 rounded-lg shadow">
+                        <div class="flex items-center justify-between mb-2">
+                            <i class="fas fa-clock text-2xl opacity-80"></i>
+                            <span class="text-2xl font-bold">3</span>
+                        </div>
+                        <p class="text-sm opacity-90">En attente</p>
+                    </div>
+                    <div class="bg-gradient-to-br from-purple-500 to-purple-700 text-white p-4 rounded-lg shadow">
+                        <div class="flex items-center justify-between mb-2">
+                            <i class="fas fa-coins text-2xl opacity-80"></i>
+                            <span class="text-2xl font-bold">150K€</span>
+                        </div>
+                        <p class="text-sm opacity-90">Investissements</p>
+                    </div>
+                </div>
+                <p class="text-sm text-green-600 mt-2">✅ OK: Grille responsive (1 col mobile → 4 cols desktop)</p>
+            </div>
+
+            <!-- TEST 5: Cartes de Projets -->
+            <div class="p-4 border-b">
+                <h2 class="text-xl font-bold mb-3">Test 5: Cartes de Projets</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                        <img src="https://via.placeholder.com/400x200" alt="Projet" class="w-full h-48 object-cover">
+                        <div class="p-4">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">Technologie</span>
+                                <span class="text-green-600 font-bold">50 000 €</span>
+                            </div>
+                            <h3 class="font-bold text-lg mb-2">Application Mobile Innovation</h3>
+                            <p class="text-gray-600 text-sm mb-3 line-clamp-2">Description courte du projet qui peut être longue mais sera tronquée...</p>
+                            <div class="flex gap-2">
+                                <button class="flex-1 bg-blue-600 text-white py-2 rounded text-sm">Voir</button>
+                                <button class="p-2 border border-gray-300 rounded"><i class="fas fa-heart text-gray-400"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <p class="text-sm text-green-600 mt-2">✅ OK: Cards responsive avec images adaptatives</p>
+            </div>
+
+            <!-- TEST 6: Graphique -->
+            <div class="p-4">
+                <h2 class="text-xl font-bold mb-3">Test 6: Graphique Responsive</h2>
+                <div class="bg-white p-4 rounded-lg shadow">
+                    <div class="aspect-video bg-gray-100 flex items-center justify-center">
+                        <div class="text-center">
+                            <i class="fas fa-chart-line text-4xl text-gray-400 mb-2"></i>
+                            <p class="text-gray-600">Canvas Chart.js</p>
+                            <p class="text-sm text-gray-500">(maintainAspectRatio: true)</p>
+                        </div>
+                    </div>
+                </div>
+                <p class="text-sm text-green-600 mt-2">✅ OK: Utiliser aspect-ratio ou responsive: true dans Chart.js</p>
+            </div>
+
+        </div>
+
+        <!-- Résultats et Recommendations -->
+        <div class="mt-6 bg-white p-6 rounded-lg shadow">
+            <h2 class="text-2xl font-bold mb-4">📋 Checklist Responsive Design</h2>
+            
+            <div class="space-y-3">
+                <div class="flex items-start gap-3">
+                    <span class="text-2xl">✅</span>
+                    <div>
+                        <p class="font-medium">Viewport meta tag configuré</p>
+                        <code class="text-sm bg-gray-100 px-2 py-1 rounded">&lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;</code>
+                    </div>
+                </div>
+                
+                <div class="flex items-start gap-3">
+                    <span class="text-2xl">✅</span>
+                    <div>
+                        <p class="font-medium">Menu burger mobile implémenté</p>
+                        <p class="text-sm text-gray-600">Sidebar avec overlay fonctionnel</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-start gap-3">
+                    <span class="text-2xl">⚠️</span>
+                    <div>
+                        <p class="font-medium">Tableaux à optimiser</p>
+                        <p class="text-sm text-gray-600">Solution: hidden md:block (table) + md:hidden (cards)</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-start gap-3">
+                    <span class="text-2xl">⚠️</span>
+                    <div>
+                        <p class="font-medium">Formulaires à vérifier</p>
+                        <p class="text-sm text-gray-600">Espacement, taille des inputs, boutons full-width</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-start gap-3">
+                    <span class="text-2xl">⚠️</span>
+                    <div>
+                        <p class="font-medium">Graphiques Chart.js</p>
+                        <p class="text-sm text-gray-600">Ajouter responsive: true, maintainAspectRatio: true</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function setScreen(size) {
+            const simulator = document.getElementById('simulator');
+            simulator.className = 'screen-simulator bg-white shadow-xl ' + size;
+        }
+    </script>
+
+</body>
+</html>
