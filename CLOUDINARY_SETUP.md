@@ -130,8 +130,8 @@ Si vous avez déjà des images uploadées localement:
 ```python
 # manage.py migrate_to_cloudinary
 import cloudinary.uploader
-from apps.core.models import BlogPost
-from apps.projects.models import Project
+from core.models import BlogPost
+from projects.models import Project
 
 for post in BlogPost.objects.all():
     if post.image and post.image.path:
