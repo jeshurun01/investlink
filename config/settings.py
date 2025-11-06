@@ -50,23 +50,23 @@ if not DEBUG:
 # Application definition
 
 INSTALLED_APPS = [
-    "django.contrib.admin",
-    "django.contrib.auth",
-    "django.contrib.contenttypes",
-    "django.contrib.sessions",
-    "django.contrib.messages",
-    "django.contrib.staticfiles",
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
     
     # Third party apps
-    "crispy_forms",
-    "crispy_tailwind",
+    'crispy_forms',
+    'crispy_tailwind',
+    'cloudinary_storage',
+    'cloudinary',
     
     # Local apps
-    "users",
-    "projects",
-    "messaging",
-    "notifications",
-    "core",
+    'apps.core',
+    'apps.users',
+    'apps.projects',
 ]
 
 MIDDLEWARE = [
@@ -168,15 +168,38 @@ STATICFILES_DIRS = [BASE_DIR / 'static']
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Media files (User uploaded content)
-MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
-
-# For production: Ensure media files are served
-# WhiteNoise can serve media files in production when configured in urls.py
-# For better performance in production, consider using:
-# - Cloudinary: for image optimization and CDN
-# - AWS S3: for scalable cloud storage
-# - Azure Blob Storage: for Microsoft Azure deployments
+# Configuration conditionnelle : Cloudinary en production, local en développement
+if not DEBUG:
+    # ======================================
+    # CLOUDINARY CONFIGURATION (Production)
+    # ======================================
+    # Configure via environment variables:
+    # CLOUDINARY_CLOUD_NAME=your_cloud_name
+    # CLOUDINARY_API_KEY=your_api_key
+    # CLOUDINARY_API_SECRET=your_api_secret
+    
+    import cloudinary
+    import cloudinary.uploader
+    import cloudinary.api
+    
+    cloudinary.config(
+        cloud_name=env('CLOUDINARY_CLOUD_NAME', default=''),
+        api_key=env('CLOUDINARY_API_KEY', default=''),
+        api_secret=env('CLOUDINARY_API_SECRET', default=''),
+        secure=True
+    )
+    
+    # Cloudinary Storage Backend
+    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+    
+    MEDIA_URL = '/media/'  # Cloudinary will handle the actual URL
+    
+else:
+    # ======================================
+    # LOCAL STORAGE (Development)
+    # ======================================
+    MEDIA_URL = '/media/'
+    MEDIA_ROOT = BASE_DIR / 'media'
 
 # Crispy Forms Configuration
 CRISPY_ALLOWED_TEMPLATE_PACKS = "tailwind"
