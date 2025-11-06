@@ -60,13 +60,22 @@ INSTALLED_APPS = [
     # Third party apps
     'crispy_forms',
     'crispy_tailwind',
-    'cloudinary_storage',
-    'cloudinary',
-    
-    # Local apps
+]
+
+# Add Cloudinary only in production
+if not DEBUG:
+    INSTALLED_APPS += [
+        'cloudinary_storage',
+        'cloudinary',
+    ]
+
+# Local apps
+INSTALLED_APPS += [
     'core',
     'users',
     'projects',
+    'messaging',
+    'notifications',
 ]
 
 MIDDLEWARE = [
