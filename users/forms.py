@@ -1,5 +1,5 @@
 from django import forms
-from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, PasswordChangeForm
 from django.core.exceptions import ValidationError
 from .models import User, ProjectOwnerProfile, InvestorProfile
 
@@ -299,3 +299,30 @@ class InvestorProfileUpdateForm(forms.ModelForm):
             'risk_level': forms.Select(attrs={'class': 'input-field'}),
             'location_preference': forms.TextInput(attrs={'class': 'input-field'}),
         }
+
+
+class CustomPasswordChangeForm(PasswordChangeForm):
+    """Formulaire de changement de mot de passe personnalisé"""
+    
+    old_password = forms.CharField(
+        label='Mot de passe actuel',
+        widget=forms.PasswordInput(attrs={
+            'class': 'input-field',
+            'placeholder': 'Entrez votre mot de passe actuel'
+        })
+    )
+    new_password1 = forms.CharField(
+        label='Nouveau mot de passe',
+        widget=forms.PasswordInput(attrs={
+            'class': 'input-field',
+            'placeholder': 'Entrez votre nouveau mot de passe'
+        }),
+        help_text='Minimum 8 caractères'
+    )
+    new_password2 = forms.CharField(
+        label='Confirmer le nouveau mot de passe',
+        widget=forms.PasswordInput(attrs={
+            'class': 'input-field',
+            'placeholder': 'Confirmez votre nouveau mot de passe'
+        })
+    )

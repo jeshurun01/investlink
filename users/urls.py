@@ -24,6 +24,7 @@ urlpatterns = [
     path('dashboard/', views.dashboard, name='dashboard'),
     path('profile/', views.profile, name='profile'),
     path('profile/edit/', views.profile_edit, name='profile_edit'),
+    path('profile/change-password/', views.change_password, name='change_password'),
     
     # Interface administrateur
     path('admin/dashboard/', views.admin_dashboard, name='admin_dashboard'),

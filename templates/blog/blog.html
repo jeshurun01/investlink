@@ -12,14 +12,14 @@
             </div>
             {% if user.is_authenticated and user.user_type == 'admin' %}
             <div class="flex flex-col gap-2">
-                <a href="{% url 'core:admin_blog_post_create' %}" 
+                <a href="{% url 'blog:admin_blog_post_create' %}" 
                    class="bg-white text-purple-700 px-6 py-3 rounded-lg font-semibold hover:bg-purple-50 transition flex items-center shadow-lg">
                     <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                     </svg>
                     Créer un article
                 </a>
-                <a href="{% url 'core:admin_blog_posts' %}" 
+                <a href="{% url 'blog:admin_blog_posts' %}" 
                    class="bg-purple-800 text-white px-6 py-2 rounded-lg font-semibold hover:bg-purple-900 transition flex items-center text-sm">
                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
@@ -45,7 +45,7 @@
                     <i class="fas fa-search text-purple-600 mr-2"></i>
                     Rechercher
                 </h3>
-                <form method="get" action="{% url 'core:blog' %}">
+                <form method="get" action="{% url 'blog:blog' %}">
                     <div class="relative">
                         <input type="text" 
                                name="q" 
@@ -68,7 +68,7 @@
                 </h3>
                 <ul class="space-y-2">
                     <li>
-                        <a href="{% url 'core:blog' %}" 
+                        <a href="{% url 'blog:blog' %}" 
                            class="text-gray-700 hover:text-purple-600 transition flex items-center justify-between {% if not current_category %}font-semibold text-purple-600{% endif %}">
                             <span>Toutes</span>
                             <i class="fas fa-chevron-right text-xs"></i>
@@ -76,7 +76,7 @@
                     </li>
                     {% for category in categories %}
                     <li>
-                        <a href="{% url 'core:blog' %}?category={{ category.slug }}" 
+                        <a href="{% url 'blog:blog' %}?category={{ category.slug }}" 
                            class="text-gray-700 hover:text-purple-600 transition flex items-center justify-between {% if current_category == category.slug %}font-semibold text-purple-600{% endif %}">
                             <span>{{ category.name }}</span>
                             <i class="fas fa-chevron-right text-xs"></i>
@@ -95,7 +95,7 @@
                 <ul class="space-y-4">
                     {% for recent_post in recent_posts %}
                     <li class="border-b border-gray-200 pb-3 last:border-0 last:pb-0">
-                        <a href="{% url 'core:blog_detail' recent_post.slug %}" 
+                        <a href="{% url 'blog:blog_detail' recent_post.slug %}" 
                            class="text-sm text-gray-700 hover:text-purple-600 transition font-medium line-clamp-2">
                             {{ recent_post.title }}
                         </a>
@@ -117,7 +117,7 @@
                 </h3>
                 <div class="flex flex-wrap gap-2">
                     {% for tag in popular_tags %}
-                    <a href="{% url 'core:blog' %}?tag={{ tag }}" 
+                    <a href="{% url 'blog:blog' %}?tag={{ tag }}" 
                        class="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-xs hover:bg-purple-200 transition {% if current_tag == tag %}bg-purple-600 text-white{% endif %}">
                         {{ tag }}
                     </a>
@@ -152,7 +152,7 @@
                     </span>
                     {% endif %}
                 </div>
-                <a href="{% url 'core:blog' %}" class="text-purple-600 hover:text-purple-800 text-sm font-medium">
+                <a href="{% url 'blog:blog' %}" class="text-purple-600 hover:text-purple-800 text-sm font-medium">
                     <i class="fas fa-times-circle mr-1"></i> Réinitialiser
                 </a>
             </div>
@@ -193,7 +193,7 @@
                         
                         <!-- Title -->
                         <h3 class="text-xl font-bold text-gray-900 mb-3 group-hover:text-purple-600 transition line-clamp-2">
-                            <a href="{% url 'core:blog_detail' post.slug %}">
+                            <a href="{% url 'blog:blog_detail' post.slug %}">
                                 {{ post.title }}
                             </a>
                         </h3>
@@ -215,7 +215,7 @@
                                     {{ post.views_count }}
                                 </span>
                             </div>
-                            <a href="{% url 'core:blog_detail' post.slug %}" 
+                            <a href="{% url 'blog:blog_detail' post.slug %}" 
                                class="text-purple-600 hover:text-purple-800 font-semibold text-sm flex items-center">
                                 Lire la suite
                                 <i class="fas fa-arrow-right ml-1"></i>
@@ -270,7 +270,7 @@
                     {% endif %}
                 </p>
                 {% if search_query or current_category or current_tag %}
-                <a href="{% url 'core:blog' %}" 
+                <a href="{% url 'blog:blog' %}" 
                    class="inline-block bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 transition font-semibold">
                     <i class="fas fa-undo mr-2"></i>
                     Voir tous les articles

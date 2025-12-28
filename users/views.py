@@ -19,7 +19,8 @@ from .forms import (
     CustomAuthenticationForm,
     ProfileUpdateForm,
     ProjectOwnerProfileUpdateForm,
-    InvestorProfileUpdateForm
+    InvestorProfileUpdateForm,
+    CustomPasswordChangeForm
 )
 from .models import User, ProjectOwnerProfile, InvestorProfile
 
@@ -356,6 +357,26 @@ def profile_edit(request):
     }
     
     return render(request, 'users/profile_edit.html', context)
+
+
+@login_required
+def change_password(request):
+    """Page de changement de mot de passe"""
+    if request.method == 'POST':
+        form = CustomPasswordChangeForm(user=request.user, data=request.POST)
+        if form.is_valid():
+            user = form.save()
+            # Mettre à jour la session pour éviter la déconnexion
+            from django.contrib.auth import update_session_auth_hash
+            update_session_auth_hash(request, user)
+            messages.success(request, 'Votre mot de passe a été changé avec succès.')
+            return redirect('users:profile')
+        else:
+            messages.error(request, 'Veuillez corriger les erreurs ci-dessous.')
+    else:
+        form = CustomPasswordChangeForm(user=request.user)
+    
+    return render(request, 'users/change_password.html', {'form': form})
 
 
 # ============================================

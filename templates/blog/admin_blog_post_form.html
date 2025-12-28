@@ -11,7 +11,7 @@
         <div class="mb-8">
             <div class="flex items-center justify-between">
                 <h1 class="text-3xl font-bold text-gray-900">{{ action }} un Article</h1>
-                <a href="{% url 'core:admin_blog_posts' %}" 
+                <a href="{% url 'blog:admin_blog_posts' %}" 
                    class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition">
                     ← Retour
                 </a>
@@ -121,7 +121,7 @@
                 </div>
 
                 <div class="flex items-center justify-end space-x-4 pt-6 border-t">
-                    <a href="{% url 'core:admin_blog_posts' %}" 
+                    <a href="{% url 'blog:admin_blog_posts' %}" 
                        class="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition">
                         Annuler
                     </a>

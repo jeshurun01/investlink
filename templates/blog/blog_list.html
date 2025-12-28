@@ -1,0 +1,188 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Blog - InvestLink{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+    <!-- Hero Section -->
+    <div class="bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-16">
+        <div class="container mx-auto px-4">
+            <h1 class="text-4xl md:text-5xl font-bold mb-4">Blog InvestLink</h1>
+            <p class="text-xl text-indigo-100">Actualités, conseils et tendances de l'investissement</p>
+        </div>
+    </div>
+
+    <div class="container mx-auto px-4 py-12">
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+            <!-- Sidebar -->
+            <div class="lg:col-span-1">
+                <!-- Search -->
+                <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+                    <h3 class="text-lg font-semibold mb-4">Rechercher</h3>
+                    <form method="get" action="{% url 'blog:blog_list' %}">
+                        <input 
+                            type="text" 
+                            name="q" 
+                            value="{{ search_query|default:'' }}"
+                            placeholder="Rechercher un article..." 
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                        >
+                        <button type="submit" class="mt-3 w-full bg-indigo-600 text-white py-2 rounded-lg hover:bg-indigo-700 transition">
+                            Rechercher
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Categories -->
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-lg font-semibold mb-4">Catégories</h3>
+                    <ul class="space-y-2">
+                        <li>
+                            <a href="{% url 'blog:blog_list' %}" 
+                               class="flex items-center justify-between text-gray-700 hover:text-indigo-600 transition {% if not current_category %}font-semibold text-indigo-600{% endif %}">
+                                <span>Tous les articles</span>
+                            </a>
+                        </li>
+                        {% for category in categories %}
+                        <li>
+                            <a href="{% url 'blog:blog_list' %}?category={{ category.slug }}" 
+                               class="flex items-center justify-between text-gray-700 hover:text-indigo-600 transition {% if current_category == category.slug %}font-semibold text-indigo-600{% endif %}">
+                                <span>{{ category.name }}</span>
+                                <span class="bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded-full">{{ category.post_count }}</span>
+                            </a>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="lg:col-span-3">
+                <!-- Featured Posts -->
+                {% if featured_posts and not search_query and not current_category %}
+                <div class="mb-12">
+                    <h2 class="text-2xl font-bold mb-6 flex items-center">
+                        <svg class="w-6 h-6 mr-2 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                        </svg>
+                        Articles en vedette
+                    </h2>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        {% for post in featured_posts %}
+                        <a href="{% url 'blog:post_detail' post.slug %}" class="group">
+                            <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition duration-300">
+                                {% if post.featured_image %}
+                                <img src="{{ post.featured_image.url }}" alt="{{ post.title }}" class="w-full h-48 object-cover group-hover:scale-105 transition duration-300">
+                                {% else %}
+                                <div class="w-full h-48 bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
+                                    <span class="text-white text-4xl font-bold">{{ post.title.0 }}</span>
+                                </div>
+                                {% endif %}
+                                <div class="p-4">
+                                    <h3 class="font-semibold text-lg mb-2 group-hover:text-indigo-600 transition line-clamp-2">{{ post.title }}</h3>
+                                    <p class="text-sm text-gray-600">{{ post.published_at|date:"d M Y" }}</p>
+                                </div>
+                            </div>
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- All Posts -->
+                <div>
+                    {% if search_query %}
+                    <h2 class="text-2xl font-bold mb-6">Résultats pour "{{ search_query }}"</h2>
+                    {% elif current_category %}
+                    <h2 class="text-2xl font-bold mb-6">Articles dans "{{ categories|first.name }}"</h2>
+                    {% else %}
+                    <h2 class="text-2xl font-bold mb-6">Tous les articles</h2>
+                    {% endif %}
+
+                    {% if page_obj %}
+                    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                        {% for post in page_obj %}
+                        <article class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition duration-300 flex flex-col">
+                            <a href="{% url 'blog:post_detail' post.slug %}" class="group">
+                                {% if post.featured_image %}
+                                <img src="{{ post.featured_image.url }}" alt="{{ post.title }}" class="w-full h-48 object-cover group-hover:scale-105 transition duration-300">
+                                {% else %}
+                                <div class="w-full h-48 bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
+                                    <span class="text-white text-5xl font-bold">{{ post.title.0 }}</span>
+                                </div>
+                                {% endif %}
+                            </a>
+                            <div class="p-6 flex-1 flex flex-col">
+                                <div class="mb-3 flex items-center justify-between">
+                                    {% if post.category %}
+                                    <span class="text-xs font-semibold text-indigo-600 bg-indigo-50 px-3 py-1 rounded-full">
+                                        {{ post.category.name }}
+                                    </span>
+                                    {% endif %}
+                                    <span class="text-xs text-gray-500 flex items-center">
+                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                        </svg>
+                                        {{ post.views_count }}
+                                    </span>
+                                </div>
+                                <a href="{% url 'blog:post_detail' post.slug %}">
+                                    <h3 class="text-xl font-bold mb-3 hover:text-indigo-600 transition line-clamp-2">{{ post.title }}</h3>
+                                </a>
+                                <p class="text-gray-600 mb-4 flex-1 line-clamp-3">{{ post.excerpt|default:post.content|truncatewords:20 }}</p>
+                                <div class="flex items-center justify-between text-sm text-gray-500 mt-auto">
+                                    <span>{{ post.published_at|date:"d M Y" }}</span>
+                                    <a href="{% url 'blog:post_detail' post.slug %}" class="text-indigo-600 hover:text-indigo-800 font-semibold flex items-center">
+                                        Lire plus
+                                        <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                        </svg>
+                                    </a>
+                                </div>
+                            </div>
+                        </article>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Pagination -->
+                    {% if page_obj.has_other_pages %}
+                    <div class="mt-12 flex justify-center">
+                        <nav class="flex items-center space-x-2">
+                            {% if page_obj.has_previous %}
+                            <a href="?page={{ page_obj.previous_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if current_category %}&category={{ current_category }}{% endif %}" 
+                               class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition">
+                                Précédent
+                            </a>
+                            {% endif %}
+
+                            <span class="px-4 py-2 text-gray-700">
+                                Page {{ page_obj.number }} sur {{ page_obj.paginator.num_pages }}
+                            </span>
+
+                            {% if page_obj.has_next %}
+                            <a href="?page={{ page_obj.next_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if current_category %}&category={{ current_category }}{% endif %}" 
+                               class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition">
+                                Suivant
+                            </a>
+                            {% endif %}
+                        </nav>
+                    </div>
+                    {% endif %}
+
+                    {% else %}
+                    <div class="text-center py-12">
+                        <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        <h3 class="mt-2 text-lg font-medium text-gray-900">Aucun article trouvé</h3>
+                        <p class="mt-1 text-gray-500">Essayez une autre recherche ou catégorie.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

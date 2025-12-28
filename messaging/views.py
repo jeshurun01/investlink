@@ -46,11 +46,15 @@ def inbox(request):
 @login_required
 def conversation_detail(request, pk):
     """Détail d'une conversation avec envoi de message"""
-    conversation = get_object_or_404(
-        Conversation.objects.prefetch_related('participants'),
-        pk=pk,
-        participants=request.user
-    )
+    # Vérifier que la conversation existe
+    try:
+        conversation = Conversation.objects.prefetch_related('participants').get(
+            pk=pk,
+            participants=request.user
+        )
+    except Conversation.DoesNotExist:
+        django_messages.error(request, "Cette conversation n'existe pas ou vous n'y avez pas accès.")
+        return redirect('messaging:inbox')
     
     # Marquer les messages non lus comme lus
     unread_messages = conversation.messages.filter(

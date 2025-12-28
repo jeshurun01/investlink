@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}Supprimer la Catégorie - Admin{% endblock %}
+{% block title %}Supprimer l'Article - Admin{% endblock %}
 
 {% block content %}
 <div class="min-h-screen bg-gray-50 py-8">
@@ -13,17 +13,17 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
                     </svg>
                 </div>
-                <h2 class="text-2xl font-bold text-gray-900 mb-2">Supprimer la catégorie ?</h2>
-                <p class="text-gray-600">Les articles de cette catégorie ne seront pas supprimés mais n'auront plus de catégorie</p>
+                <h2 class="text-2xl font-bold text-gray-900 mb-2">Supprimer l'article ?</h2>
+                <p class="text-gray-600">Cette action est irréversible</p>
             </div>
 
             <div class="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
-                <p class="text-sm text-red-800 font-medium">{{ category.name }}</p>
+                <p class="text-sm text-red-800 font-medium">{{ post.title }}</p>
             </div>
 
             <form method="post" class="flex items-center justify-center space-x-4">
                 {% csrf_token %}
-                <a href="{% url 'core:admin_categories' %}" 
+                <a href="{% url 'blog:admin_blog_posts' %}" 
                    class="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition">
                     Annuler
                 </a>
