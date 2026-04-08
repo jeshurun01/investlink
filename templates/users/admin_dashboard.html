@@ -116,6 +116,55 @@
         </div>
     </section>
     
+    <!-- 💰 Statistiques Investissements -->
+    <section class="mb-8">
+        <h2 class="text-2xl font-bold text-gray-900 mb-6 flex items-center">
+            <i class="fas fa-chart-pie text-purple-600 mr-2"></i>
+            Statistiques Investissements
+        </h2>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+            <!-- Total Investissements -->
+            <div class="bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl shadow-lg p-6 text-white transform hover:scale-105 transition">
+                <div class="flex items-center justify-between mb-3">
+                    <i class="fas fa-chart-line text-3xl opacity-80"></i>
+                    <span class="bg-white/20 px-2 py-1 rounded text-xs font-medium">Total</span>
+                </div>
+                <p class="text-4xl font-bold mb-1">{{ total_investments }}</p>
+                <p class="text-purple-100 text-sm">Investissements</p>
+            </div>
+            
+            <!-- Montant Total Investi -->
+            <div class="bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-xl shadow-lg p-6 text-white transform hover:scale-105 transition">
+                <div class="flex items-center justify-between mb-3">
+                    <i class="fas fa-dollar-sign text-3xl opacity-80"></i>
+                    <span class="bg-white/20 px-2 py-1 rounded text-xs font-medium">Confirmé</span>
+                </div>
+                <p class="text-4xl font-bold mb-1">${{ total_invested|floatformat:0 }}</p>
+                <p class="text-emerald-100 text-sm">Montant total</p>
+            </div>
+            
+            <!-- Investissement Moyen -->
+            <div class="bg-gradient-to-br from-cyan-500 to-cyan-600 rounded-xl shadow-lg p-6 text-white transform hover:scale-105 transition">
+                <div class="flex items-center justify-between mb-3">
+                    <i class="fas fa-balance-scale text-3xl opacity-80"></i>
+                    <span class="bg-white/20 px-2 py-1 rounded text-xs font-medium">Moyenne</span>
+                </div>
+                <p class="text-4xl font-bold mb-1">${{ avg_investment|floatformat:0 }}</p>
+                <p class="text-cyan-100 text-sm">Par investissement</p>
+            </div>
+            
+            <!-- Valeur Actuelle -->
+            <div class="bg-gradient-to-br from-teal-500 to-teal-600 rounded-xl shadow-lg p-6 text-white transform hover:scale-105 transition">
+                <div class="flex items-center justify-between mb-3">
+                    <i class="fas fa-trending-up text-3xl opacity-80"></i>
+                    <span class="bg-white/20 px-2 py-1 rounded text-xs font-medium">Valeur</span>
+                </div>
+                <p class="text-4xl font-bold mb-1">${{ total_current_value|floatformat:0 }}</p>
+                <p class="text-teal-100 text-sm">Valeur actuelle</p>
+            </div>
+        </div>
+    </section>
+    
     <!-- 🎯 Actions Rapides -->
     <section class="mb-8">
         <h2 class="text-2xl font-bold text-gray-900 mb-6 flex items-center">
@@ -123,6 +172,11 @@
             Actions Rapides
         </h2>
         <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+            <a href="{% url 'users:admin_create_user' %}" class="bg-white border-2 border-gray-200 rounded-lg p-4 hover:border-indigo-500 hover:shadow-md transition text-center group">
+                <i class="fas fa-user-plus text-3xl text-indigo-500 mb-2 group-hover:scale-110 transition"></i>
+                <p class="font-semibold text-gray-900 text-sm">Créer Utilisateur</p>
+            </a>
+            
             <a href="{% url 'projects:admin_pending' %}" class="bg-white border-2 border-gray-200 rounded-lg p-4 hover:border-yellow-500 hover:shadow-md transition text-center group">
                 <i class="fas fa-tasks text-3xl text-yellow-500 mb-2 group-hover:scale-110 transition"></i>
                 <p class="font-semibold text-gray-900 text-sm">Validation Projets</p>
@@ -134,6 +188,14 @@
             <a href="{% url 'projects:admin_pending_investments' %}" class="bg-white border-2 border-gray-200 rounded-lg p-4 hover:border-orange-500 hover:shadow-md transition text-center group">
                 <i class="fas fa-wallet text-3xl text-orange-500 mb-2 group-hover:scale-110 transition"></i>
                 <p class="font-semibold text-gray-900 text-sm">Validation Invest.</p>
+                {% if pending_investments > 0 %}
+                <span class="inline-block mt-1 px-2 py-1 bg-orange-100 text-orange-800 text-xs font-bold rounded-full">{{ pending_investments }}</span>
+                {% endif %}
+            </a>
+            
+            <a href="{% url 'projects:admin_all_investments' %}" class="bg-white border-2 border-gray-200 rounded-lg p-4 hover:border-purple-500 hover:shadow-md transition text-center group">
+                <i class="fas fa-hand-holding-usd text-3xl text-purple-500 mb-2 group-hover:scale-110 transition"></i>
+                <p class="font-semibold text-gray-900 text-sm">Tous Investiss.</p>
             </a>
             
             <a href="{% url 'users:admin_users' %}" class="bg-white border-2 border-gray-200 rounded-lg p-4 hover:border-blue-500 hover:shadow-md transition text-center group">
@@ -156,7 +218,7 @@
                 <p class="font-semibold text-gray-900 text-sm">Nouvel Article</p>
             </a>
             
-            <a href="{% url 'core:admin_contact_messages' %}" class="bg-white border-2 border-gray-200 rounded-lg p-4 hover:border-cyan-500 hover:shadow-md transition text-center group">
+            <a href="{% url 'core:contact' %}" class="bg-white border-2 border-gray-200 rounded-lg p-4 hover:border-cyan-500 hover:shadow-md transition text-center group">
                 <i class="fas fa-envelope-open-text text-3xl text-cyan-500 mb-2 group-hover:scale-110 transition"></i>
                 <p class="font-semibold text-gray-900 text-sm">Messages Contact</p>
             </a>
@@ -235,6 +297,32 @@
                             <div class="bg-red-50 rounded-lg p-4 border border-red-200">
                                 <p class="text-sm text-gray-600 mb-1">Refusés</p>
                                 <p class="text-2xl font-bold text-red-600">{{ rejected_projects }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Investissements détaillés -->
+                    <div class="mb-6">
+                        <h3 class="text-lg font-semibold text-gray-700 mb-4 flex items-center">
+                            <i class="fas fa-hand-holding-usd text-purple-600 mr-2"></i>
+                            État des Investissements
+                        </h3>
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                                <p class="text-sm text-gray-600 mb-1">Total</p>
+                                <p class="text-2xl font-bold text-gray-900">{{ total_investments }}</p>
+                            </div>
+                            <div class="bg-yellow-50 rounded-lg p-4 border border-yellow-200">
+                                <p class="text-sm text-gray-600 mb-1">En attente</p>
+                                <p class="text-2xl font-bold text-yellow-600">{{ pending_investments }}</p>
+                            </div>
+                            <div class="bg-green-50 rounded-lg p-4 border border-green-200">
+                                <p class="text-sm text-gray-600 mb-1">Confirmés</p>
+                                <p class="text-2xl font-bold text-green-600">{{ confirmed_investments }}</p>
+                            </div>
+                            <div class="bg-red-50 rounded-lg p-4 border border-red-200">
+                                <p class="text-sm text-gray-600 mb-1">Rejetés</p>
+                                <p class="text-2xl font-bold text-red-600">{{ rejected_investments }}</p>
                             </div>
                         </div>
                     </div>

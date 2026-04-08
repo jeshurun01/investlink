@@ -1,7 +1,21 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, PasswordChangeForm
 from django.core.exceptions import ValidationError
+from django.conf import settings
+import os
 from .models import User, ProjectOwnerProfile, InvestorProfile
+
+
+def validate_avatar_file(file):
+    """Valide le fichier avatar"""
+    # Vérifier la taille
+    if file.size > settings.MAX_UPLOAD_SIZE:
+        raise ValidationError(f'La taille du fichier ne doit pas dépasser {settings.MAX_UPLOAD_SIZE / (1024 * 1024):.0f} MB.')
+    
+    # Vérifier l'extension
+    ext = os.path.splitext(file.name)[1].lower()
+    if ext not in settings.ALLOWED_IMAGE_EXTENSIONS:
+        raise ValidationError(f'Extension de fichier non autorisée. Extensions acceptées : {", ".join(settings.ALLOWED_IMAGE_EXTENSIONS)}.')
 
 
 class UserRegistrationForm(UserCreationForm):
@@ -117,6 +131,11 @@ class ProjectOwnerRegistrationForm(UserRegistrationForm):
             'placeholder': 'https://www.example.com'
         })
     )
+    gdpr_consent = forms.BooleanField(
+        required=True,
+        label='J\'accepte la politique de confidentialité et les conditions d\'utilisation (RGPD)',
+        widget=forms.CheckboxInput(attrs={'class': 'checkbox-field'})
+    )
     
     class Meta:
         model = User
@@ -146,6 +165,9 @@ class ProjectOwnerRegistrationForm(UserRegistrationForm):
         
         if commit:
             user.save()
+            # Enregistrer le consentement RGPD
+            if self.cleaned_data.get('gdpr_consent'):
+                user.give_gdpr_consent()
             # Créer le profil porteur avec les infos supplémentaires
             ProjectOwnerProfile.objects.create(
                 user=user,
@@ -190,6 +212,11 @@ class InvestorRegistrationForm(UserRegistrationForm):
             'placeholder': 'Kinshasa, RDC, Afrique...'
         })
     )
+    gdpr_consent = forms.BooleanField(
+        required=True,
+        label='J\'accepte la politique de confidentialité et les conditions d\'utilisation (RGPD)',
+        widget=forms.CheckboxInput(attrs={'class': 'checkbox-field'})
+    )
     
     class Meta:
         model = User
@@ -219,6 +246,9 @@ class InvestorRegistrationForm(UserRegistrationForm):
         
         if commit:
             user.save()
+            # Enregistrer le consentement RGPD
+            if self.cleaned_data.get('gdpr_consent'):
+                user.give_gdpr_consent()
             # Créer le profil investisseur avec les préférences
             InvestorProfile.objects.create(
                 user=user,
@@ -266,9 +296,16 @@ class ProfileUpdateForm(forms.ModelForm):
             'last_name': forms.TextInput(attrs={'class': 'input-field'}),
             'email': forms.EmailInput(attrs={'class': 'input-field'}),
             'phone': forms.TextInput(attrs={'class': 'input-field'}),
-            'avatar': forms.FileInput(attrs={'class': 'file-input'}),
+            'avatar': forms.FileInput(attrs={'class': 'file-input', 'accept': 'image/*'}),
             'bio': forms.Textarea(attrs={'class': 'input-field', 'rows': 4}),
         }
+    
+    def clean_avatar(self):
+        """Valider le fichier avatar"""
+        avatar = self.cleaned_data.get('avatar')
+        if avatar:
+            validate_avatar_file(avatar)
+        return avatar
 
 
 class ProjectOwnerProfileUpdateForm(forms.ModelForm):
@@ -326,3 +363,99 @@ class CustomPasswordChangeForm(PasswordChangeForm):
             'placeholder': 'Confirmez votre nouveau mot de passe'
         })
     )
+
+class AdminCreateUserForm(forms.ModelForm):
+    """Formulaire admin pour créer un nouvel utilisateur"""
+    
+    password = forms.CharField(
+        label='Mot de passe',
+        widget=forms.PasswordInput(attrs={
+            'class': 'input-field',
+            'placeholder': 'Mot de passe (minimum 8 caractères)'
+        }),
+        help_text='Minimum 8 caractères'
+    )
+    password_confirm = forms.CharField(
+        label='Confirmer le mot de passe',
+        widget=forms.PasswordInput(attrs={
+            'class': 'input-field',
+            'placeholder': 'Confirmez le mot de passe'
+        })
+    )
+    
+    class Meta:
+        model = User
+        fields = ['username', 'email', 'first_name', 'last_name', 'phone', 'user_type', 'is_active', 'is_staff']
+        widgets = {
+            'username': forms.TextInput(attrs={
+                'class': 'input-field',
+                'placeholder': 'Nom d\'utilisateur'
+            }),
+            'email': forms.EmailInput(attrs={
+                'class': 'input-field',
+                'placeholder': 'adresse@email.com'
+            }),
+            'first_name': forms.TextInput(attrs={
+                'class': 'input-field',
+                'placeholder': 'Prénom'
+            }),
+            'last_name': forms.TextInput(attrs={
+                'class': 'input-field',
+                'placeholder': 'Nom'
+            }),
+            'phone': forms.TextInput(attrs={
+                'class': 'input-field',
+                'placeholder': '+243 XXX XXX XXX'
+            }),
+            'user_type': forms.Select(attrs={
+                'class': 'input-field'
+            }),
+        }
+        labels = {
+            'username': 'Nom d\'utilisateur',
+            'email': 'Email',
+            'first_name': 'Prénom',
+            'last_name': 'Nom',
+            'phone': 'Téléphone',
+            'user_type': 'Type d\'utilisateur',
+            'is_active': 'Compte actif',
+            'is_staff': 'Statut administrateur',
+        }
+    
+    def clean_email(self):
+        """Vérifier que l'email n'existe pas déjà"""
+        email = self.cleaned_data.get('email')
+        if User.objects.filter(email=email).exists():
+            raise ValidationError('Un utilisateur avec cet email existe déjà.')
+        return email
+    
+    def clean_username(self):
+        """Vérifier que le nom d'utilisateur n'existe pas déjà"""
+        username = self.cleaned_data.get('username')
+        if User.objects.filter(username=username).exists():
+            raise ValidationError('Ce nom d\'utilisateur est déjà pris.')
+        return username
+    
+    def clean(self):
+        """Valider que les mots de passe correspondent"""
+        cleaned_data = super().clean()
+        password = cleaned_data.get('password')
+        password_confirm = cleaned_data.get('password_confirm')
+        
+        if password and password_confirm:
+            if password != password_confirm:
+                raise ValidationError('Les mots de passe ne correspondent pas.')
+            if len(password) < 8:
+                raise ValidationError('Le mot de passe doit contenir au moins 8 caractères.')
+        
+        return cleaned_data
+    
+    def save(self, commit=True):
+        """Créer l'utilisateur avec le mot de passe hashé"""
+        user = super().save(commit=False)
+        user.set_password(self.cleaned_data['password'])
+        
+        if commit:
+            user.save()
+        
+        return user

@@ -1,6 +1,21 @@
 from django import forms
 from django.core.exceptions import ValidationError
+from django.conf import settings
+import os
 from .models import Project, ProjectDocument
+
+
+def validate_file_size(file):
+    """Valide la taille d'un fichier"""
+    if file.size > settings.MAX_UPLOAD_SIZE:
+        raise ValidationError(f'La taille du fichier ne doit pas dépasser {settings.MAX_UPLOAD_SIZE / (1024 * 1024):.0f} MB.')
+
+
+def validate_file_extension(file, allowed_extensions):
+    """Valide l'extension d'un fichier"""
+    ext = os.path.splitext(file.name)[1].lower()
+    if ext not in allowed_extensions:
+        raise ValidationError(f'Extension de fichier non autorisée. Extensions acceptées : {", ".join(allowed_extensions)}.')
 
 
 class ProjectValidationForm(forms.ModelForm):
@@ -211,31 +226,39 @@ class ProjectSubmissionForm(forms.ModelForm):
         """Valider le fichier business plan"""
         file = self.cleaned_data.get('business_plan')
         if file:
-            # Vérifier la taille (10 MB max)
-            if file.size > 10 * 1024 * 1024:
-                raise ValidationError('La taille du fichier ne doit pas dépasser 10 MB.')
-            
-            # Vérifier l'extension
-            allowed_extensions = ['.pdf', '.doc', '.docx']
-            file_extension = file.name.lower().split('.')[-1]
-            if f'.{file_extension}' not in allowed_extensions:
-                raise ValidationError('Format non autorisé. Utilisez PDF, DOC ou DOCX.')
-        
+            validate_file_size(file)
+            validate_file_extension(file, settings.ALLOWED_DOCUMENT_EXTENSIONS)
         return file
+    
+    def clean_financial_documents(self):
+        """Valider les documents financiers"""
+        files = self.cleaned_data.get('financial_documents')
+        if files:
+            if not isinstance(files, list):
+                files = [files]
+            for file in files:
+                validate_file_size(file)
+                validate_file_extension(file, settings.ALLOWED_DOCUMENT_EXTENSIONS)
+        return files
+    
+    def clean_legal_documents(self):
+        """Valider les documents juridiques"""
+        files = self.cleaned_data.get('legal_documents')
+        if files:
+            if not isinstance(files, list):
+                files = [files]
+            for file in files:
+                validate_file_size(file)
+                validate_file_extension(file, ['.pdf'])
+        return files
     
     def clean_featured_image(self):
         """Valider l'image principale"""
-        image = self.cleaned_data.get('featured_image')
-        if image:
-            # Vérifier la taille (5 MB max)
-            if image.size > 5 * 1024 * 1024:
-                raise ValidationError('La taille de l\'image ne doit pas dépasser 5 MB.')
-            
-            # Vérifier que c'est bien une image
-            if not image.content_type.startswith('image/'):
-                raise ValidationError('Le fichier doit être une image.')
-        
-        return image
+        file = self.cleaned_data.get('featured_image')
+        if file:
+            validate_file_size(file)
+            validate_file_extension(file, settings.ALLOWED_IMAGE_EXTENSIONS)
+        return file
     
     def clean_video_url(self):
         """Valider l'URL de la vidéo"""

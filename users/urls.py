@@ -20,6 +20,14 @@ urlpatterns = [
     path('password-reset/confirm/<uidb64>/<token>/', views.password_reset_confirm, name='password_reset_confirm'),
     path('password-reset/complete/', views.password_reset_complete, name='password_reset_complete'),
     
+    # Email verification
+    path('verify-email/<str:token>/', views.verify_email, name='verify_email'),
+    path('resend-verification/', views.resend_verification, name='resend_verification'),
+    
+    # RGPD / GDPR
+    path('export-data/', views.export_my_data, name='export_data'),
+    path('delete-account/', views.delete_account, name='delete_account'),
+    
     # Profil et dashboard
     path('dashboard/', views.dashboard, name='dashboard'),
     path('profile/', views.profile, name='profile'),
@@ -29,6 +37,7 @@ urlpatterns = [
     # Interface administrateur
     path('admin/dashboard/', views.admin_dashboard, name='admin_dashboard'),
     path('admin/users/', views.admin_users, name='admin_users'),
+    path('admin/users/create/', views.admin_create_user, name='admin_create_user'),
     path('admin/users/<int:user_id>/', views.admin_user_detail, name='admin_user_detail'),
     path('admin/users/<int:user_id>/toggle-status/', views.admin_toggle_user_status, name='admin_toggle_user_status'),
     path('admin/users/<int:user_id>/delete/', views.admin_delete_user, name='admin_delete_user'),

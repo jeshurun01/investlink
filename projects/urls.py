@@ -25,6 +25,7 @@ urlpatterns = [
     
     # Administration - Validation des investissements
     path('admin/investments/', views.admin_pending_investments, name='admin_pending_investments'),
+    path('admin/investments/all/', views.admin_pending_investments, name='admin_all_investments'),
     path('admin/investments/<int:investment_id>/validate/', views.admin_validate_investment, name='admin_validate_investment'),
     
     # Détails et édition (doivent être en dernier pour éviter les conflits)

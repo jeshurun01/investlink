@@ -1,6 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.urls import reverse
+from django.utils import timezone
+import uuid
 
 
 class User(AbstractUser):
@@ -26,7 +28,16 @@ class User(AbstractUser):
         verbose_name='Photo de profil'
     )
     bio = models.TextField(blank=True, verbose_name='Biographie')
+    
+    # Email verification fields
     email_verified = models.BooleanField(default=False, verbose_name='Email vérifié')
+    verification_token = models.CharField(max_length=100, blank=True, null=True, verbose_name='Token de vérification')
+    token_expires_at = models.DateTimeField(blank=True, null=True, verbose_name='Expiration du token')
+    
+    # GDPR compliance fields
+    gdpr_consent = models.BooleanField(default=False, verbose_name='Consentement RGPD')
+    gdpr_consent_date = models.DateTimeField(blank=True, null=True, verbose_name='Date consentement RGPD')
+    
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='Date d\'inscription')
     updated_at = models.DateTimeField(auto_now=True, verbose_name='Dernière modification')
     
@@ -52,6 +63,33 @@ class User(AbstractUser):
     def is_admin_user(self):
         """Vérifie si l'utilisateur est admin"""
         return self.user_type == 'admin' or self.is_staff or self.is_superuser
+    
+    def generate_verification_token(self):
+        """Génère un token de vérification unique"""
+        from datetime import timedelta
+        self.verification_token = str(uuid.uuid4())
+        self.token_expires_at = timezone.now() + timedelta(hours=24)
+        self.save()
+        return self.verification_token
+    
+    def is_verification_token_valid(self):
+        """Vérifie si le token de vérification est toujours valide"""
+        if not self.verification_token or not self.token_expires_at:
+            return False
+        return timezone.now() < self.token_expires_at
+    
+    def verify_email(self):
+        """Marque l'email comme vérifié et supprime le token"""
+        self.email_verified = True
+        self.verification_token = None
+        self.token_expires_at = None
+        self.save()
+    
+    def give_gdpr_consent(self):
+        """Enregistre le consentement RGPD"""
+        self.gdpr_consent = True
+        self.gdpr_consent_date = timezone.now()
+        self.save()
 
 
 class ProjectOwnerProfile(models.Model):

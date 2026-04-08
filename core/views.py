@@ -4,6 +4,7 @@ from django.core.paginator import Paginator
 from django.db.models import Q, Count
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.utils import timezone
+from django.http import JsonResponse
 from .forms import ContactForm
 from .models import BlogPost, BlogCategory, ActivityLog
 
@@ -97,7 +98,52 @@ def blog_detail(request, slug):
 
 
 def contact(request):
-    """Page Contact avec formulaire"""
+    """Page Contact - Formulaire pour visiteurs, Liste de messages pour admins"""
+    # Si l'utilisateur est admin, afficher la liste des messages
+    if request.user.is_authenticated and request.user.is_staff:
+        from .models import ContactMessage
+        
+        # Filtres
+        status_filter = request.GET.get('status', '')
+        search = request.GET.get('q', '')
+        
+        # Récupérer tous les messages
+        contact_messages = ContactMessage.objects.select_related('user').order_by('-created_at')
+        
+        # Appliquer les filtres
+        if status_filter:
+            contact_messages = contact_messages.filter(status=status_filter)
+        
+        if search:
+            contact_messages = contact_messages.filter(
+                Q(name__icontains=search) |
+                Q(email__icontains=search) |
+                Q(subject__icontains=search) |
+                Q(message__icontains=search)
+            )
+        
+        # Pagination
+        paginator = Paginator(contact_messages, 20)
+        page_number = request.GET.get('page')
+        page_obj = paginator.get_page(page_number)
+        
+        # Statistiques
+        stats = {
+            'total': ContactMessage.objects.count(),
+            'new': ContactMessage.objects.filter(status='new').count(),
+            'in_progress': ContactMessage.objects.filter(status='in_progress').count(),
+            'resolved': ContactMessage.objects.filter(status='resolved').count(),
+        }
+        
+        context = {
+            'page_obj': page_obj,
+            'stats': stats,
+            'status_filter': status_filter,
+            'search': search,
+        }
+        return render(request, 'core/contact_admin.html', context)
+    
+    # Pour les utilisateurs normaux, afficher le formulaire
     if request.method == 'POST':
         form = ContactForm(request.POST)
         if form.is_valid():
@@ -142,6 +188,88 @@ def contact(request):
         form = ContactForm(initial=initial_data)
     
     return render(request, 'core/contact.html', {'form': form})
+
+
+def contact_message_detail(request, message_id):
+    """Détails d'un message de contact (admin seulement)"""
+    if not request.user.is_staff:
+        messages.error(request, "Vous n'avez pas accès à cette page.")
+        return redirect('core:home')
+    
+    from .models import ContactMessage
+    
+    message = get_object_or_404(ContactMessage, id=message_id)
+    
+    # Marquer comme lu automatiquement
+    if message.status == 'new':
+        message.mark_as_read()
+    
+    # Traitement du formulaire de mise à jour
+    if request.method == 'POST':
+        new_status = request.POST.get('status')
+        admin_notes = request.POST.get('admin_notes', '')
+        
+        if new_status in dict(ContactMessage.STATUS_CHOICES).keys():
+            message.status = new_status
+            if admin_notes:
+                message.admin_notes = admin_notes
+            if new_status == 'resolved' and not message.resolved_at:
+                from django.utils import timezone
+                message.resolved_at = timezone.now()
+            message.save()
+            
+            # Log de l'action
+            ActivityLog.log(
+                user=request.user,
+                action='update',
+                entity_type='message',
+                entity_id=message.id,
+                entity_name=f"{message.name} - {message.subject}",
+                description=f"Statut du message mis à jour : {new_status}",
+                request=request
+            )
+            
+            messages.success(request, 'Le message a été mis à jour.')
+            return redirect('core:contact_message_detail', message_id=message.id)
+    
+    context = {
+        'message': message,
+        'status_choices': ContactMessage.STATUS_CHOICES,
+    }
+    return render(request, 'core/contact_message_detail.html', context)
+
+
+def contact_message_update_status(request, message_id):
+    """Mise à jour rapide du statut d'un message (AJAX)"""
+    if not request.user.is_staff or request.method != 'POST':
+        return JsonResponse({'success': False, 'error': 'Non autorisé'}, status=403)
+    
+    from .models import ContactMessage
+    
+    message = get_object_or_404(ContactMessage, id=message_id)
+    new_status = request.POST.get('status')
+    
+    if new_status in dict(ContactMessage.STATUS_CHOICES).keys():
+        message.status = new_status
+        if new_status == 'resolved' and not message.resolved_at:
+            from django.utils import timezone
+            message.resolved_at = timezone.now()
+        message.save()
+        
+        # Log de l'action
+        ActivityLog.log(
+            user=request.user,
+            action='update',
+            entity_type='message',
+            entity_id=message.id,
+            entity_name=f"{message.name} - {message.subject}",
+            description=f"Statut mis à jour : {new_status}",
+            request=request
+        )
+        
+        return JsonResponse({'success': True, 'new_status': new_status})
+    
+    return JsonResponse({'success': False, 'error': 'Statut invalide'}, status=400)
 
 
 def faq(request):
@@ -524,118 +652,4 @@ def admin_activity_logs(request):
     
     
     return render(request, 'core/admin_activity_logs.html', context)
-
-
-# ============================================
-# VUES ADMIN - MESSAGES DE CONTACT
-# ============================================
-
-@login_required
-@user_passes_test(is_admin)
-def admin_contact_messages(request):
-    """Liste des messages de contact"""
-    from .models import ContactMessage
-    
-    # Filtres
-    status = request.GET.get('status', '')
-    search = request.GET.get('q', '')
-    
-    messages_list = ContactMessage.objects.select_related('user').order_by('-created_at')
-    
-    if status:
-        messages_list = messages_list.filter(status=status)
-    
-    if search:
-        messages_list = messages_list.filter(
-            Q(name__icontains=search) |
-            Q(email__icontains=search) |
-            Q(subject__icontains=search) |
-            Q(message__icontains=search)
-        )
-    
-    # Pagination
-    paginator = Paginator(messages_list, 20)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
-    
-    # Statistiques
-    stats = {
-        'total': ContactMessage.objects.count(),
-        'new': ContactMessage.objects.filter(status='new').count(),
-        'read': ContactMessage.objects.filter(status='read').count(),
-        'in_progress': ContactMessage.objects.filter(status='in_progress').count(),
-        'resolved': ContactMessage.objects.filter(status='resolved').count(),
-    }
-    
-    context = {
-        'page_obj': page_obj,
-        'status_choices': ContactMessage.STATUS_CHOICES,
-        'current_status': status,
-        'search_query': search,
-        'stats': stats,
-    }
-    
-    return render(request, 'core/admin_contact_messages.html', context)
-
-
-@login_required
-@user_passes_test(is_admin)
-def admin_contact_message_detail(request, message_id):
-    """Détail d'un message de contact"""
-    from .models import ContactMessage
-    
-    contact_message = get_object_or_404(ContactMessage, id=message_id)
-    
-    # Marquer comme lu si nouveau
-    if contact_message.status == 'new':
-        contact_message.mark_as_read()
-        ActivityLog.log(
-            user=request.user,
-            action='view',
-            entity_type='message',
-            entity_id=contact_message.id,
-            entity_name=f"{contact_message.name} - {contact_message.subject}",
-            description="Consultation du message de contact",
-            request=request
-        )
-    
-    if request.method == 'POST':
-        action = request.POST.get('action')
-        
-        if action == 'update_status':
-            new_status = request.POST.get('status')
-            admin_notes = request.POST.get('admin_notes', '')
-            
-            old_status = contact_message.status
-            contact_message.status = new_status
-            if admin_notes:
-                contact_message.admin_notes = admin_notes
-            
-            if new_status == 'resolved':
-                from django.utils import timezone
-                contact_message.resolved_at = timezone.now()
-            
-            contact_message.save()
-            
-            # Log
-            ActivityLog.log(
-                user=request.user,
-                action='update',
-                entity_type='message',
-                entity_id=contact_message.id,
-                entity_name=f"{contact_message.name} - {contact_message.subject}",
-                description=f"Changement de statut: {old_status} → {new_status}",
-                request=request
-            )
-            
-            messages.success(request, "Le statut du message a été mis à jour.")
-            return redirect('core:admin_contact_message_detail', message_id=message_id)
-    
-    context = {
-        'contact_message': contact_message,
-        'status_choices': ContactMessage.STATUS_CHOICES,
-    }
-    
-    return render(request, 'core/admin_contact_message_detail.html', context)
-
 

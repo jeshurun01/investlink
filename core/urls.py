@@ -16,6 +16,6 @@ urlpatterns = [
     path('content/logs/', views.admin_activity_logs, name='admin_activity_logs'),
     
     # Admin - Messages de contact
-    path('content/messages/', views.admin_contact_messages, name='admin_contact_messages'),
-    path('content/messages/<int:message_id>/', views.admin_contact_message_detail, name='admin_contact_message_detail'),
+    path('contact/message/<int:message_id>/', views.contact_message_detail, name='contact_message_detail'),
+    path('contact/message/<int:message_id>/update-status/', views.contact_message_update_status, name='contact_message_update_status'),
 ]

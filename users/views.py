@@ -36,7 +36,28 @@ def register_porteur(request):
         form = ProjectOwnerRegistrationForm(request.POST)
         if form.is_valid():
             user = form.save()
-            messages.success(request, 'Votre compte a été créé avec succès ! Vous pouvez maintenant vous connecter.')
+            # Générer le token de vérification
+            token = user.generate_verification_token()
+            
+            # Envoyer l'email de vérification
+            verification_url = request.build_absolute_uri(
+                reverse('users:verify_email', kwargs={'token': token})
+            )
+            subject = 'InvestLink - Vérifiez votre adresse email'
+            message = render_to_string('emails/verify_email.html', {
+                'user': user,
+                'verification_url': verification_url,
+            })
+            send_mail(
+                subject,
+                message,
+                settings.DEFAULT_FROM_EMAIL,
+                [user.email],
+                fail_silently=False,
+                html_message=message
+            )
+            
+            messages.success(request, 'Votre compte a été créé avec succès ! Veuillez vérifier votre email pour activer votre compte.')
             return redirect('users:login')
     else:
         form = ProjectOwnerRegistrationForm()
@@ -50,7 +71,28 @@ def register_investisseur(request):
         form = InvestorRegistrationForm(request.POST)
         if form.is_valid():
             user = form.save()
-            messages.success(request, 'Votre compte a été créé avec succès ! Vous pouvez maintenant vous connecter.')
+            # Générer le token de vérification
+            token = user.generate_verification_token()
+            
+            # Envoyer l'email de vérification
+            verification_url = request.build_absolute_uri(
+                reverse('users:verify_email', kwargs={'token': token})
+            )
+            subject = 'InvestLink - Vérifiez votre adresse email'
+            message = render_to_string('emails/verify_email.html', {
+                'user': user,
+                'verification_url': verification_url,
+            })
+            send_mail(
+                subject,
+                message,
+                settings.DEFAULT_FROM_EMAIL,
+                [user.email],
+                fail_silently=False,
+                html_message=message
+            )
+            
+            messages.success(request, 'Votre compte a été créé avec succès ! Veuillez vérifier votre email pour activer votre compte.')
             return redirect('users:login')
     else:
         form = InvestorRegistrationForm()
@@ -183,6 +225,172 @@ def password_reset_confirm(request, uidb64, token):
 def password_reset_complete(request):
     """Page de confirmation finale de réinitialisation"""
     return render(request, 'users/password_reset_complete.html')
+
+
+def verify_email(request, token):
+    """Vérification de l'email via le token"""
+    try:
+        user = User.objects.get(verification_token=token)
+        
+        if user.is_verification_token_valid():
+            user.verify_email()
+            messages.success(request, 'Votre email a été vérifié avec succès ! Vous pouvez maintenant vous connecter.')
+            return redirect('users:login')
+        else:
+            messages.error(request, 'Ce lien de vérification a expiré. Veuillez demander un nouveau lien.')
+            return redirect('users:resend_verification')
+    except User.DoesNotExist:
+        messages.error(request, 'Lien de vérification invalide.')
+        return redirect('users:login')
+
+
+@login_required
+def resend_verification(request):
+    """Renvoyer l'email de vérification"""
+    user = request.user
+    
+    if user.email_verified:
+        messages.info(request, 'Votre email est déjà vérifié.')
+        return redirect('users:dashboard')
+    
+    if request.method == 'POST':
+        # Générer un nouveau token
+        token = user.generate_verification_token()
+        
+        # Envoyer l'email de vérification
+        verification_url = request.build_absolute_uri(
+            reverse('users:verify_email', kwargs={'token': token})
+        )
+        subject = 'InvestLink - Vérifiez votre adresse email'
+        message = render_to_string('emails/verify_email.html', {
+            'user': user,
+            'verification_url': verification_url,
+        })
+        send_mail(
+            subject,
+            message,
+            settings.DEFAULT_FROM_EMAIL,
+            [user.email],
+            fail_silently=False,
+            html_message=message
+        )
+        
+        messages.success(request, 'Un nouvel email de vérification a été envoyé.')
+        return redirect('users:dashboard')
+    
+    return render(request, 'users/resend_verification.html')
+
+
+@login_required
+def export_my_data(request):
+    """Exporter les données personnelles de l'utilisateur (RGPD)"""
+    import json
+    from django.http import JsonResponse
+    from projects.models import Project, Investment
+    from messaging.models import Message, Conversation
+    from notifications.models import Notification
+    
+    user = request.user
+    
+    # Collecter toutes les données de l'utilisateur
+    data = {
+        'user_info': {
+            'username': user.username,
+            'email': user.email,
+            'first_name': user.first_name,
+            'last_name': user.last_name,
+            'user_type': user.user_type,
+            'phone': user.phone,
+            'bio': user.bio,
+            'email_verified': user.email_verified,
+            'gdpr_consent': user.gdpr_consent,
+            'gdpr_consent_date': str(user.gdpr_consent_date) if user.gdpr_consent_date else None,
+            'created_at': str(user.created_at),
+            'updated_at': str(user.updated_at),
+        },
+        'projects': [],
+        'investments': [],
+        'messages': [],
+        'notifications': [],
+    }
+    
+    # Ajouter les projets
+    if user.can_access_porteur_features():
+        projects = Project.objects.filter(owner=user)
+        for project in projects:
+            data['projects'].append({
+                'title': project.title,
+                'status': project.status,
+                'sector': project.sector,
+                'funding_goal': str(project.funding_goal),
+                'current_funding': str(project.current_funding),
+                'created_at': str(project.created_at),
+            })
+    
+    # Ajouter les investissements
+    if user.can_access_investisseur_features():
+        investments = Investment.objects.filter(investor=user)
+        for investment in investments:
+            data['investments'].append({
+                'project': investment.project.title,
+                'amount': str(investment.amount),
+                'status': investment.status,
+                'investment_date': str(investment.investment_date),
+            })
+    
+    # Ajouter les messages
+    messages_qs = Message.objects.filter(sender=user)
+    for msg in messages_qs:
+        data['messages'].append({
+            'content': msg.content,
+            'created_at': str(msg.created_at),
+            'is_read': msg.is_read,
+        })
+    
+    # Ajouter les notifications
+    notifications = Notification.objects.filter(recipient=user)
+    for notif in notifications:
+        data['notifications'].append({
+            'notification_type': notif.notification_type,
+            'title': notif.title,
+            'message': notif.message,
+            'created_at': str(notif.created_at),
+            'is_read': notif.is_read,
+        })
+    
+    # Retourner les données en JSON
+    response = JsonResponse(data, json_dumps_params={'indent': 2, 'ensure_ascii': False})
+    response['Content-Disposition'] = f'attachment; filename="investlink_data_{user.username}.json"'
+    return response
+
+
+@login_required
+def delete_account(request):
+    """Supprimer le compte utilisateur (RGPD)"""
+    if request.method == 'POST':
+        password = request.POST.get('password')
+        
+        # Vérifier le mot de passe
+        if request.user.check_password(password):
+            user = request.user
+            
+            # Anonymiser les données avant suppression (soft delete)
+            user.email = f'deleted_{user.id}@investlink.deleted'
+            user.username = f'deleted_{user.id}'
+            user.first_name = 'Utilisateur'
+            user.last_name = 'Supprimé'
+            user.phone = ''
+            user.bio = ''
+            user.is_active = False
+            user.save()
+            
+            logout(request)
+            messages.success(request, 'Votre compte a été supprimé avec succès.')
+            return redirect('core:home')
+        else:
+            messages.error(request, 'Mot de passe incorrect.')
+    
+    return render(request, 'users/delete_account.html')
 
 
 @login_required
@@ -386,9 +594,10 @@ def change_password(request):
 @staff_member_required
 def admin_dashboard(request):
     """Dashboard administrateur avec statistiques globales"""
-    from projects.models import Project
+    from projects.models import Project, Investment
     from messaging.models import Message, Conversation
     from notifications.models import Notification
+    from django.db.models import Sum, Avg
     
     # Statistiques utilisateurs
     total_users = User.objects.count()
@@ -408,6 +617,22 @@ def admin_dashboard(request):
     ).count()
     approved_projects = Project.objects.filter(status='approved').count()
     rejected_projects = Project.objects.filter(status='rejected').count()
+    
+    # Statistiques investissements
+    total_investments = Investment.objects.count()
+    pending_investments = Investment.objects.filter(status='pending').count()
+    confirmed_investments = Investment.objects.filter(status='confirmed').count()
+    rejected_investments = Investment.objects.filter(status='rejected').count()
+    
+    # Montants financiers
+    investment_stats = Investment.objects.filter(status='confirmed').aggregate(
+        total_amount=Sum('amount'),
+        avg_amount=Avg('amount'),
+        total_current_value=Sum('current_value')
+    )
+    total_invested = investment_stats['total_amount'] or 0
+    avg_investment = investment_stats['avg_amount'] or 0
+    total_current_value = investment_stats['total_current_value'] or 0
     
     # Statistiques par secteur
     projects_by_sector = Project.objects.values('sector').annotate(
@@ -436,6 +661,11 @@ def admin_dashboard(request):
         'sender', 'conversation'
     )
     
+    # Investissements récents
+    recent_investments = Investment.objects.order_by('-created_at')[:10].select_related(
+        'investor', 'project'
+    )
+    
     context = {
         # Utilisateurs
         'total_users': total_users,
@@ -451,6 +681,15 @@ def admin_dashboard(request):
         'rejected_projects': rejected_projects,
         'projects_by_sector': projects_by_sector,
         
+        # Investissements
+        'total_investments': total_investments,
+        'pending_investments': pending_investments,
+        'confirmed_investments': confirmed_investments,
+        'rejected_investments': rejected_investments,
+        'total_invested': total_invested,
+        'avg_investment': avg_investment,
+        'total_current_value': total_current_value,
+        
         # Messagerie
         'total_messages': total_messages,
         'total_conversations': total_conversations,
@@ -464,6 +703,7 @@ def admin_dashboard(request):
         'recent_users': recent_users,
         'recent_projects': recent_projects,
         'recent_messages': recent_messages,
+        'recent_investments': recent_investments,
     }
     
     return render(request, 'users/admin_dashboard.html', context)
@@ -507,6 +747,40 @@ def admin_users(request):
     }
     
     return render(request, 'users/admin_users.html', context)
+
+
+@staff_member_required
+def admin_create_user(request):
+    """Créer un nouvel utilisateur (admin)"""
+    from .forms import AdminCreateUserForm
+    from core.models import ActivityLog
+    
+    if request.method == 'POST':
+        form = AdminCreateUserForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            
+            # Log de l'action
+            ActivityLog.log(
+                user=request.user,
+                action='create',
+                entity_type='user',
+                entity_id=user.id,
+                entity_name=user.username,
+                description=f"Création d'un nouvel utilisateur: {user.username} ({user.get_user_type_display()})",
+                request=request
+            )
+            
+            messages.success(request, f'L\'utilisateur {user.username} a été créé avec succès.')
+            return redirect('users:admin_users')
+    else:
+        form = AdminCreateUserForm()
+    
+    context = {
+        'form': form,
+    }
+    
+    return render(request, 'users/admin_create_user.html', context)
 
 
 @staff_member_required

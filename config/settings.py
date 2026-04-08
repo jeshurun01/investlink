@@ -211,6 +211,13 @@ else:
     MEDIA_URL = '/media/'
     MEDIA_ROOT = BASE_DIR / 'media'
 
+# File Upload Settings
+FILE_UPLOAD_MAX_MEMORY_SIZE = 10485760  # 10 MB in bytes
+DATA_UPLOAD_MAX_MEMORY_SIZE = 10485760  # 10 MB in bytes
+MAX_UPLOAD_SIZE = 10485760  # 10 MB (for custom validation)
+ALLOWED_DOCUMENT_EXTENSIONS = ['.pdf', '.doc', '.docx', '.xls', '.xlsx', '.ppt', '.pptx']
+ALLOWED_IMAGE_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.gif', '.webp']
+
 # Crispy Forms Configuration
 CRISPY_ALLOWED_TEMPLATE_PACKS = "tailwind"
 CRISPY_TEMPLATE_PACK = "tailwind"
