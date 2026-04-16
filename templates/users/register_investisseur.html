@@ -172,6 +172,17 @@
                         </div>
                     {% endif %}
                     
+                    <!-- Consentement RGPD -->
+                    <div>
+                        <label class="flex items-start gap-3 cursor-pointer">
+                            {{ form.gdpr_consent }}
+                            <span class="text-sm text-gray-700">{{ form.gdpr_consent.label }}</span>
+                        </label>
+                        {% if form.gdpr_consent.errors %}
+                            <p class="text-red-600 text-sm mt-1">{{ form.gdpr_consent.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
                     <!-- Submit -->
                     <div class="flex items-center justify-between">
                         <a href="{% url 'users:register_choice' %}" class="text-gray-600 hover:text-gray-800">
